@@ -1,0 +1,362 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+%}
+
+/** Generate matrix
+ */
+
+/* Globals
+ */
+uplo            [type = int]
+descA           [type = "parsec_tiled_matrix_dc_t*"]
+descAr          [type = "parsec_tiled_matrix_dc_t*"]
+problem_data    [type = "void *"]
+problem_kernel  [type = "STARSH_kernel *"]
+problem_index   [type = "STARSH_int *"]
+tol             [type = "double"]
+maxrank         [type = "int"]
+band_size       [type = "int"]
+rsvd_oversample [type = "int"]
+rsvd_lwork      [type = "size_t"]
+rsvd_liwork     [type = "size_t"]
+INFO            [type = "int*"]
+old_destruct    [type = "parsec_destruct_fn_t" hidden = on default = NULL]
+d_work          [type = "parsec_memory_pool_t *" hidden = on default = NULL
+                 size = "is this redundant?!? (sizeof(double)*descA->mb*descA->mb)"]
+rsvd_work       [type = "parsec_memory_pool_t *" hidden = on default = NULL
+                 size = "(sizeof(double)*rsvd_lwork)"]
+rsvd_iwork      [type = "parsec_memory_pool_t *" hidden = on default = NULL
+                 size = "(sizeof(int)*rsvd_liwork)"]
+send_full_tile  [type = "int" hidden = on default = 0 ]
+
+/**************************************************
+ *        generate diagonal tiles                 *
+ **************************************************/
+generate_band(m, n) [high_priority = on]
+
+// Execution space
+m = 0 .. descA->mt-1
+n = %{ return parsec_imax(m-band_size+1, 0); %} .. m 
+
+// Parallel partitioning
+:descA(m, n)
+
+// Parameters
+READ D <- descA(m, n)               [ type = FULL ]
+
+BODY
+{
+    int iinfo = 0;
+    int ldd = BLKLDD(descA, m);
+    int tempmm = m == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
+    int tempnn = tempmm;
+
+    /* New data_copy and allocate memory on band if not allocated */
+    if( NULL == D ) {
+        this_task->data._f_D.data_out = parsec_data_copy_new(data_of_descA(m, n), 0);
+        this_task->data._f_D.data_out->device_private = calloc(descA->mb * descA->mb, sizeof(double));
+    }
+
+    problem_kernel(tempmm, tempnn, problem_index + m*descA->mb,
+            problem_index + n*descA->mb, problem_data, problem_data,
+            this_task->data._f_D.data_out->device_private, ldd);
+
+    if(HICMA_get_print_index() == 1){
+        printf("%d+DIAG\t|AD(%d,%d) m:%d lda(11):%d\n", 0, m, n, tempmm, ldd);
+    }
+
+    if(HICMA_get_print_mat() == 1){
+        printf("%d\tdiag-output A\n", __LINE__);
+        _printmat(D, tempmm, tempmm, ldd);
+    }
+}
+END
+
+
+/**************************************************
+ **************************************************/
+READ_R(m, n)
+
+// Execution space
+m = band_size .. descA->mt-1
+n = 0 .. m-band_size
+
+:descAr(m, n)
+
+READ R <- descAr(m, n)                       [ type = AR ]
+       -> R generate_approximate_L(m, n)     [ type = AR ]
+
+BODY
+{
+}
+END
+
+
+/**************************************************
+ **************************************************/
+WRITE_R(m, n)
+
+// Execution space
+m = band_size .. descA->mt-1
+n = 0 .. m-band_size
+
+:descAr(m, n)
+
+RW R <- R generate_approximate_L(m, n)       [ type = AR ]
+     -> descAr(m, n)                         [ type = AR ]
+
+BODY
+{
+}
+END
+
+
+/**************************************************
+ * generate and approximate lower triangular part *
+ **************************************************/
+generate_approximate_L(m, n) [high_priority = on]
+
+// Execution space
+m = band_size .. descA->mt-1
+n = 0 .. m-band_size
+
+// Parallel partitioning
+:descA(m, n)
+
+// Parameters
+RW R <- R READ_R(m, n)             [ type = AR ]
+     -> R WRITE_R(m, n)            [ type = AR ]
+
+WRITE U <- NEW                     [ type = UV ]
+
+READ A <- NULL                     [ type = UV ]
+
+BODY
+{
+    // TODO @kadir: Do we have guarantee that U and V will be initially zero??
+    int iinfo = 0;
+    int size = 0;
+    int ldU = BLKLDD(descA, m);
+    int ldV = BLKLDD(descA, m);
+    int tempmm = m == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
+    int tempnn = n == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
+    void *tmp_D = parsec_private_memory_pop(d_work);
+    void *work = parsec_private_memory_pop(rsvd_work);
+    void *iwork = parsec_private_memory_pop(rsvd_iwork);
+    int rank = -1;
+    void *V = (void *)U + descA->mb * maxrank * sizeof(double);
+
+    problem_kernel(tempmm, tempnn, problem_index + m*descA->mb,
+            problem_index + n*descA->mb, problem_data, problem_data, tmp_D,
+            tempmm);
+
+    starsh_dense_dlrrsdd(tempmm, tempnn, tmp_D, tempmm, U, ldU, V, ldV, &rank,
+            maxrank, rsvd_oversample, tol, work, rsvd_lwork, iwork);
+
+    if(HICMA_get_print_index() == 1) {
+        printf("%d+LR\t|AU(%d,%d)%dx%d-%d AV(%d,%d)%dx%d-%d\n", 0, m, n, tempmm, rank, ldU, m, n, tempnn, rank, ldV);
+    }
+
+    if(rank == -1) {
+        printf("Tile(%d, %d) is dense, try increasing NB or maxrank \n", m, n);
+        *INFO = -1;
+    } else {
+        /* Update R and size */
+        *(int *)R = rank;
+
+        if(send_full_tile == 1){ /* Storage of UV tiles is MB by maxrank by 2 */
+            size = descA->mb * maxrank * 2;
+        } else {
+            size = descA->mb * parsec_imin(maxrank, rank) * 2;
+        }
+
+        /* New data_copy and allocate memory for descA(m, n); 
+         * For off band, if send_full_tile, allocate mb * maxrank * 2,
+         * else, size = mb * min(maxrank, rank) * 2
+         */
+        this_task->data._f_A.data_out = parsec_data_copy_new(data_of_descA(m, n), 0);
+        this_task->data._f_A.data_out->device_private = calloc(size, sizeof(double));
+
+        /* New nb_elts for data_of(m, n) */
+        (data_of_descA(m, n))->nb_elts = size * sizeof(double);
+
+        /* Copy U to A */
+        memcpy((void *)this_task->data._f_A.data_out->device_private,
+               (void *)U, descA->mb * rank * sizeof(double));
+
+        /* Copy V to A */
+        memcpy((void *)this_task->data._f_A.data_out->device_private + descA->mb * rank * sizeof(double),
+               (void *)V, descA->mb * rank * sizeof(double));
+
+        /*printf("%d,%d: %d\n", m, n, rank);*/
+        if(HICMA_get_print_mat() == 1) {
+            printf("%d\tU (tempmm:%d ldU:%d)\n", __LINE__, tempmm, ldU);
+            _printmat(U, ldU, rank, ldU);
+            printf("%d\tV\n", __LINE__);
+            _printmat(V, tempnn, rank, ldV);
+        }
+    }
+
+    parsec_private_memory_push(d_work, tmp_D);
+    parsec_private_memory_push(rsvd_work, work);
+    parsec_private_memory_push(rsvd_iwork, iwork);
+}
+END
+
+extern "C" %{
+
+/**
+ * Generate matrix
+ *
+ * @param [in] uplo:         support PlasmaLower now
+ * @param [inout] dcA:       the data, already distributed and allocated
+ * @param [in] dcAr:         the rank data, already distributed and allocated
+ * @param [in] data:         data in generate tiles
+ * @param [in] kernel:       kernels in generate matrix
+ * @param [in] index:        index in generate matrix
+ * @param [in] tol:          fixed accuracy threshold
+ * @param [in] maxrank:      max rank
+ * @param [in] band_size:    band size
+ * @param [in] send_full_tile: when send full tile
+ * @param [inout] info:        check result
+ * @return the parsec object to schedule
+ */
+parsec_taskpool_t*
+STARSH_gen_New(int uplo,
+                  parsec_tiled_matrix_dc_t *A,
+                  parsec_tiled_matrix_dc_t *Ar,
+                  void *data,
+                  STARSH_kernel *kernel,
+                  STARSH_int *index,
+                  double tol,
+                  int maxrank,
+                  int band_size,
+                  int send_full_tile,
+                  int *info)
+{
+    parsec_taskpool_t *tp = NULL;
+    parsec_arena_t* default_arena;
+
+    /* Check input arguments */
+    if ((uplo != PlasmaUpper) && (uplo != PlasmaLower)) {
+        dplasma_error("STARSH_appr_New", "illegal value of uplo");
+        return NULL /*-1*/;
+    }
+
+    /* Calculate workspace */
+    int rsvd_oversample = 10;
+    int mn = rsvd_oversample + maxrank;
+    if(mn > A->mb)
+        mn = A->mb;
+    size_t rsvd_lwork = (4*mn+7) * mn;
+    if(rsvd_lwork < A->mb)
+        rsvd_lwork = A->mb;
+    rsvd_lwork += mn*(3*A->mb+mn+1);
+    size_t rsvd_liwork = 8*mn;
+
+    *info = 0;
+    parsec_STARSH_gen_taskpool_t *starsh_gen =
+        parsec_STARSH_gen_new(uplo, A, Ar, data, kernel, index,
+			tol, maxrank, band_size, rsvd_oversample,
+			rsvd_lwork, rsvd_liwork, info);
+
+    starsh_gen->_g_send_full_tile = send_full_tile;
+    tp = (parsec_taskpool_t*)starsh_gen;
+
+    /* Memery pool */
+    starsh_gen->_g_d_work = malloc(sizeof(parsec_memory_pool_t));
+    parsec_private_memory_init(starsh_gen->_g_d_work,
+            A->mb*A->mb*sizeof(double));
+
+    starsh_gen->_g_rsvd_work = malloc(sizeof(parsec_memory_pool_t));
+    parsec_private_memory_init(starsh_gen->_g_rsvd_work,
+            rsvd_lwork*sizeof(double));
+
+    starsh_gen->_g_rsvd_iwork = malloc(sizeof(parsec_memory_pool_t));
+    parsec_private_memory_init(starsh_gen->_g_rsvd_iwork,
+            rsvd_liwork*sizeof(int));
+
+    /* Arena */
+    parsec_matrix_add2arena(starsh_gen->arenas[PARSEC_STARSH_gen_FULL_ARENA],
+                            parsec_datatype_double_t, matrix_UpperLower,
+                            1, A->mb, A->mb, A->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    parsec_matrix_add2arena(starsh_gen->arenas[PARSEC_STARSH_gen_UV_ARENA],
+                            parsec_datatype_double_t, matrix_UpperLower,
+                            1, A->mb, maxrank*2, A->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    parsec_matrix_add2arena(starsh_gen->arenas[PARSEC_STARSH_gen_AR_ARENA],
+                            parsec_datatype_int_t, matrix_UpperLower,
+                            1, 1, 1, 1,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    return tp;
+}
+
+/* Destructor */
+void STARSH_gen_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_STARSH_gen_taskpool_t *STARSH_gen_taskpool = (parsec_STARSH_gen_taskpool_t *)taskpool;
+
+    parsec_matrix_del2arena(STARSH_gen_taskpool->arenas[PARSEC_STARSH_gen_FULL_ARENA]);
+    parsec_matrix_del2arena(STARSH_gen_taskpool->arenas[PARSEC_STARSH_gen_UV_ARENA]);
+    parsec_matrix_del2arena(STARSH_gen_taskpool->arenas[PARSEC_STARSH_gen_AR_ARENA]);
+
+    parsec_taskpool_free(taskpool);
+}
+
+/**
+ * Generate matrix 
+ *              
+ * @param [in] parsec:       parsec context
+ * @param [in] uplo:         support PlasmaLower now
+ * @param [inout] dcA:       the data, already distributed and allocated
+ * @param [in] dcAr:         the rank data, already distributed and allocated
+ * @param [in] data:         data in generate tiles
+ * @param [in] kernel:       kernels in generate matrix
+ * @param [in] index:        index in generate matrix
+ * @param [in] tol:          fixed accuracy threshold 
+ * @param [in] maxrank:      max rank 
+ * @param [in] band_size:    band size
+ * @param [in] send_full_tile: when send full tile 
+ * @param [inout] info:        check result 
+ */
+int STARSH_gen( parsec_context_t *parsec,
+                int uplo,
+                parsec_tiled_matrix_dc_t *dcA,
+                parsec_tiled_matrix_dc_t *dcAr,
+                void *data,
+                STARSH_kernel *kernel,
+                STARSH_int *index,
+                double tol,
+                int maxrank,
+                int band_size,
+                int send_full_tile,
+                int *info)
+{
+    parsec_taskpool_t *parsec_STARSH_gen = NULL;
+
+    parsec_STARSH_gen = STARSH_gen_New(
+             uplo, dcA, dcAr, data,
+             kernel, index, tol, maxrank,
+	     band_size, send_full_tile, info);
+
+    parsec_context_add_taskpool(parsec, parsec_STARSH_gen);
+    parsec_context_start(parsec);
+    parsec_context_wait(parsec);
+
+    STARSH_gen_Destruct(parsec_STARSH_gen);
+
+    return 0;
+}
+
+%}

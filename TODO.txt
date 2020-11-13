@@ -1,0 +1,6 @@
+TODO
+2018-10-28: Number of rows of dcAu must be MTMB instead of N. The padding in cleanup tiles must be set to zero in STARSH_gen.jdf
+
+DONE
+2018-10-29: This problem is fixed. Two solutions: 1) use MKL 2) use single threaded OpenBLAS
+    2018-10-28: testing_gen.c in muxas/add-starsh branch freezes for 2 MPI processes

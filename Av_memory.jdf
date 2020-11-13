@@ -1,0 +1,121 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+%}
+
+/**
+ * Set offset in descA to descAv, used in 3flow version
+ */
+descA      [ type = "parsec_tiled_matrix_dc_t*" ]
+descAv     [ type = "parsec_tiled_matrix_dc_t*" aligned = descA ]
+descAr     [ type = "parsec_tiled_matrix_dc_t*" aligned = descA ]
+maxrank    [ type = "int" ]
+
+/**************************************************
+ *                    Main task                   *
+ **************************************************/
+my_task(m, n)
+
+// Execution space
+m = 1 .. descAv->mt-1
+n = 0 .. m-1
+
+: descAv(m, n)
+
+READ A  <- descA(m, n)       [ type = UV ]
+
+READ Ar <- descAr(m, n)      [ type = AR ]
+
+RW   Av <- descAv(m, n)
+        -> descAv(m, n)
+
+BODY
+{
+    /* Set offset in descA to descAv */
+    int rank = *((int *)Ar);
+    this_task->data._f_Av.data_out = parsec_data_copy_new(data_of_descAv(m, n), 0);
+    this_task->data._f_Av.data_out->device_private = A + descA->mb * rank * sizeof(double); 
+}
+END
+
+extern "C" %{
+
+/**
+ * @param [in] dcA:          the data, already distributed and allocated
+ * @param [inout] dcAv:      the data, already distributed and allocated
+ * @param [in] dcAr:         the rank data, already distributed and allocated
+ * @param [in] maxrank:      max rank 
+ * @return the parsec object to schedule.
+ */
+parsec_taskpool_t*
+parsec_Av_memory_New(parsec_tiled_matrix_dc_t *dcA,
+                     parsec_tiled_matrix_dc_t *dcAv,
+                     parsec_tiled_matrix_dc_t *dcAr,
+		     int maxrank) 
+{
+    parsec_Av_memory_taskpool_t* taskpool = NULL;
+    taskpool = parsec_Av_memory_new(dcA, dcAv, dcAr, maxrank);
+
+    parsec_matrix_add2arena(taskpool->arenas[PARSEC_Av_memory_DEFAULT_ARENA],
+                            parsec_datatype_double_t, matrix_UpperLower,
+                            1, dcA->mb, maxrank, dcA->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    parsec_matrix_add2arena(taskpool->arenas[PARSEC_Av_memory_UV_ARENA],
+                            parsec_datatype_double_t, matrix_UpperLower,
+                            1, dcA->mb, maxrank*2, dcA->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    parsec_matrix_add2arena(taskpool->arenas[PARSEC_Av_memory_AR_ARENA],
+                            parsec_datatype_int_t, matrix_UpperLower,
+                            1, 1, 1, 1,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    return (parsec_taskpool_t*)taskpool; 
+}
+
+/**
+ * @param [inout] the parsec object to destroy
+*/
+void parsec_Av_memory_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_Av_memory_taskpool_t *tp = (parsec_Av_memory_taskpool_t *)taskpool;
+    parsec_matrix_del2arena( tp->arenas[PARSEC_Av_memory_DEFAULT_ARENA] );
+    parsec_matrix_del2arena( tp->arenas[PARSEC_Av_memory_UV_ARENA] );
+    parsec_matrix_del2arena( tp->arenas[PARSEC_Av_memory_AR_ARENA] );
+    parsec_taskpool_free(taskpool);
+}
+
+/**
+ * @param [in] dcA:          the data, already distributed and allocated
+ * @param [inout] dcAv:      the data, already distributed and allocated
+ * @param [in] dcAr:         the rank data, already distributed and allocated
+ * @param [in] maxrank:      max rank
+ * @return the parsec object to schedule.
+ */
+int parsec_Av_memory(parsec_context_t *parsec,
+                     parsec_tiled_matrix_dc_t *dcA,
+                     parsec_tiled_matrix_dc_t *dcAv,
+                     parsec_tiled_matrix_dc_t *dcAr,
+		     int maxrank)
+{
+    parsec_taskpool_t *parsec_Av_memory = NULL;
+    parsec_Av_memory = parsec_Av_memory_New(dcA, dcAv, dcAr, maxrank); 
+
+    if( parsec_Av_memory != NULL ){
+        parsec_context_add_taskpool(parsec, parsec_Av_memory);
+        parsec_context_start(parsec);
+        parsec_context_wait(parsec);
+        parsec_Av_memory_Destruct(parsec_Av_memory);
+    }
+
+    return 0;
+}
+
+%}

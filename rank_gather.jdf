@@ -1,0 +1,195 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+/* buffer to store gathered rank info */
+static int *buff_g0 = NULL;
+static int *buff_g1 = NULL;
+static int *buff_g2 = NULL;
+static int *buff_g3 = NULL;
+static int *buff_g4 = NULL;
+
+%}
+
+descRank   [ type = "parsec_tiled_matrix_dc_t*" ]
+band_size  [ type = "int" ]
+num_col    [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descRank)->grid.cols * ((two_dim_block_cyclic_t *)descRank)->grid.kcols" ]
+NT         [ type = "int" hidden=on default="(descRank->lnt-1)/num_col" ]
+
+/**************************************************
+ *                      send                      *
+ **************************************************/
+send(m, n, batch)
+
+batch = 0 .. NT
+m = band_size+1 .. descRank->lmt-1
+n = %{ return batch*num_col+1; %} .. %{ return parsec_imin((batch+1)*num_col, m-band_size); %}
+
+: descRank(m, n)
+
+READ Y <- descRank(m, n)
+       -> Y get(m, n, batch)
+
+CTL ctl <- (batch > 0)? ctl get(m, n-num_col, batch-1)
+
+BODY
+{
+}
+END
+
+/**************************************************
+ *                      get                       *
+ **************************************************/
+get(m, n, batch)
+
+batch = 0 .. NT
+m = band_size+1 .. descRank->lmt-1
+n = %{ return batch*num_col+1; %} .. %{ return parsec_imin((batch+1)*num_col, m-band_size); %}
+
+: descRank(0, 0)
+
+READ Y <- Y send(m, n, batch)
+
+CTL ctl -> (batch < NT)? ctl send(m, n+num_col, batch+1)
+
+BODY
+{
+    buff_g0[n*descRank->lmt+m] = ((int *)Y)[0];
+    buff_g1[n*descRank->lmt+m] = ((int *)Y)[1];
+    buff_g2[n*descRank->lmt+m] = ((int *)Y)[2];
+    buff_g3[n*descRank->lmt+m] = ((int *)Y)[3];
+    buff_g4[n*descRank->lmt+m] = ((int *)Y)[2] - ((int *)Y)[1];
+}
+END
+
+extern "C" %{
+
+/**
+ * Gather and print rank distribution
+ *
+ * @param [inout] dcRank:    the rank data, already distributed and allocated
+ * @param [in] band_size:    band size
+ * @return the parsec object to schedule.
+ */
+parsec_taskpool_t*
+parsec_rank_gather_New(parsec_tiled_matrix_dc_t *Rank, int band_size)
+{
+    parsec_rank_gather_taskpool_t* taskpool = NULL;
+    taskpool = parsec_rank_gather_new(Rank, band_size);
+    parsec_matrix_add2arena(taskpool->arenas[PARSEC_rank_gather_DEFAULT_ARENA],
+                            parsec_datatype_int_t, matrix_UpperLower,
+                            1, Rank->mb, Rank->nb, Rank->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+    return (parsec_taskpool_t*)taskpool; 
+}
+
+/**
+ * @param [inout] the parsec object to destroy
+ */
+void parsec_rank_gather_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_rank_gather_taskpool_t *rank_gather_taskpool = (parsec_rank_gather_taskpool_t *)taskpool;
+    parsec_matrix_del2arena(rank_gather_taskpool->arenas[PARSEC_rank_gather_DEFAULT_ARENA]);
+    parsec_taskpool_free(taskpool);
+}
+
+/**
+ * Gather and print rank distribution
+ *
+ * @param [in] parsec:       parsec context 
+ * @param [inout] dcRank:    the rank data, already distributed and allocated
+ * @param [in] band_size:    band size
+ */
+int parsec_rank_gather(parsec_context_t *parsec,
+                       parsec_tiled_matrix_dc_t *dcRank,
+		       int band_size)
+{
+    parsec_taskpool_t *parsec_rank_gather = NULL;
+
+    /* Allocate memory */
+    if( dcRank->super.rank_of(&dcRank->super, 0, 0) == dcRank->super.myrank ) {
+        buff_g0 = (int *)calloc(dcRank->lmt * dcRank->lnt, sizeof(int));
+        buff_g1 = (int *)calloc(dcRank->lmt * dcRank->lnt, sizeof(int));
+        buff_g2 = (int *)calloc(dcRank->lmt * dcRank->lnt, sizeof(int));
+        buff_g3 = (int *)calloc(dcRank->lmt * dcRank->lnt, sizeof(int));
+        buff_g4 = (int *)calloc(dcRank->lmt * dcRank->lnt, sizeof(int));
+    }
+
+    parsec_rank_gather = parsec_rank_gather_New( dcRank, band_size );
+
+    parsec_context_add_taskpool(parsec, parsec_rank_gather);
+    parsec_context_start(parsec);
+    parsec_context_wait(parsec);
+    parsec_rank_gather_Destruct(parsec_rank_gather);
+
+    /* Print rank distribution */
+    if( dcRank->super.rank_of(&dcRank->super, 0, 0) == dcRank->super.myrank && 0 == parsec->virtual_processes[0]->execution_streams[0]->th_id ) {
+        if( 0 == RANK_MAP_TYPE || 5 == RANK_MAP_TYPE ) {
+            printf("\nInitial Rank\n");
+            for( int i = 0; i < dcRank->lmt; i++) {
+                for( int j = 0; j < dcRank->lnt; j++)
+                    printf("%d ", buff_g0[j*dcRank->lmt+i]);
+                printf("\n");
+            }
+            printf("\n\n");
+        } 
+
+        if( 1 == RANK_MAP_TYPE || 5 == RANK_MAP_TYPE ) {
+            printf("\nMinimum Rank\n");
+            for( int i = 0; i < dcRank->lmt; i++) {
+                for( int j = 0; j < dcRank->lnt; j++)
+                    printf("%d ", buff_g1[j*dcRank->lmt+i]);
+                printf("\n");
+            }
+            printf("\n\n");
+        }
+
+        if( 2 == RANK_MAP_TYPE || 5 == RANK_MAP_TYPE ) {
+            printf("\nMaximum Rank\n");
+            for( int i = 0; i < dcRank->lmt; i++) {
+                for( int j = 0; j < dcRank->lnt; j++)
+                    printf("%d ", buff_g2[j*dcRank->lmt+i]);
+                printf("\n");
+            }
+            printf("\n\n");
+        }
+
+        if( 3 == RANK_MAP_TYPE || 5 == RANK_MAP_TYPE ) {
+            printf("\nFinal Rank\n");
+            for( int i = 0; i < dcRank->lmt; i++) {
+                for( int j = 0; j < dcRank->lnt; j++)
+                    printf("%d ", buff_g3[j*dcRank->lmt+i]);
+                printf("\n");
+            }
+            printf("\n\n");
+        }
+
+        if( 4 == RANK_MAP_TYPE || 5 == RANK_MAP_TYPE ) {
+            printf("\nDifference Rank, max - min\n");
+            for( int i = 0; i < dcRank->lmt; i++) {
+                for( int j = 0; j < dcRank->lnt; j++)
+                    printf("%d ", buff_g4[j*dcRank->lmt+i]);
+                printf("\n");
+            }
+            printf("\n\n");
+        }
+    }
+
+    /* Free memory */
+    if( dcRank->super.rank_of(&dcRank->super, 0, 0) == dcRank->super.myrank ) {
+        free(buff_g0);
+        free(buff_g1);
+        free(buff_g2);
+        free(buff_g3);
+        free(buff_g4);
+    }
+
+    return 0;
+}
+
+%}

@@ -1,0 +1,155 @@
+diff --git a/parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic_band.c b/parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic_band.c
+index 5b63c51fa..b8ee104fb 100644
+--- a/parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic_band.c
++++ b/parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic_band.c
+@@ -34,7 +34,7 @@ static inline void sym_twoDBC_band_offset(sym_two_dim_block_cyclic_t *dc,
+ /* New rank_of for sym two dim block cyclic band */
+ uint32_t sym_twoDBC_band_rank_of(parsec_data_collection_t * desc, ...)
+ {
+-    unsigned int m, n;
++    unsigned int m, n, m_band, n_band;
+     va_list ap;
+     sym_two_dim_block_cyclic_band_t * dc = (sym_two_dim_block_cyclic_band_t *)desc;
+ 
+@@ -51,17 +51,18 @@ uint32_t sym_twoDBC_band_rank_of(parsec_data_collection_t * desc, ...)
+     /* Check tile location */
+     if( (unsigned int)abs(m-(int)n) < dc->band_size ){
+         /* New index */
+-        m = abs(m - (int)n);
++        m_band = abs(m - (int)n); 
++        n_band = m;
+ 
+         if( (dc->band.grid.krows != 1) || (dc->band.grid.kcols != 1) ){
+-            m = kview_compute_m(&dc->band, m);
+-            n = kview_compute_n(&dc->band, n);
++            m_band = kview_compute_m(&dc->band, m_band);
++            n_band = kview_compute_n(&dc->band, n_band);
+         }
+ 
+         /* Offset of (i, j) and assert */
+-        twoDBC_band_offset(&dc->band, &m, &n);
++        twoDBC_band_offset(&dc->band, &m_band, &n_band);
+ 
+-        return twoDBC_band_get_rank(&dc->band, m, n);
++        return twoDBC_band_get_rank(&dc->band, m_band, n_band);
+     }
+     else{
+         /* Offset of (i, j) and assert */
+@@ -74,7 +75,7 @@ uint32_t sym_twoDBC_band_rank_of(parsec_data_collection_t * desc, ...)
+ /* New data_of for sym two dim block cyclic band */
+ parsec_data_t* sym_twoDBC_band_data_of(parsec_data_collection_t *desc, ...)
+ {
+-    unsigned int m, n, position, key;
++    unsigned int m, n, m_band, n_band, position, key;
+     va_list ap;
+     sym_two_dim_block_cyclic_band_t * dc;
+     dc = (sym_two_dim_block_cyclic_band_t *)desc;
+@@ -99,18 +100,19 @@ parsec_data_t* sym_twoDBC_band_data_of(parsec_data_collection_t *desc, ...)
+     /* Check tile location */
+     if( (unsigned int)abs(m-(int)n) < dc->band_size ){
+         /* The new m in band */
+-        m = abs(m - (int)n);
++        m_band = abs(m - (int)n);
++        n_band = m;
+ 
+         if( (dc->band.grid.krows != 1) || (dc->band.grid.kcols != 1) ){
+-            m = kview_compute_m(&dc->band, m);
+-            n = kview_compute_n(&dc->band, n);
++            m_band = kview_compute_m(&dc->band, m_band);
++            n_band = kview_compute_n(&dc->band, n_band);
+         }
+ 
+         /* Offset of (i, j) and assert */
+-        twoDBC_band_offset(&dc->band, &m, &n);
++        twoDBC_band_offset(&dc->band, &m_band, &n_band);
+ 
+         /* Get position in data_map */
+-        position = twoDBC_coordinates_to_position(&dc->band, m, n);
++        position = twoDBC_coordinates_to_position(&dc->band, m_band, n_band);
+ 
+         if( NULL == dc->band.mat )
+             return parsec_matrix_create_data( &dc->band.super, NULL, position, key );
+diff --git a/parsec/data_dist/matrix/two_dim_rectangle_cyclic_band.c b/parsec/data_dist/matrix/two_dim_rectangle_cyclic_band.c
+index 562dc3ab9..2b65dd5c8 100644
+--- a/parsec/data_dist/matrix/two_dim_rectangle_cyclic_band.c
++++ b/parsec/data_dist/matrix/two_dim_rectangle_cyclic_band.c
+@@ -33,7 +33,7 @@ inline void twoDBC_band_offset(two_dim_block_cyclic_t *dc,
+ /* New rank_of for two dim block cyclic band */
+ uint32_t twoDBC_band_rank_of(parsec_data_collection_t * desc, ...)
+ {
+-    unsigned int m, n;
++    unsigned int m, n, m_band, n_band;
+     va_list ap;
+     two_dim_block_cyclic_band_t * dc = (two_dim_block_cyclic_band_t *)desc;
+ 
+@@ -46,17 +46,18 @@ uint32_t twoDBC_band_rank_of(parsec_data_collection_t * desc, ...)
+     /* Check tile location */
+     if( (unsigned int)abs(m-n) < dc->band_size ){
+         /* The new m in band */
+-        m = m - n + dc->band_size - 1;
++        m_band = m - n + dc->band_size - 1;
++        n_band = m;
+ 
+         if( (dc->band.grid.krows != 1) || (dc->band.grid.kcols != 1) ){
+-            m = kview_compute_m(&dc->band, m);
+-            n = kview_compute_n(&dc->band, n);
++            m_band = kview_compute_m(&dc->band, m_band);
++            n_band = kview_compute_n(&dc->band, n_band);
+         }
+ 
+         /* Offset of (i, j) and assert */
+-        twoDBC_band_offset(&dc->band, &m, &n);
++        twoDBC_band_offset(&dc->band, &m_band, &n_band);
+ 
+-        return twoDBC_band_get_rank(&dc->band, m, n);
++        return twoDBC_band_get_rank(&dc->band, m_band, n_band);
+     }
+     else{
+         if( (dc->super.grid.krows != 1) || (dc->super.grid.kcols != 1) ){
+@@ -74,7 +75,7 @@ uint32_t twoDBC_band_rank_of(parsec_data_collection_t * desc, ...)
+ /* New data_of for two dim block cyclic band */
+ parsec_data_t* twoDBC_band_data_of(parsec_data_collection_t *desc, ...)
+ {
+-    unsigned int m, n, position, key;
++    unsigned int m, n, m_band, n_band, position, key;
+     va_list ap;
+     two_dim_block_cyclic_band_t * dc;
+     dc = (two_dim_block_cyclic_band_t *)desc;
+@@ -95,18 +96,19 @@ parsec_data_t* twoDBC_band_data_of(parsec_data_collection_t *desc, ...)
+     /* Check tile location */
+     if( (unsigned int)abs(m-n) < dc->band_size ){
+         /* The new m in band */
+-        m = m - n + dc->band_size - 1;
++        m_band = m - n + dc->band_size - 1;
++        n_band = m; 
+ 
+         if( (dc->band.grid.krows != 1) || (dc->band.grid.kcols != 1) ){
+-            m = kview_compute_m(&dc->band, m);
+-            n = kview_compute_n(&dc->band, n);
++            m_band = kview_compute_m(&dc->band, m_band);
++            n_band = kview_compute_n(&dc->band, n_band);
+         }
+ 
+         /* Offset of (i, j) and assert */
+-        twoDBC_band_offset(&dc->band, &m, &n);
++        twoDBC_band_offset(&dc->band, &m_band, &n_band);
+ 
+         /* Get position in data_map */
+-        position = twoDBC_coordinates_to_position(&dc->band, m, n);
++        position = twoDBC_coordinates_to_position(&dc->band, m_band, n_band);
+ 
+         if( NULL == dc->band.mat )
+             return parsec_matrix_create_data( &dc->band.super, NULL, position, key );
+diff --git a/parsec/include/parsec/parsec_config_bottom.h b/parsec/include/parsec/parsec_config_bottom.h
+index 748c3106b..2fa448e86 100644
+--- a/parsec/include/parsec/parsec_config_bottom.h
++++ b/parsec/include/parsec/parsec_config_bottom.h
+@@ -70,7 +70,7 @@
+ # undef DISTRIBUTED
+ #endif
+ 
+-/*#define PARSEC_KCYCLIC_WITH_VIEW */
++#define PARSEC_KCYCLIC_WITH_VIEW 1 
+ 
+ #if defined(PARSEC_PROF_DRY_RUN)
+ # define PARSEC_PROF_DRY_BODY

@@ -1,0 +1,9 @@
+markersize=8
+linewidth=4
+markeredgeweight=2
+appmarkers={1:'D',2:'^',5:'s',6:'*', 13:'+'}
+appnames={1:'Syn',2:'st-2d-sqexp',5:'Matern',6:'ed-2d-sin', 13:'st-3d-sqexp', 14:'st-3d-exp' }
+katrial="asdas"
+#problabels={'edsin':'Electrodynamics','sqexp':'Statistics'}
+#problabelsnumeric={6:'Electrodynamics',2:'Statistics'}
+problabelsnumeric={6:'Synthetic',2:'Statistics'}

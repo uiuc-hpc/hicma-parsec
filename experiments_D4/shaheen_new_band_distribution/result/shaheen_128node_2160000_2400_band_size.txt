@@ -1,0 +1,3140 @@
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:1 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    647.55657 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.14685 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 1 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00973 : Gather rank	band_size= 1  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:404550
+avg:34.7652 min:15 max:814
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01005 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00004 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 1 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 4.231255 GB, memory_per_node_max= 135.937706 GB
+
+[****] TIME(s)      4.89824 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 1 reorder_gemm= 0
+
+[****] TIME(s)      0.02025 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 1 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00732 : Gather rank	band_size= 1  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:404550
+avg:34.7652 min:15 max:814
+[****] TIME(s)      0.00005 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)   3379.33448 : HiCMA_potrf	send_full_tile= 0 band_size= 1 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 :  994052.039724 gflops
+966: HiCMA dpotrf ended in 3379.33 seconds
+[****] TIME(s)      0.02431 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 1 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 647.557	time_hicma: 3379.33	
+Ranks will be gathered
+[****] TIME(s)      0.01957 : Gather rank	band_size= 1  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:404550
+avg:42.1235 min:2 max:1034
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.12226 : Operation_counts : band_size= 1 total= 3.336263e+16 op_band= 2.250758e+14 op_offband= 3.313756e+16 ratio_band= 0.006792 op_critical_path= 2.163951e+13 op_off_critical_path= 3.334099e+16 ratio_critical_path= 0.000649
+[****] TIME(s)      0.00023 : Total_critical_path_time 1441031466550.155273, potrf 1441031466056.255371, trsm 114.857444, syrk 379.042562
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 1 1 0 0 1200 1200 1200   34.7652 15 814   34.7652 15 814   42.1235 2 1034   4.231255 135.937706   1441031466550.155273 1441031466056.255371 114.857444 379.042562    647.556568 3379.334480 0.000000 0.000000 4.898243    3.336263e+16 2.250758e+14 3.313756e+16 2.163951e+13 3.334099e+16 0.006792 0.000649 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 1 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:2 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    643.39849 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.20914 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 2 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01042 : Gather rank	band_size= 2  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:403651
+avg:33.5225 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01123 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 2 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 4.384127 GB, memory_per_node_max= 135.938041 GB
+
+[****] TIME(s)      4.78227 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 2 reorder_gemm= 0
+
+[****] TIME(s)      0.02051 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 2 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00273 : Gather rank	band_size= 2  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:403651
+avg:33.5225 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)   1263.51619 : HiCMA_potrf	send_full_tile= 0 band_size= 2 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 2658639.722426 gflops
+966: HiCMA dpotrf ended in 1263.52 seconds
+[****] TIME(s)      0.02024 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 2 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 643.398	time_hicma: 1263.52	
+Ranks will be gathered
+[****] TIME(s)      0.02214 : Gather rank	band_size= 2  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:403651
+avg:40.4593 min:2 max:751
+[****] TIME(s)      0.00003 : Print ranks of tiles
+[****] TIME(s)      0.01065 : Operation_counts : band_size= 2 total= 2.589935e+16 op_band= 4.342034e+14 op_offband= 2.546514e+16 ratio_band= 0.017051 op_critical_path= 4.142794e+13 op_off_critical_path= 2.585792e+16 ratio_critical_path= 0.001602
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319900161841.940918, potrf 1441034152901.506592, trsm 1439433004448.075195, syrk 1439433004492.358887
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 2 1 0 0 1200 1200 1200   33.5225 15 596   33.5225 15 596   40.4593 2 751   4.384127 135.938041   4319900161841.940918 1441034152901.506592 1439433004448.075195 1439433004492.358887    643.398486 1263.516190 0.000000 0.000000 4.782270    2.589935e+16 4.342034e+14 2.546514e+16 4.142794e+13 2.585792e+16 0.017051 0.001602 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 2 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:3 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    639.96695 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.29584 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 3 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01519 : Gather rank	band_size= 3  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:402753
+avg:33.0207 min:15 max:596
+[****] TIME(s)      0.00164 : Print ranks of tiles
+[****] TIME(s)      0.02951 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 3 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 4.621000 GB, memory_per_node_max= 135.938711 GB
+
+[****] TIME(s)      4.93188 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 3 reorder_gemm= 0
+
+[****] TIME(s)      0.02040 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 3 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.01158 : Gather rank	band_size= 3  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:402753
+avg:33.0207 min:15 max:596
+[****] TIME(s)      0.00005 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)   1112.49358 : HiCMA_potrf	send_full_tile= 0 band_size= 3 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3019553.901255 gflops
+966: HiCMA dpotrf ended in 1112.49 seconds
+[****] TIME(s)      0.02025 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 3 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 639.967	time_hicma: 1112.49	
+Ranks will be gathered
+[****] TIME(s)      0.03182 : Gather rank	band_size= 3  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:402753
+avg:39.6156 min:2 max:752
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01039 : Operation_counts : band_size= 3 total= 2.453095e+16 op_band= 6.578088e+14 op_offband= 2.387314e+16 ratio_band= 0.027554 op_critical_path= 4.142794e+13 op_off_critical_path= 2.448952e+16 ratio_critical_path= 0.001692
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319905367397.604004, potrf 1441035889457.491455, trsm 1439434738896.895020, syrk 1439434739043.217285
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 3 1 0 0 1200 1200 1200   33.0207 15 596   33.0207 15 596   39.6156 2 752   4.621000 135.938711   4319905367397.604004 1441035889457.491455 1439434738896.895020 1439434739043.217285    639.966946 1112.493581 0.000000 0.000000 4.931875    2.453095e+16 6.578088e+14 2.387314e+16 4.142794e+13 2.448952e+16 0.027554 0.001692 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 3 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:4 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    639.47593 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.05524 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 4 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00987 : Gather rank	band_size= 4  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:401856
+avg:32.5382 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01112 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00004 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 4 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 4.860296 GB, memory_per_node_max= 135.939717 GB
+
+[****] TIME(s)      4.90980 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 4 reorder_gemm= 0
+
+[****] TIME(s)      0.02012 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 4 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00608 : Gather rank	band_size= 4  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:401856
+avg:32.5382 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)   1031.81094 : HiCMA_potrf	send_full_tile= 0 band_size= 4 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3255668.448932 gflops
+966: HiCMA dpotrf ended in 1031.81 seconds
+[****] TIME(s)      0.02100 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 4 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 639.476	time_hicma: 1031.81	
+Ranks will be gathered
+[****] TIME(s)      0.04163 : Gather rank	band_size= 4  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:401856
+avg:38.8469 min:2 max:752
+[****] TIME(s)      0.00087 : Print ranks of tiles
+[****] TIME(s)      0.01848 : Operation_counts : band_size= 4 total= 2.329406e+16 op_band= 8.945327e+14 op_offband= 2.239953e+16 ratio_band= 0.039935 op_critical_path= 4.142794e+13 op_off_critical_path= 2.325264e+16 ratio_critical_path= 0.001782
+[****] TIME(s)      0.00248 : Total_critical_path_time 4319910259791.301270, potrf 1441037521492.210205, trsm 1439436369070.645996, syrk 1439436369228.444824
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 4 1 0 0 1200 1200 1200   32.5382 15 596   32.5382 15 596   38.8469 2 752   4.860296 135.939717   4319910259791.301270 1441037521492.210205 1439436369070.645996 1439436369228.444824    639.475931 1031.810943 0.000000 0.000000 4.909799    2.329406e+16 8.945327e+14 2.239953e+16 4.142794e+13 2.325264e+16 0.039935 0.001782 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 4 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:5 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    637.77878 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.06453 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 5 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01581 : Gather rank	band_size= 5  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:400960
+avg:32.2699 min:15 max:596
+[****] TIME(s)      0.00054 : Print ranks of tiles
+[****] TIME(s)      0.06707 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 5 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 5.123837 GB, memory_per_node_max= 135.941058 GB
+
+[****] TIME(s)      4.82374 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 5 reorder_gemm= 0
+
+[****] TIME(s)      0.01993 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 5 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00585 : Gather rank	band_size= 5  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:400960
+avg:32.2699 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)   1006.03482 : HiCMA_potrf	send_full_tile= 0 band_size= 5 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3339083.577711 gflops
+966: HiCMA dpotrf ended in 1006.03 seconds
+[****] TIME(s)      0.02266 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 5 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 637.779	time_hicma: 1006.03	
+Ranks will be gathered
+[****] TIME(s)      0.05497 : Gather rank	band_size= 5  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:400960
+avg:38.3303 min:2 max:752
+[****] TIME(s)      0.00118 : Print ranks of tiles
+[****] TIME(s)      0.02976 : Operation_counts : band_size= 5 total= 2.300275e+16 op_band= 1.156087e+15 op_offband= 2.184666e+16 ratio_band= 0.052918 op_critical_path= 4.142794e+13 op_off_critical_path= 2.296132e+16 ratio_critical_path= 0.001804
+[****] TIME(s)      0.00109 : Total_critical_path_time 4319915007671.356445, potrf 1441039105295.009277, trsm 1439437951112.568359, syrk 1439437951263.778564
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 5 1 0 0 1200 1200 1200   32.2699 15 596   32.2699 15 596   38.3303 2 752   5.123837 135.941058   4319915007671.356445 1441039105295.009277 1439437951112.568359 1439437951263.778564    637.778781 1006.034816 0.000000 0.000000 4.823737    2.300275e+16 1.156087e+15 2.184666e+16 4.142794e+13 2.296132e+16 0.052918 0.001804 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 5 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:6 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    634.72225 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.05489 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01010 : Gather rank	band_size= 6  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:400065
+avg:32.0514 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.00984 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 6 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 5.393094 GB, memory_per_node_max= 135.942735 GB
+
+[****] TIME(s)      4.77176 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 6 reorder_gemm= 0
+
+[****] TIME(s)      0.01993 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00580 : Gather rank	band_size= 6  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:400065
+avg:32.0514 min:15 max:596
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    992.66629 : HiCMA_potrf	send_full_tile= 0 band_size= 6 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3384051.978804 gflops
+966: HiCMA dpotrf ended in 992.666 seconds
+[****] TIME(s)      0.02012 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 634.722	time_hicma: 992.666	
+Ranks will be gathered
+[****] TIME(s)      0.03124 : Gather rank	band_size= 6  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:400065
+avg:37.8839 min:2 max:751
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01187 : Operation_counts : band_size= 6 total= 2.288043e+16 op_band= 1.436216e+15 op_offband= 2.144422e+16 ratio_band= 0.066975 op_critical_path= 4.142794e+13 op_off_critical_path= 2.283900e+16 ratio_critical_path= 0.001814
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319919695447.015625, potrf 1441040669038.291260, trsm 1439439513139.022217, syrk 1439439513269.702148
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 6 1 0 0 1200 1200 1200   32.0514 15 596   32.0514 15 596   37.8839 2 751   5.393094 135.942735   4319919695447.015625 1441040669038.291260 1439439513139.022217 1439439513269.702148    634.722246 992.666293 0.000000 0.000000 4.771764    2.288043e+16 1.436216e+15 2.144422e+16 4.142794e+13 2.283900e+16 0.066975 0.001814 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 6 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:7 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    634.61899 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.05315 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 7 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01777 : Gather rank	band_size= 7  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:399171
+avg:31.6478 min:15 max:578
+[****] TIME(s)      0.00117 : Print ranks of tiles
+[****] TIME(s)      0.01717 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 7 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 5.641822 GB, memory_per_node_max= 135.944746 GB
+
+[****] TIME(s)      4.80252 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 7 reorder_gemm= 0
+
+[****] TIME(s)      0.01981 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 7 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00600 : Gather rank	band_size= 7  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:399171
+avg:31.6478 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    850.34327 : HiCMA_potrf	send_full_tile= 0 band_size= 7 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3950445.025603 gflops
+966: HiCMA dpotrf ended in 850.343 seconds
+[****] TIME(s)      0.01996 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 7 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 634.619	time_hicma: 850.343	
+Ranks will be gathered
+[****] TIME(s)      0.03042 : Gather rank	band_size= 7  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:399171
+avg:37.2673 min:2 max:714
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.01067 : Operation_counts : band_size= 7 total= 2.180438e+16 op_band= 1.722196e+15 op_offband= 2.008219e+16 ratio_band= 0.085757 op_critical_path= 4.142794e+13 op_off_critical_path= 2.176296e+16 ratio_critical_path= 0.001904
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319923989920.246094, potrf 1441042101622.249756, trsm 1439440944084.084473, syrk 1439440944213.912109
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 7 1 0 0 1200 1200 1200   31.6478 15 578   31.6478 15 578   37.2673 2 714   5.641822 135.944746   4319923989920.246094 1441042101622.249756 1439440944084.084473 1439440944213.912109    634.618993 850.343268 0.000000 0.000000 4.802523    2.180438e+16 1.722196e+15 2.008219e+16 4.142794e+13 2.176296e+16 0.085757 0.001904 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 7 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:8 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    631.20167 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.33733 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 8 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00963 : Gather rank	band_size= 8  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:398278
+avg:31.4189 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01162 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00004 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 8 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 5.910207 GB, memory_per_node_max= 135.947093 GB
+
+[****] TIME(s)      5.07942 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 8 reorder_gemm= 0
+
+[****] TIME(s)      0.02008 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 8 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00590 : Gather rank	band_size= 8  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:398278
+avg:31.4189 min:15 max:578
+[****] TIME(s)      0.00004 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    861.81910 : HiCMA_potrf	send_full_tile= 0 band_size= 8 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3897841.587093 gflops
+966: HiCMA dpotrf ended in 861.819 seconds
+[****] TIME(s)      0.02036 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 8 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 631.202	time_hicma: 861.819	
+Ranks will be gathered
+[****] TIME(s)      0.02887 : Gather rank	band_size= 8  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:398278
+avg:36.8444 min:2 max:714
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01111 : Operation_counts : band_size= 8 total= 2.168654e+16 op_band= 2.039563e+15 op_offband= 1.964698e+16 ratio_band= 0.103811 op_critical_path= 4.142794e+13 op_off_critical_path= 2.164512e+16 ratio_critical_path= 0.001914
+[****] TIME(s)      0.00002 : Total_critical_path_time 4319928277545.617676, potrf 1441043531876.930908, trsm 1439442372779.517822, syrk 1439442372889.168945
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 8 1 0 0 1200 1200 1200   31.4189 15 578   31.4189 15 578   36.8444 2 714   5.910207 135.947093   4319928277545.617676 1441043531876.930908 1439442372779.517822 1439442372889.168945    631.201666 861.819101 0.000000 0.000000 5.079424    2.168654e+16 2.039563e+15 1.964698e+16 4.142794e+13 2.164512e+16 0.103811 0.001914 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 8 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:9 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    633.30043 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.05500 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 9 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01013 : Gather rank	band_size= 9  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:397386
+avg:31.2846 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01122 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 9 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 6.189216 GB, memory_per_node_max= 135.949776 GB
+
+[****] TIME(s)      4.81177 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 9 reorder_gemm= 0
+
+[****] TIME(s)      0.01980 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 9 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00585 : Gather rank	band_size= 9  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:397386
+avg:31.2846 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    867.39108 : HiCMA_potrf	send_full_tile= 0 band_size= 9 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3872802.505591 gflops
+966: HiCMA dpotrf ended in 867.391 seconds
+[****] TIME(s)      0.01994 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 9 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 633.3	time_hicma: 867.391	
+Ranks will be gathered
+[****] TIME(s)      0.03084 : Gather rank	band_size= 9  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:397386
+avg:36.5458 min:2 max:714
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.01173 : Operation_counts : band_size= 9 total= 2.186149e+16 op_band= 2.381271e+15 op_offband= 1.948022e+16 ratio_band= 0.122240 op_critical_path= 4.142794e+13 op_off_critical_path= 2.182006e+16 ratio_critical_path= 0.001899
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319932587941.203125, potrf 1441044969740.126221, trsm 1439443809042.533203, syrk 1439443809158.543945
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 9 1 0 0 1200 1200 1200   31.2846 15 578   31.2846 15 578   36.5458 2 714   6.189216 135.949776   4319932587941.203125 1441044969740.126221 1439443809042.533203 1439443809158.543945    633.300431 867.391076 0.000000 0.000000 4.811771    2.186149e+16 2.381271e+15 1.948022e+16 4.142794e+13 2.182006e+16 0.122240 0.001899 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 9 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:10 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    631.38773 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.05456 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 10 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00978 : Gather rank	band_size= 10  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:396495
+avg:31.1566 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.00994 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 10 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 6.468998 GB, memory_per_node_max= 135.952793 GB
+
+[****] TIME(s)      4.82269 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 10 reorder_gemm= 0
+
+[****] TIME(s)      0.01976 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 10 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00614 : Gather rank	band_size= 10  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:396495
+avg:31.1566 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    859.70932 : HiCMA_potrf	send_full_tile= 0 band_size= 10 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3907407.137874 gflops
+966: HiCMA dpotrf ended in 859.709 seconds
+[****] TIME(s)      0.01986 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 10 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 631.388	time_hicma: 859.709	
+Ranks will be gathered
+[****] TIME(s)      0.02846 : Gather rank	band_size= 10  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:396495
+avg:36.2737 min:2 max:714
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.01065 : Operation_counts : band_size= 10 total= 2.206509e+16 op_band= 2.743463e+15 op_offband= 1.932162e+16 ratio_band= 0.141989 op_critical_path= 4.142794e+13 op_off_critical_path= 2.202366e+16 ratio_critical_path= 0.001881
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319936878858.348145, potrf 1441046401109.509033, trsm 1439445238816.721191, syrk 1439445238932.117676
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 10 1 0 0 1200 1200 1200   31.1566 15 578   31.1566 15 578   36.2737 2 714   6.468998 135.952793   4319936878858.348145 1441046401109.509033 1439445238816.721191 1439445238932.117676    631.387734 859.709320 0.000000 0.000000 4.822685    2.206509e+16 2.743463e+15 1.932162e+16 4.142794e+13 2.202366e+16 0.141989 0.001881 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 10 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:11 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    627.39141 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.15858 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 11 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00986 : Gather rank	band_size= 11  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:395605
+avg:31.0645 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01507 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 11 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 6.752813 GB, memory_per_node_max= 135.956146 GB
+
+[****] TIME(s)      4.74161 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 11 reorder_gemm= 0
+
+[****] TIME(s)      0.01960 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 11 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00571 : Gather rank	band_size= 11  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:395605
+avg:31.0645 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:14 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    877.78760 : HiCMA_potrf	send_full_tile= 0 band_size= 11 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3826932.990790 gflops
+966: HiCMA dpotrf ended in 877.788 seconds
+[****] TIME(s)      0.01984 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 11 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 627.391	time_hicma: 877.788	
+Ranks will be gathered
+[****] TIME(s)      0.02786 : Gather rank	band_size= 11  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:395605
+avg:36.051 min:2 max:714
+[****] TIME(s)      0.00003 : Print ranks of tiles
+[****] TIME(s)      0.01079 : Operation_counts : band_size= 11 total= 2.237615e+16 op_band= 3.130833e+15 op_offband= 1.924532e+16 ratio_band= 0.162680 op_critical_path= 4.142794e+13 op_off_critical_path= 2.233472e+16 ratio_critical_path= 0.001855
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319941189256.068359, potrf 1441047838962.018555, trsm 1439446675095.952148, syrk 1439446675198.097656
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 11 1 0 0 1200 1200 1200   31.0645 15 578   31.0645 15 578   36.051 2 714   6.752813 135.956146   4319941189256.068359 1441047838962.018555 1439446675095.952148 1439446675198.097656    627.391408 877.787602 0.000000 0.000000 4.741608    2.237615e+16 3.130833e+15 1.924532e+16 4.142794e+13 2.233472e+16 0.162680 0.001855 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 11 -F 0 -Y 1 -z 300 -E 0 "
+[****] TIME(s)    624.35818 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.22352 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 14 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01000 : Gather rank	band_size= 14  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:392941
+avg:30.6145 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01124 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 14 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 7.585531 GB, memory_per_node_max= 135.968216 GB
+
+[****] TIME(s)      4.71992 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 14 reorder_gemm= 0
+
+[****] TIME(s)      0.02341 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 14 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00953 : Gather rank	band_size= 14  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:392941
+avg:30.6145 min:15 max:578
+[****] TIME(s)      0.00026 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:12 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+[****] TIME(s)    625.32865 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.17112 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 12 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00999 : Gather rank	band_size= 12  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:394716
+avg:30.9459 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01101 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00004 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 12 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 7.033774 GB, memory_per_node_max= 135.959834 GB
+
+[****] TIME(s)      4.73360 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 12 reorder_gemm= 0
+
+[****] TIME(s)      0.01996 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 12 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00276 : Gather rank	band_size= 12  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:394716
+avg:30.9459 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 558, 62.00 % is finished
+In potrf, k 0, 0.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    894.31963 : HiCMA_potrf	send_full_tile= 0 band_size= 14 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3756189.859198 gflops
+966: HiCMA dpotrf ended in 894.32 seconds
+[****] TIME(s)      0.01945 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 14 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 624.358	time_hicma: 894.32	
+Ranks will be gathered
+[****] TIME(s)      0.03216 : Gather rank	band_size= 14  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:392941
+avg:35.2108 min:2 max:714
+[****] TIME(s)      0.00021 : Print ranks of tiles
+[****] TIME(s)      0.01158 : Operation_counts : band_size= 14 total= 2.284134e+16 op_band= 4.402715e+15 op_offband= 1.843863e+16 ratio_band= 0.238777 op_critical_path= 4.142794e+13 op_off_critical_path= 2.279991e+16 ratio_critical_path= 0.001817
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319943704538.693359, potrf 1441048677995.197266, trsm 1439447513227.523926, syrk 1439447513315.972168
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 14 1 0 0 1200 1200 1200   30.6145 15 578   30.6145 15 578   35.2108 2 714   7.585531 135.968216   4319943704538.693359 1441048677995.197266 1439447513227.523926 1439447513315.972168    624.358181 894.319632 0.000000 0.000000 4.719919    2.284134e+16 4.402715e+15 1.843863e+16 4.142794e+13 2.279991e+16 0.238777 0.001817 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 14 -F 0 -Y 1 -z 300 -E 0 "
+In potrf, k 126, 14.00 % is finished
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:15 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+[****] TIME(s)    622.62068 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.36823 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 15 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00970 : Gather rank	band_size= 15  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:392055
+avg:30.551 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01094 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 15 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 7.872755 GB, memory_per_node_max= 135.972910 GB
+
+[****] TIME(s)      4.80168 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 15 reorder_gemm= 0
+
+[****] TIME(s)      0.01948 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 15 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00287 : Gather rank	band_size= 15  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:392055
+avg:30.551 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 846, 94.00 % is finished
+In potrf, k 0, 0.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    888.18237 : HiCMA_potrf	send_full_tile= 0 band_size= 12 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3782144.795883 gflops
+966: HiCMA dpotrf ended in 888.182 seconds
+[****] TIME(s)      0.01956 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 12 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 625.329	time_hicma: 888.182	
+Ranks will be gathered
+[****] TIME(s)      0.03267 : Gather rank	band_size= 12  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:394716
+avg:35.796 min:2 max:714
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01226 : Operation_counts : band_size= 12 total= 2.261628e+16 op_band= 3.535221e+15 op_offband= 1.908106e+16 ratio_band= 0.185274 op_critical_path= 4.142794e+13 op_off_critical_path= 2.257485e+16 ratio_critical_path= 0.001835
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319945531279.618164, potrf 1441049287370.802246, trsm 1439448121903.036133, syrk 1439448122005.779785
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 12 1 0 0 1200 1200 1200   30.9459 15 578   30.9459 15 578   35.796 2 714   7.033774 135.959834   4319945531279.618164 1441049287370.802246 1439448121903.036133 1439448122005.779785    625.328652 888.182371 0.000000 0.000000 4.733604    2.261628e+16 3.535221e+15 1.908106e+16 4.142794e+13 2.257485e+16 0.185274 0.001835 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 12 -F 0 -Y 1 -z 300 -E 0 "
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:13 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+[****] TIME(s)    622.08953 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.15369 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 13 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01006 : Gather rank	band_size= 13  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:393828
+In potrf, k 630, 70.00 % is finished
+avg:30.7376 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01125 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 13 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 7.304916 GB, memory_per_node_max= 135.963857 GB
+
+[****] TIME(s)      4.76907 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 13 reorder_gemm= 0
+
+[****] TIME(s)      0.01953 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 13 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00607 : Gather rank	band_size= 13  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:393828
+avg:30.7376 min:15 max:578
+[****] TIME(s)      0.00003 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 639, 71.00 % is finished
+In potrf, k 0, 0.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    918.64834 : HiCMA_potrf	send_full_tile= 0 band_size= 15 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3656714.086048 gflops
+966: HiCMA dpotrf ended in 918.648 seconds
+[****] TIME(s)      0.01951 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 15 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 622.621	time_hicma: 918.648	
+Ranks will be gathered
+[****] TIME(s)      0.02801 : Gather rank	band_size= 15  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:392055
+avg:35.0447 min:2 max:714
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.01163 : Operation_counts : band_size= 15 total= 2.329345e+16 op_band= 4.886378e+15 op_offband= 1.840707e+16 ratio_band= 0.265462 op_critical_path= 4.142794e+13 op_off_critical_path= 2.325202e+16 ratio_critical_path= 0.001782
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319947880539.080566, potrf 1441050071013.824219, trsm 1439448904722.500000, syrk 1439448904802.756348
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 15 1 0 0 1200 1200 1200   30.551 15 578   30.551 15 578   35.0447 2 714   7.872755 135.972910   4319947880539.080566 1441050071013.824219 1439448904722.500000 1439448904802.756348    622.620676 918.648342 0.000000 0.000000 4.801677    2.329345e+16 4.886378e+15 1.840707e+16 4.142794e+13 2.325202e+16 0.265462 0.001782 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 15 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:16 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+[****] TIME(s)    621.36980 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.39398 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 16 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00977 : Gather rank	band_size= 16  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:391170
+In potrf, k 747, 83.00 % is finished
+avg:30.4877 min:15 max:578
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.01112 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 16 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 8.160025 GB, memory_per_node_max= 135.977939 GB
+
+[****] TIME(s)      4.85580 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 16 reorder_gemm= 0
+
+[****] TIME(s)      0.01936 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 16 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00280 : Gather rank	band_size= 16  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:391170
+avg:30.4877 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    890.92202 : HiCMA_potrf	send_full_tile= 0 band_size= 13 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3770514.439690 gflops
+966: HiCMA dpotrf ended in 890.922 seconds
+[****] TIME(s)      0.01948 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 13 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 622.09	time_hicma: 890.922	
+Ranks will be gathered
+[****] TIME(s)      0.02838 : Gather rank	band_size= 13  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:393828
+avg:35.4503 min:2 max:714
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.01182 : Operation_counts : band_size= 13 total= 2.256290e+16 op_band= 3.950983e+15 op_offband= 1.861192e+16 ratio_band= 0.212282 op_critical_path= 4.142794e+13 op_off_critical_path= 2.252147e+16 ratio_critical_path= 0.001839
+[****] TIME(s)      0.00002 : Total_critical_path_time 4319949881265.860352, potrf 1441050738436.689941, trsm 1439449571366.595947, syrk 1439449571462.574219
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 13 1 0 0 1200 1200 1200   30.7376 15 578   30.7376 15 578   35.4503 2 714   7.304916 135.963857   4319949881265.860352 1441050738436.689941 1439449571366.595947 1439449571462.574219    622.089533 890.922018 0.000000 0.000000 4.769067    2.256290e+16 3.950983e+15 1.861192e+16 4.142794e+13 2.252147e+16 0.212282 0.001839 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 13 -F 0 -Y 1 -z 300 -E 0 "
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    933.12278 : HiCMA_potrf	send_full_tile= 0 band_size= 16 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3599991.786347 gflops
+966: HiCMA dpotrf ended in 933.123 seconds
+[****] TIME(s)      0.01945 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 16 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 621.37	time_hicma: 933.123	
+Ranks will be gathered
+[****] TIME(s)      0.02814 : Gather rank	band_size= 16  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:391170
+avg:34.8867 min:2 max:714
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01168 : Operation_counts : band_size= 16 total= 2.376496e+16 op_band= 5.391600e+15 op_offband= 1.837336e+16 ratio_band= 0.293447 op_critical_path= 4.142794e+13 op_off_critical_path= 2.372353e+16 ratio_critical_path= 0.001746
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319952099472.042969, potrf 1441051478361.856934, trsm 1439450310512.820312, syrk 1439450310597.365967
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 16 1 0 0 1200 1200 1200   30.4877 15 578   30.4877 15 578   34.8867 2 714   8.160025 135.977939   4319952099472.042969 1441051478361.856934 1439450310512.820312 1439450310597.365967    621.369797 933.122777 0.000000 0.000000 4.855799    2.376496e+16 5.391600e+15 1.837336e+16 4.142794e+13 2.372353e+16 0.293447 0.001746 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 16 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:17 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    620.85076 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.21495 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 17 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00975 : Gather rank	band_size= 17  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:390286
+avg:30.4322 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.00988 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00002 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 17 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 8.448197 GB, memory_per_node_max= 135.983303 GB
+
+[****] TIME(s)      4.79033 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 17 reorder_gemm= 0
+
+[****] TIME(s)      0.01937 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 17 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00282 : Gather rank	band_size= 17  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:390286
+avg:30.4322 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    934.51820 : HiCMA_potrf	send_full_tile= 0 band_size= 17 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3594616.272642 gflops
+966: HiCMA dpotrf ended in 934.518 seconds
+[****] TIME(s)      0.01959 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 17 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 620.851	time_hicma: 934.518	
+Ranks will be gathered
+[****] TIME(s)      0.03056 : Gather rank	band_size= 17  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:390286
+avg:34.7397 min:2 max:714
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01178 : Operation_counts : band_size= 17 total= 2.427497e+16 op_band= 5.919976e+15 op_offband= 1.835499e+16 ratio_band= 0.322527 op_critical_path= 4.142794e+13 op_off_critical_path= 2.423354e+16 ratio_critical_path= 0.001710
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319956326984.045898, potrf 1441052888579.487793, trsm 1439451719155.899170, syrk 1439451719248.659180
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 17 1 0 0 1200 1200 1200   30.4322 15 578   30.4322 15 578   34.7397 2 714   8.448197 135.983303   4319956326984.045898 1441052888579.487793 1439451719155.899170 1439451719248.659180    620.850757 934.518201 0.000000 0.000000 4.790326    2.427497e+16 5.919976e+15 1.835499e+16 4.142794e+13 2.423354e+16 0.322527 0.001710 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 17 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:18 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    616.48376 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.28095 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 18 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01432 : Gather rank	band_size= 18  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:389403
+avg:30.3772 min:15 max:578
+[****] TIME(s)      0.00085 : Print ranks of tiles
+[****] TIME(s)      0.01321 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 18 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 8.736454 GB, memory_per_node_max= 135.989003 GB
+
+[****] TIME(s)      4.88257 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 18 reorder_gemm= 0
+
+[****] TIME(s)      0.01943 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 18 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00343 : Gather rank	band_size= 18  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:389403
+avg:30.3772 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    959.85771 : HiCMA_potrf	send_full_tile= 0 band_size= 18 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3499721.150369 gflops
+966: HiCMA dpotrf ended in 959.858 seconds
+[****] TIME(s)      0.01930 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 18 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 616.484	time_hicma: 959.858	
+Ranks will be gathered
+[****] TIME(s)      0.03028 : Gather rank	band_size= 18  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:389403
+avg:34.5929 min:2 max:714
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.01192 : Operation_counts : band_size= 18 total= 2.480464e+16 op_band= 6.469713e+15 op_offband= 1.833493e+16 ratio_band= 0.352863 op_critical_path= 4.142794e+13 op_off_critical_path= 2.476321e+16 ratio_critical_path= 0.001673
+[****] TIME(s)      0.00004 : Total_critical_path_time 4319960592047.979980, potrf 1441054311309.220703, trsm 1439453140326.897705, syrk 1439453140411.861816
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 18 1 0 0 1200 1200 1200   30.3772 15 578   30.3772 15 578   34.5929 2 714   8.736454 135.989003   4319960592047.979980 1441054311309.220703 1439453140326.897705 1439453140411.861816    616.483756 959.857711 0.000000 0.000000 4.882572    2.480464e+16 6.469713e+15 1.833493e+16 4.142794e+13 2.476321e+16 0.352863 0.001673 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 18 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:19 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    616.20708 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.26623 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 19 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01001 : Gather rank	band_size= 19  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:388521
+avg:30.3041 min:15 max:578
+[****] TIME(s)      0.00004 : Print ranks of tiles
+[****] TIME(s)      0.01112 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00003 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 19 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 9.022777 GB, memory_per_node_max= 135.995038 GB
+
+[****] TIME(s)      4.76740 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 19 reorder_gemm= 0
+
+[****] TIME(s)      0.01892 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 19 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00590 : Gather rank	band_size= 19  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:388521
+avg:30.3041 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)    976.04889 : HiCMA_potrf	send_full_tile= 0 band_size= 19 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3441666.058871 gflops
+966: HiCMA dpotrf ended in 976.049 seconds
+[****] TIME(s)      0.01926 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 19 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 616.207	time_hicma: 976.049	
+Ranks will be gathered
+[****] TIME(s)      0.03132 : Gather rank	band_size= 19  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:388521
+avg:34.4266 min:2 max:714
+[****] TIME(s)      0.00003 : Print ranks of tiles
+[****] TIME(s)      0.01127 : Operation_counts : band_size= 19 total= 2.531360e+16 op_band= 7.037581e+15 op_offband= 1.827602e+16 ratio_band= 0.385072 op_critical_path= 4.142794e+13 op_off_critical_path= 2.527217e+16 ratio_critical_path= 0.001639
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319964908456.805176, potrf 1441055751177.261719, trsm 1439454578590.970703, syrk 1439454578688.572754
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 19 1 0 0 1200 1200 1200   30.3041 15 578   30.3041 15 578   34.4266 2 714   9.022777 135.995038   4319964908456.805176 1441055751177.261719 1439454578590.970703 1439454578688.572754    616.207079 976.048889 0.000000 0.000000 4.767395    2.531360e+16 7.037581e+15 1.827602e+16 4.142794e+13 2.527217e+16 0.385072 0.001639 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 19 -F 0 -Y 1 -z 300 -E 0 "
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 128 x 31 + 0 (3968+0)
+#+++++ P x Q                : 8 x 16 (128/128)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 2400 x 2400
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:2400 NB:2400 HMB:300 HNB:300
+nodes:128 P:8 Q:16 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:0
+send_full_tile:0 lookahead: 1 band_size:20 max rank:1200 gen:1200 comp:1200
+397: STARSH will generate problem
+461: STARSH generated problem
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)    618.18233 : STARSH_gen	PxQ=   8 16  NB= 2400 N= 2160000
+[****] TIME(s)      0.30261 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 20 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01166 : Gather rank	band_size= 20  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:387640
+avg:30.246 min:15 max:578
+[****] TIME(s)      0.00068 : Print ranks of tiles
+[****] TIME(s)      0.09074 : rank_copy	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.00129 : Allocate Sum	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 20 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 9.310776 GB, memory_per_node_max= 136.001408 GB
+
+[****] TIME(s)      4.90230 : reorder_gemm	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 send_full= 0 band_size= 20 reorder_gemm= 0
+
+[****] TIME(s)      0.01921 : Before HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 20 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00599 : Gather rank	band_size= 20  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:387640
+avg:30.246 min:15 max:578
+[****] TIME(s)      0.00002 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 9, 1.00 % is finished
+In potrf, k 18, 2.00 % is finished
+In potrf, k 27, 3.00 % is finished
+In potrf, k 36, 4.00 % is finished
+In potrf, k 45, 5.00 % is finished
+In potrf, k 54, 6.00 % is finished
+In potrf, k 63, 7.00 % is finished
+In potrf, k 72, 8.00 % is finished
+In potrf, k 81, 9.00 % is finished
+In potrf, k 90, 10.00 % is finished
+In potrf, k 99, 11.00 % is finished
+In potrf, k 108, 12.00 % is finished
+In potrf, k 117, 13.00 % is finished
+In potrf, k 126, 14.00 % is finished
+In potrf, k 135, 15.00 % is finished
+In potrf, k 144, 16.00 % is finished
+In potrf, k 153, 17.00 % is finished
+In potrf, k 162, 18.00 % is finished
+In potrf, k 171, 19.00 % is finished
+In potrf, k 180, 20.00 % is finished
+In potrf, k 189, 21.00 % is finished
+In potrf, k 198, 22.00 % is finished
+In potrf, k 207, 23.00 % is finished
+In potrf, k 216, 24.00 % is finished
+In potrf, k 225, 25.00 % is finished
+In potrf, k 234, 26.00 % is finished
+In potrf, k 243, 27.00 % is finished
+In potrf, k 252, 28.00 % is finished
+In potrf, k 261, 29.00 % is finished
+In potrf, k 270, 30.00 % is finished
+In potrf, k 279, 31.00 % is finished
+In potrf, k 288, 32.00 % is finished
+In potrf, k 297, 33.00 % is finished
+In potrf, k 306, 34.00 % is finished
+In potrf, k 315, 35.00 % is finished
+In potrf, k 324, 36.00 % is finished
+In potrf, k 333, 37.00 % is finished
+In potrf, k 342, 38.00 % is finished
+In potrf, k 351, 39.00 % is finished
+In potrf, k 360, 40.00 % is finished
+In potrf, k 369, 41.00 % is finished
+In potrf, k 378, 42.00 % is finished
+In potrf, k 387, 43.00 % is finished
+In potrf, k 396, 44.00 % is finished
+In potrf, k 405, 45.00 % is finished
+In potrf, k 414, 46.00 % is finished
+In potrf, k 423, 47.00 % is finished
+In potrf, k 432, 48.00 % is finished
+In potrf, k 441, 49.00 % is finished
+In potrf, k 450, 50.00 % is finished
+In potrf, k 459, 51.00 % is finished
+In potrf, k 468, 52.00 % is finished
+In potrf, k 477, 53.00 % is finished
+In potrf, k 486, 54.00 % is finished
+In potrf, k 495, 55.00 % is finished
+In potrf, k 504, 56.00 % is finished
+In potrf, k 513, 57.00 % is finished
+In potrf, k 522, 58.00 % is finished
+In potrf, k 531, 59.00 % is finished
+In potrf, k 540, 60.00 % is finished
+In potrf, k 549, 61.00 % is finished
+In potrf, k 558, 62.00 % is finished
+In potrf, k 567, 63.00 % is finished
+In potrf, k 576, 64.00 % is finished
+In potrf, k 585, 65.00 % is finished
+In potrf, k 594, 66.00 % is finished
+In potrf, k 603, 67.00 % is finished
+In potrf, k 612, 68.00 % is finished
+In potrf, k 621, 69.00 % is finished
+In potrf, k 630, 70.00 % is finished
+In potrf, k 639, 71.00 % is finished
+In potrf, k 648, 72.00 % is finished
+In potrf, k 657, 73.00 % is finished
+In potrf, k 666, 74.00 % is finished
+In potrf, k 675, 75.00 % is finished
+In potrf, k 684, 76.00 % is finished
+In potrf, k 693, 77.00 % is finished
+In potrf, k 702, 78.00 % is finished
+In potrf, k 711, 79.00 % is finished
+In potrf, k 720, 80.00 % is finished
+In potrf, k 729, 81.00 % is finished
+In potrf, k 738, 82.00 % is finished
+In potrf, k 747, 83.00 % is finished
+In potrf, k 756, 84.00 % is finished
+In potrf, k 765, 85.00 % is finished
+In potrf, k 774, 86.00 % is finished
+In potrf, k 783, 87.00 % is finished
+In potrf, k 792, 88.00 % is finished
+In potrf, k 801, 89.00 % is finished
+In potrf, k 810, 90.00 % is finished
+In potrf, k 819, 91.00 % is finished
+In potrf, k 828, 92.00 % is finished
+In potrf, k 837, 93.00 % is finished
+In potrf, k 846, 94.00 % is finished
+In potrf, k 855, 95.00 % is finished
+In potrf, k 864, 96.00 % is finished
+In potrf, k 873, 97.00 % is finished
+In potrf, k 882, 98.00 % is finished
+In potrf, k 891, 99.00 % is finished
+[****] TIME(s)   1005.19254 : HiCMA_potrf	send_full_tile= 0 band_size= 20 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   8 16  NB= 2400 N= 2160000 2flow= 1 : 3341881.479774 gflops
+966: HiCMA dpotrf ended in 1005.19 seconds
+[****] TIME(s)      0.01932 : After HiCMA Check Rank	PxQ=   8 16  NB= 2400 N= 2160000 maxrank= 1200 band_size= 20 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 618.182	time_hicma: 1005.19	
+Ranks will be gathered
+[****] TIME(s)      0.03341 : Gather rank	band_size= 20  PxQ=   8 16  NB= 2400 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:387640
+avg:34.2813 min:2 max:714
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.02176 : Operation_counts : band_size= 20 total= 2.588181e+16 op_band= 7.630842e+15 op_offband= 1.825097e+16 ratio_band= 0.418106 op_critical_path= 4.142794e+13 op_off_critical_path= 2.584039e+16 ratio_critical_path= 0.001603
+[****] TIME(s)      0.00003 : Total_critical_path_time 4319969296506.849609, potrf 1441057214932.209473, trsm 1439456040738.601562, syrk 1439456040836.038574
+R-LO 2160000 2160000 2400 2400   300 300   128 8 16 31   4 st-3d-exp 1.0e-08 2.16e+06 0 0   0 20 1 0 0 1200 1200 1200   30.246 15 578   30.246 15 578   34.2813 2 714   9.310776 136.001408   4319969296506.849609 1441057214932.209473 1439456040738.601562 1439456040836.038574    618.182329 1005.192540 0.000000 0.000000 4.902299    2.588181e+16 7.630842e+15 1.825097e+16 4.142794e+13 2.584039e+16 0.418106 0.001603 1  eff47b36aca3b36257346ce71927438521ff0e68    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 8 -Q 16 -N 2160000 -t 2400 -e 1e-8 --maxrank 1200 -j 2160000 -v -c 31 --genmaxrank 1200 --compmaxrank 1200 -D 4 --band 20 -F 0 -Y 1 -z 300 -E 0 "

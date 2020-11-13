@@ -1,0 +1,623 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+/* Used for operation count */
+extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
+
+/*
+ * Priorities used in this jdf:
+ *      - potrf_dpotrf(k)    : (MT-k)**3
+ *      - potrf_dsyrk(k,m)   : (MT-m)**3 + 3 * (m - k)
+ *      - potrf_dtrsm(m,k)   : (MT-m)**3 + 3 * (m - k) * (2 * MT - k - m - 1)
+ *      - potrf_dgemm(m,n,k) : (MT-m)**3 + 3 * (m - n) * (2 * MT - m - n - 1) + 6 * (m - k)
+ *
+ * So max priority is:
+ *      (MT - PRI_CHANGE)**3 + 3 * MT * (2 * MT - PRI_CHANGE - 1) + 6 * MT  < (MT**3 + 6 MT**2 + 3 MT)
+ *
+ * WARNING: If mt is greater than 1200, we might get integer overflow.
+ */
+
+/* Count operations */
+#define LOG_OPCOUNT(cnt, i, j) \
+    do{\
+        int myrank; \
+        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);\
+        int nth = es->virtual_process->nb_cores;\
+        if(0) printf("%s rank:%d th_id:%d nthreads per node:%d\n", __func__, myrank, es->th_id, nth);\
+        int myid = es->th_id;\
+        opcounters[myrank*nth+myid] += cnt;  \
+        tileopcounters[i*descAg->nt+j] += cnt; \
+    }while(0);
+%}
+
+/* Globals
+ */
+uplo         [ type = PLASMA_enum ]
+descAg       [ type = "parsec_tiled_matrix_dc_t*" ]
+descAu       [ type = "parsec_tiled_matrix_dc_t*" aligned = descAg ]
+descAv       [ type = "parsec_tiled_matrix_dc_t*" aligned = descAg ]
+descAr       [ type = "parsec_tiled_matrix_dc_t*" ]
+descRank     [ type = "parsec_tiled_matrix_dc_t*" aligned = descAg ]
+INFO         [ type = "int*" ]
+acc          [ type = "double" ]
+rk           [ type = "int" ]
+storage_maxrank        [ type = "int" ]
+computation_maxrank    [ type = "int" ]
+lookahead    [ type = "int" ]
+band_size    [ type = "int" ]
+
+/* Hidden Globals
+ */
+/* Memory pool handler */
+p_work       [ type = "parsec_memory_pool_t *" hidden = on default = NULL ]
+p_work_rr    [ type = "parsec_memory_pool_t *" hidden = on default = NULL ]
+p_work_mbr   [ type = "parsec_memory_pool_t *" hidden = on default = NULL ]
+
+/* Priority */
+PRI_CHANGE   [ type = "int" hidden = on default = 0 ]
+PRI_MAX      [ type = "int" hidden = on default = "(descAu->mt * ( 3 + descAu->mt * ( 2 + descAu->mt )))" ]
+
+/* Subtile size in recursive */
+smallnb      [ type = "int" hidden = on default = 300 ]
+
+/* Whethre execute kernel */
+enable_potrf [ type = "int" hidden = on ]
+enable_trsm  [ type = "int" hidden = on ]
+enable_syrk  [ type = "int" hidden = on ]
+enable_gemm  [ type = "int" hidden = on ]
+
+/* Whether send full tile */
+send_full_tile    [ type = "int" hidden = on default = 0 ]
+
+/* Tile and operation count */
+tileopcounters    [ type = "unsigned long*" hidden = on default = NULL ]
+opcounters        [ type = "unsigned long*" hidden = on default = NULL ]
+
+/* Time gathering */
+potrf_time           [ type = "double*" hidden = on default = 0 ]
+trsm_time            [ type = "double*" hidden = on default = 0 ]
+syrk_time            [ type = "double*" hidden = on default = 0 ]
+potrf_time_temp      [ type = "double*" hidden = on default = 0 ]
+trsm_time_temp       [ type = "double*" hidden = on default = 0 ]
+syrk_time_temp       [ type = "double*" hidden = on default = 0 ]
+wrap_potrf           [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_trsm            [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_syrk            [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_gemm            [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_potrf_complete  [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_trsm_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_syrk_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
+wrap_gemm_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
+
+/* GPU workspace */
+ws_handle            [ type = "void *" hidden = on default = NULL ]
+ws_mbr               [ type = "void *" hidden = on default = NULL ]
+ws_rr                [ type = "void *" hidden = on default = NULL ]
+
+/* GPU number and index */
+nb_cuda_devices      [ type = "int"   hidden = on default = 0 ]
+cuda_device_index    [ type = "int *" hidden = on default = "NULL"]
+
+
+/**************************************************
+ **************************************************/
+READ_Cu(m, n)
+
+m = 1 .. descAu->mt-1
+n = 0 .. 0
+
+// Control message size to send, it's the new Cr
+size = 1
+
+:descAu(m, n)
+
+READ Cu <- descAu(m, n)                                    [ type = UV ]
+        -> Au potrf_dsyrk(n, m)                            [ layout = MPI_DOUBLE count = size ]
+        -> Au potrf_dgemm(m, 1..m-1, 0)                    [ layout = MPI_DOUBLE count = size ]
+        -> Bu potrf_dgemm(m+1..descAu->mt-1, m, 0)         [ layout = MPI_DOUBLE count = size ]
+
+READ Cr <- Cr READ_Cr(m, n)                                [ type = AR ]
+
+BODY
+{
+    /* Pass Cr value to size */
+    if(send_full_tile == 1){
+        this_task->locals.size.value = storage_maxrank * descAu->mb;
+    } else {
+        this_task->locals.size.value = ((int *)Cr)[0] * descAu->mb;
+    }
+    if(DEBUG_INFO) printf("Cr in READ_Cu(%d, %d): %d\n", m, n, ((int *)Cr)[0]);
+}
+END
+
+/**************************************************
+ **************************************************/
+READ_Cr(m, n)
+
+m = 1 .. descAu->mt-1
+n = 0 .. m-1
+
+:descAr(m, n)
+
+READ Cr <- descAr(m, n)                                                [ type = AR ]
+        -> (n == 0) ? Cr potrf_dtrsm(m, n) : Cr potrf_dgemm(m, n, 0)   [ type = AR ]
+        -> (n == 0) ? Ar potrf_dsyrk(n, m)                             [ type = AR ]
+        -> (n == 0) ? Ar potrf_dgemm(m, 1..m-1, 0)                     [ type = AR ]
+        -> (n == 0) ? Br potrf_dgemm(m+1..descAu->mt-1, m, 0)          [ type = AR ]
+        -> Cr READ_Cu(m, n)                                            [ type = AR ]
+
+BODY
+{
+    if(DEBUG_INFO) printf("READ_Cr(%d, %d)\n", m, n);
+}
+END
+
+/**************************************************
+ **************************************************/
+WRITE_Cr(m, n, k)
+
+k = 0   .. descAg->mt-3
+m = k+2 .. descAg->mt-1
+n = k+1 .. k+1 
+
+:descAr(m, n)
+
+READ Cr <- Cr potrf_dgemm(m, n, k)           [ type = AR ]
+        -> descAr(m, n)                      [ type = AR ]
+
+BODY
+{
+    if(DEBUG_INFO) printf("WRITE_Cr(%d, %d)\n", m, n);
+}
+END
+
+/**************************************************
+ *               potrf_dpotrf                     *
+ **************************************************/
+potrf_dpotrf(k) [high_priority = on]
+
+// Execution space
+k = 0 .. descAg->mt-1
+
+// Parallel partitioning
+:descAg(k, k)
+
+// Parameters
+RW T <- (k == 0) ? descAg(k, k) : T potrf_dsyrk(k-1, k) [ type = FULL ]
+     -> T potrf_dtrsm(k+1..descAg->mt-1, k)             [ type = FULL ]
+     -> descAg(k, k)                                    [ type = FULL ]
+
+; (k >= (descAg->mt - PRI_CHANGE)) ? (descAg->mt - k) * (descAg->mt - k) * (descAg->mt - k) : PRI_MAX
+
+BODY [type=RECURSIVE]
+{
+    if(enable_potrf == 0) return PARSEC_HOOK_RETURN_DONE;
+    int tempkm = k == descAg->mt-1 ? descAg->m - k*descAg->mb : descAg->mb;
+    int iinfo = 0;
+
+    /* Operation count */
+    unsigned long int cnt = ka_counts('c', tempkm, 0, 0, 0);
+    LOG_OPCOUNT(cnt, k, k);
+    op_band[es->th_id] += cnt;
+    op_path[es->th_id] += cnt;
+
+    if( descAg->mt/1000 && 0 == (k+1) % (descAg->mt/1000) )
+        fprintf(stderr, "In potrf, k %d, %.2lf %% is finished\n", k, 100.0*(k+1)/descAg->mt);
+
+    if (tempkm > smallnb)
+    {
+        subtile_desc_t *small_descT;
+        parsec_taskpool_t *parsec_dpotrf;
+
+        small_descT = subtile_desc_create( descAg, k, k,
+                                           smallnb, smallnb, 0, 0, tempkm, tempkm );
+        small_descT->mat = T;
+
+        parsec_dpotrf = dplasma_dpotrf_New(uplo, (parsec_tiled_matrix_dc_t *)small_descT, &iinfo );
+
+        parsec_recursivecall(es, (parsec_task_t*)this_task,
+                             parsec_dpotrf, dplasma_dpotrf_Destruct,
+                             1, small_descT);
+
+        return PARSEC_HOOK_RETURN_ASYNC;
+    }
+    else
+        /* Go for the sequential CPU version */
+        return PARSEC_HOOK_RETURN_NEXT;
+}
+END
+
+BODY
+{
+    if(enable_potrf == 0) return PARSEC_HOOK_RETURN_DONE;
+    int tempkm = k == descAg->mt-1 ? descAg->m - k*descAg->mb : descAg->mb;
+    int iinfo = 0;
+    int ld_Ag_k = BLKLDD( descAg, k );
+
+    iinfo = HiCMA_HCORE_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
+
+    if ( iinfo != 0 && *INFO == 0 )
+            *INFO = k*descAg->mb+iinfo; /* Should return here */
+
+    if(DEBUG_INFO) printf("HCORE_dpotrf( %d )\n\t( %s, %d, A(%d,%d)[%p], %d) return info = %d\n", k, plasma_const(uplo), tempkm, k, 0, T, descAg->mb, iinfo);
+}
+END
+
+/**************************************************
+ *               potrf_dtrsm                      *
+ **************************************************/
+potrf_dtrsm(m, k) [high_priority = on]
+
+// Execution space
+m = 1 .. descAg->mt-1
+k = 0 .. m-1
+
+// Control message size to send, it's the new Cr
+size = 1
+
+// Parallel partitioning
+: descAv(m, k)
+
+// Parameters
+READ  T <- T potrf_dpotrf(k)                                         [ type = FULL ]
+RW    Cv <- (k == 0) ? descAv(m, k) : Cv potrf_dgemm(m, k, k-1)  [ type = UV ]
+         -> Av potrf_dsyrk(k, m)                                     [ layout = MPI_DOUBLE count = size ]
+         -> Av potrf_dgemm(m, k+1..m-1, k)                           [ layout = MPI_DOUBLE count = size ]
+         -> Bv potrf_dgemm(m+1..descAg->mt-1, m, k)                  [ layout = MPI_DOUBLE count = size ]
+         -> descAv(m, k)                                             [ layout = MPI_DOUBLE count = size ]
+
+READ Cr <- (k == 0) ? Cr READ_Cr(m, k) : Cr potrf_dgemm(m, k, k-1) [ type = AR ]
+
+CTL ctl <- (lookahead > 0 && m > lookahead+k)? ctl potrf_dsyrk(k, k+1)
+
+; (m >= (descAg->mt - PRI_CHANGE)) ? (descAg->mt - m) * (descAg->mt - m) * (descAg->mt - m) + 3 * ((2 * descAg->mt) - k - m - 1) * (m - k) : PRI_MAX
+
+BODY
+{
+    if(enable_trsm == 0) return PARSEC_HOOK_RETURN_DONE;
+    int tempmm = m == descAv->mt-1 ? descAv->m - m * descAv->mb : descAv->mb;
+    int ldak = BLKLDD( descAg, k );
+    int ldam = BLKLDD( descAv, m );
+
+    HiCMA_HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+               tempmm, storage_maxrank, (double)1.0, T, ldak,
+               Cv, ldam, Cr, k, 0, m, k);
+
+    if(DEBUG_INFO) printf("HCORE_dtrsm( %d, %d )\n\t( %s, %s, %s, %s, %d, %d, %f, A(%d,%d)[%p], %d,  A(%d,%d)[%p], %d)\n",
+             m, k,
+             plasma_const( PlasmaRight ), plasma_const( PlasmaLower ),
+             plasma_const( PlasmaTrans ), plasma_const( PlasmaNonUnit ),
+             tempmm, storage_maxrank,
+             1.0, k, k, T, ldak,
+                  m, k, Cv, ldam);
+
+    /* Pass Cr value to size */
+    if(send_full_tile == 1){
+        this_task->locals.size.value = storage_maxrank * descAu->mb;
+    } else {
+        this_task->locals.size.value = ((int *)Cr)[0] * descAu->mb;
+    }
+
+    if(DEBUG_INFO) printf("Cr value in DTRSM (%d, %d): %d\n", m, k, ((int *)Cr)[0]);
+
+    /* Operation count */
+    unsigned long int cnt = ka_counts('t', tempmm, ((int*)Cr)[0], 1 /*side*/, 0);  
+    LOG_OPCOUNT(cnt, m, k);
+    op_offband[es->th_id] += cnt;
+    if( 1 == m-k )
+        op_path[es->th_id] += cnt;
+    else
+        op_offpath[es->th_id] += cnt;
+}
+END
+
+
+/**************************************************
+ *               potrf_dsyrk                      *
+ **************************************************/
+potrf_dsyrk(k, m) [high_priority = on]
+
+// Execution space
+k = 0   .. descAg->mt-2
+m = k+1 .. descAg->mt-1
+
+// Parallel partitioning
+: descAg(m, m)
+
+//Parameters
+READ  Av <- Cv potrf_dtrsm(m, k)                                       [ type = UV ]
+READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)    [ type = UV ]
+READ  Ar <- (k == 0) ? Cr READ_Cr(m, 0) : Cr potrf_dgemm(m, k, k-1)    [ type = AR ]
+
+RW    T <- (k == 0) ? descAg(m, m) : T potrf_dsyrk(k-1, m)             [ type = FULL ] 
+        -> (m == k+1) ? T potrf_dpotrf(m) : T potrf_dsyrk(k+1, m)      [ type = FULL ]
+
+CTL ctl -> (lookahead > 0 && m == k+1)? ctl potrf_dtrsm(lookahead+m .. descAg->mt-1, k)
+
+; (m >= (descAg->mt - PRI_CHANGE)) ? (descAg->mt - m) * (descAg->mt - m) * (descAg->mt - m) + 3 * (m - k) : PRI_MAX
+
+BODY
+{
+    if(enable_syrk == 0) return PARSEC_HOOK_RETURN_DONE;
+    int tempmm = m == descAg->mt-1 ? descAg->m - m*descAg->mb : descAg->mb;
+    int ldam = BLKLDD( descAg, m );
+    int ldau = BLKLDD( descAu, m );
+    int ldav = BLKLDD( descAv, m );
+    int rank = ((int*)Ar)[0];
+    void *p_elem_work = NULL;
+    p_elem_work = parsec_private_memory_pop( p_work );
+
+    HiCMA_HCORE_dsyrk(PlasmaLower, PlasmaNoTrans,
+               tempmm, rank,
+               (double)-1.0, 
+               Au /*A(m, k)*/, ldau,
+               Av /*A(m, k)*/, ldav,
+               (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work);
+    parsec_private_memory_push( p_work, p_elem_work );
+
+    if(DEBUG_INFO) printf(
+             "HCORE_dsyrk( %d, %d )\n\t( %s, %s, %d, %d, %f, Av(%d,%d)[%p], %d, %f, Ag(%d,%d)[%p], %d)\n",
+             k, m,
+             plasma_const( PlasmaLower ), plasma_const( PlasmaNoTrans ),
+             tempmm, descAg->mb,
+             -1.0, m, k, Av, ldam,
+              1.0, m, 0, T, ldam);
+
+    /* Operation count */
+    /// C = C + alpha * A * A'
+    /// C = C + alpha * ( (A^u * (A^v * A^v^T) ) * A^u^T)
+    unsigned long int cnt = 0;
+    /// A^v * B^v^T
+    cnt += ka_counts('m', rank, rank, tempmm, 0);
+    /// A^u * (A^v * B^v^T)
+    cnt += ka_counts('m', tempmm, rank, rank, 0);
+    /// (A^u * (A^v * B^v^T) ) * B^u^T   
+    cnt += ka_counts('m', tempmm, tempmm, rank, 0);
+    LOG_OPCOUNT(cnt, m, m);
+    op_band[es->th_id] += cnt;
+    if( 1 == m-k )
+        op_path[es->th_id] += cnt;
+    else
+        op_offpath[es->th_id] += cnt;
+}
+END
+
+/**************************************************
+ *               potrf_dgemm                      *
+ **************************************************/
+// Name
+potrf_dgemm(m, n, k)
+
+// Execution space
+k = 0   .. descAg->mt-3
+m = k+2 .. descAg->mt-1
+n = k+1 .. m-1
+
+// Control message size to send, it's the new Cr
+size = 1
+
+// Parallel partitioning
+: descAu(m, n)
+
+// Parameters
+READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)                      [ type = UV ]
+READ  Bu <- (k == 0) ? Cu READ_Cu(n, 0) : Cu potrf_dgemm(n, k, k-1)                      [ type = UV ]
+RW    Cu <- (k == 0) ? descAu(m, n) : Cu potrf_dgemm(m, n, k-1)                      [ type = UV ]
+         -> (n == k+1) ? Au potrf_dgemm(m, n+1..m-1, n) : Cu potrf_dgemm(m, n, k+1)      [ layout = MPI_DOUBLE count = size ]
+         -> (n == k+1) ? Bu potrf_dgemm(m+1..descAu->mt-1, m, n)                         [ layout = MPI_DOUBLE count = size ]
+         -> (n == k+1) ? Au potrf_dsyrk(n, m)                                            [ layout = MPI_DOUBLE count = size ]
+         -> (n == k+1) ? descAu(m, n)                                                    [ layout = MPI_DOUBLE count = size ]
+
+READ  Av <- Cv potrf_dtrsm(m, k)                                                         [ type = UV ]
+READ  Bv <- Cv potrf_dtrsm(n, k)                                                         [ type = UV ]
+RW    Cv <- (k == 0) ? descAv(m, n) : Cv potrf_dgemm(m, n, k-1)                      [ type = UV ]
+         -> (n == k+1) ? Cv potrf_dtrsm(m, n) : Cv potrf_dgemm(m, n, k+1)                [ layout = MPI_DOUBLE count = size ]
+
+READ  Ar <- (k == 0) ? Cr READ_Cr(m, 0) : Cr potrf_dgemm(m, k, k-1)                      [ type = AR ]
+READ  Br <- (k == 0) ? Cr READ_Cr(n, 0) : Cr potrf_dgemm(n, k, k-1)                      [ type = AR ]
+RW    Cr <- (k == 0) ? Cr READ_Cr(m, n) : Cr potrf_dgemm(m, n, k-1)                      [ type = AR ]
+         -> (n == k+1) ? Ar potrf_dgemm(m, n+1..m-1, n) : Cr potrf_dgemm(m, n, k+1)      [ type = AR ]
+         -> (n == k+1) ? Br potrf_dgemm(m+1..descAu->mt-1, m, n)                         [ type = AR ]
+         -> (n == k+1) ? Cr potrf_dtrsm(m, n)                                            [ type = AR ]
+         -> (n == k+1) ? Ar potrf_dsyrk(n, m)                                            [ type = AR ]
+         -> (n == k+1) ? Cr WRITE_Cr(m, n, k)                                            [ type = AR ]
+
+; (m >= (descAg->mt - PRI_CHANGE)) ? (descAg->mt - m) * (descAg->mt - m) * (descAg->mt - m) + 3 * ((2 * descAg->mt) - m - n - 3) * (m - n) + 6 * (m - k) : PRI_MAX
+
+BODY
+{
+#if PRINT_RANK
+    /* Gather rank */
+    if( m-n >= band_size && descRank->super.myrank == sym_twoDBC_band_rank_of(&descRank->super, m, n) && 0 == k ) {
+        /* New data_copy and allocate memory for descRank(m, n) */
+        parsec_data_copy_t *my_data_copy = parsec_data_copy_new(descRank->super.data_of(&descRank->super, m, n), 0);
+        my_data_copy->device_private = calloc(RANK_MAP_BUFF, sizeof(int));
+
+        ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[0] = ((int *)Cr)[0];
+        ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] = ((int *)Cr)[0];
+        ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] = ((int *)Cr)[0];
+        ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[3] = ((int *)Cr)[0];
+    }
+#endif
+
+    if(enable_gemm == 0) return PARSEC_HOOK_RETURN_DONE;
+    int tempmmu = m == descAu->mt-1 ? descAu->m - m * descAu->mb : descAu->mb;
+    int tempmmv = m == descAv->mt-1 ? descAv->m - m * descAv->mb : descAv->mb;
+    int ldamu = BLKLDD( descAu, m );
+    int ldamv = BLKLDD( descAv, m );
+    int ldanu = BLKLDD( descAu, n );
+    int ldanv = BLKLDD( descAv, n );
+
+    int Arank = ((int*)Ar)[0];
+    int Brank = ((int*)Br)[0];
+    int Crank_old = ((int*)Cr)[0];
+    void *p_elem_work = NULL;
+    p_elem_work = parsec_private_memory_pop( p_work );
+
+    /** Calls two-step hcore_gemm.
+      First step reveals ACTUAL_RANK.
+      Second step constructs new CU and CV.
+      Provided CU and CV buffers must have at least ACTUAL_RANK number of columns.
+     */
+    double* work_new;
+    double* _CU;
+    double* _CV;
+    int CU_ncols;
+    int new_UVrk;
+    double* newU;
+    int ld_newU;
+    double* qrtauA;
+    int CV_ncols;
+    double* newV;
+    int ld_newV;
+    double* qrtauB;
+    int use_CUV_clone;
+    double* CUclone;
+    int ld_CUclone;
+    double *_CU_save;
+    double* CVclone;
+    int ld_CVclone;
+    double* _CV_save;
+    HiCMA_HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
+		    tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
+		    tempmmv,
+		    (double)-1.0,
+		    Au, Av, Ar, ldamu,
+		    Bu, Bv, Br, ldamv,
+		    (double)1.0,
+		    Cu, Cv, Cr, ldamu,
+		    rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
+		    /** parameters that will be passed to HiCMA_HCORE_dgemm_ormqr */
+		    &work_new,
+		    &_CU,
+		    &_CV,
+		    &CU_ncols,
+		    &new_UVrk,
+		    &newU,
+		    &ld_newU,
+		    &qrtauA,
+		    &CV_ncols,
+		    &newV,
+		    &ld_newV,
+		    &qrtauB,
+		    &use_CUV_clone,
+		    &CUclone,
+		    &ld_CUclone,
+		    &_CU_save,
+		    &CVclone,
+		    &ld_CVclone,
+		    &_CV_save
+			    );
+
+    /* If new_UVrk > Crank_old, re-allocate */
+    if( new_UVrk > Crank_old && !send_full_tile ) {
+	    if( DEBUG_INFO ) printf("Reallocate %d %d %d\n", m, n, k);
+	    free( this_task->data._f_Cu.data_out->device_private );
+	    this_task->data._f_Cu.data_out->device_private = calloc( descAg->mb * new_UVrk * 2, sizeof(double) );
+	    this_task->data._f_Cu.data_out->original->nb_elts = descAg->mb * new_UVrk * 2 * sizeof(double);
+    }
+
+    /* Address for Cu and Cv to be copied to */
+    _CU_save = this_task->data._f_Cu.data_out->device_private;
+    _CV_save = this_task->data._f_Cu.data_out->device_private + descAg->mb * new_UVrk * sizeof(double);
+
+    /* Update address Cv and data_of_Av(m, n) */
+    this_task->data._f_Cv.data_out = parsec_data_copy_new(data_of_descAv(m, n), 0);
+    this_task->data._f_Cv.data_out->device_private = _CV_save; 
+
+    HiCMA_HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+		    tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
+		    tempmmv,
+		    (double)-1.0,
+		    Au, Av, Ar, ldamu,
+		    (double)1.0,
+		    Cu, Cv, Cr, ldamu,
+		    rk, storage_maxrank, computation_maxrank, acc, work_new,
+		    /** parameters coming from HiCMA_HCORE_dgemm_qr_svd */
+		    _CU,
+		    _CV,
+		    CU_ncols,
+		    new_UVrk,
+		    newU,
+		    ld_newU,
+		    qrtauA,
+		    CV_ncols,
+		    newV,
+		    ld_newV,
+		    qrtauB,
+		    use_CUV_clone,
+		    CUclone,
+		    ld_CUclone,
+		    _CU_save,
+		    CVclone,
+		    ld_CVclone,
+		    _CV_save
+			    );
+
+    Cu = _CU_save;
+    Cv = _CV_save;
+
+    /* Update new rank */
+    parsec_private_memory_push( p_work, p_elem_work );
+    int Crank_new = ((int*)Cr)[0];
+    if(DEBUG_INFO) printf("Cr value in DGEMM (%d, %d, %d): %d\n", m, n, k, ((int *)Cr)[0]);
+
+    if(DEBUG_INFO) printf("HCORE_dgemm( %d, %d, %d )\n\t( %s, %s, %d, %d, %d, %f, A(%d,%d)[%p], %d-%d, A(%d,%d)[%p], %d-%d, %f, A(%d,%d)[%p], %d-%d)\n",
+             m, n, k,
+             plasma_const( PlasmaNoTrans ),  plasma_const( PlasmaTrans ),
+             tempmmu, tempmmv, descAv->mb,
+             -1.0, m, k, Au, ldamu, ldamv,
+                   n, k, Bu, ldanu, ldanv,
+              1.0, m, n, Cu, ldamu, ldamv);
+
+    /* Pass Cr value to size */
+    if(send_full_tile == 1){
+        this_task->locals.size.value = descAu->mb * storage_maxrank;
+    } else {
+        this_task->locals.size.value = ((int *)Cr)[0] * descAu->mb;
+    }
+
+    /* Operation count */
+    int Crank_old__Arank = Crank_old + Arank;
+    unsigned long int cnt = 0;
+    /// QR([CU AU])
+    unsigned long int qraflop = ka_counts('q', tempmmv, Crank_old__Arank, 0, 0);///ASSUMPTION:tempmmv is not totally correct if nrowsC<ncolsC
+    /// AV*BV^T
+    unsigned long int qrbflop = ka_counts('m', Arank, Brank, tempmmv, 0);
+    /// (AV*BV^T) * BU^T
+    qrbflop += ka_counts('m', Arank, tempmmv, Brank, 0);
+    qrbflop += ka_counts('q', tempmmv, Crank_old__Arank, 0, 0);  
+    int rA_nrows  = tempmmv < Crank_old__Arank ? tempmmv : Crank_old__Arank;
+    unsigned long int svdflop = ka_counts('r', Crank_old__Arank, Crank_old__Arank, 2, 0);// trmm is used
+    svdflop += ka_counts('s', Crank_old__Arank, 0, 0, 0);
+    svdflop += Crank_old__Arank * Crank_new; 
+    unsigned long int newuflop = ka_counts('o', tempmmv, Crank_new, Crank_old__Arank, 1);  
+    unsigned long int newvflop = ka_counts('o', Crank_new, tempmmv, Crank_old__Arank, 2); 
+
+    cnt = qraflop + qrbflop + svdflop + newuflop + newvflop;
+    LOG_OPCOUNT(cnt, m, n);
+
+    op_offband[es->th_id] += cnt;
+    op_offpath[es->th_id] += cnt;
+
+#if PRINT_RANK
+    /* Gather rank */
+    if( m-n >= band_size && descRank->super.myrank == sym_twoDBC_band_rank_of(&descRank->super, m, n) ) {
+        if( ((int *)Cr)[0] < ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] )
+            ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] = ((int *)Cr)[0];
+
+        if( ((int *)Cr)[0] > ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] )
+            ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] = ((int *)Cr)[0];
+
+        if( descA->mt-3 == k )
+            ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[3] = ((int *)Cr)[0];
+    }
+#endif
+}
+END

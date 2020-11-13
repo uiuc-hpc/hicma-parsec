@@ -1,0 +1,241 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+%}
+/** Uncompress tiles
+ */
+
+/* Globals
+ */
+uplo            [type = int]
+descA0          [type = "parsec_tiled_matrix_dc_t*"]
+descA           [type = "parsec_tiled_matrix_dc_t*"]
+descAr          [type = "parsec_tiled_matrix_dc_t*"]
+band_size       [type = "int"]
+INFO            [type = "int*"]
+old_destruct    [type = "parsec_destruct_fn_t" hidden = on default = NULL]
+
+
+/**************************************************
+ **************************************************/
+READ_band(m, n)
+
+// Execution space
+m = 0 .. descA->mt-1
+n = %{ return parsec_imax(m-band_size+1, 0); %} .. m
+
+// Parallel partitioning
+:descA(m, n)
+
+READ D <- descA(m, n)                       [ type = FULL ]
+       -> D uncompress_band(m, n)           [ type = FULL ]
+
+BODY
+{
+}
+END
+
+
+/**************************************************
+ **************************************************/
+READ_U(m, n)
+
+// Execution space
+m = band_size .. descA->mt-1
+n = 0 .. m-band_size
+
+// Parallel partitioning
+:descA(m, n)
+
+READ U <- descA(m, n)                      [ type = UV ]
+       -> U uncompress_L(m, n)             [ type = UV ]
+
+BODY
+{
+}
+END
+
+
+/**************************************************
+ **************************************************/
+READ_R(m, n)
+
+// Execution space
+m = band_size .. descA->mt-1
+n = 0 .. m-band_size
+
+// Parallel partitioning
+:descAr(m, n)
+
+READ R <- descAr(m, n)                     [ type = AR ]
+       -> R uncompress_L(m, n)             [ type = AR ]
+
+BODY
+{
+}
+END
+
+/**************************************************
+ *             uncompress band tiles              *
+ **************************************************/
+uncompress_band(m, n)
+
+// Execution space
+m = 0 .. descA0->mt-1
+n = %{ return parsec_imax(m-band_size+1, 0); %} .. m
+
+// Parallel partitioning
+:descA0(m, n)
+
+// Parameters
+READ D  <- D READ_band(m, n)             [ type = FULL ]
+
+RW D2 <- descA0(m, n)                    [ type = FULL ]
+      -> descA0(m, n)                    [ type = FULL ]
+
+BODY
+{
+    int ldD2 = BLKLDD(descA0, m);
+    int ldD = BLKLDD(descA, m);
+    int tempmm = m == descA0->mt-1 ? descA0->m - m * descA0->mb : descA0->mb;
+    int tempnn = tempmm;
+
+    LAPACKE_dlacpy(LAPACK_COL_MAJOR, 'F', tempmm, tempnn, D, ldD, D2, ldD2);
+}
+END
+
+/**************************************************
+ *          uncompress lower triag tiles          *
+ **************************************************/
+uncompress_L(m, n)
+
+// Execution space
+m = band_size .. descA->mt-1
+n = 0 .. m-band_size
+
+// Parallel partitioning
+:descA0(m, n)
+
+// Parameters
+READ D <- descA0(m, n)                     [ type = FULL ]
+READ R <- R READ_R(m, n)                   [ type = AR ]
+READ U <- U READ_U(m, n)                   [ type = UV ]
+
+BODY
+{
+    int ldD = BLKLDD(descA0, m);
+    int ldU = BLKLDD(descA, m);
+    int tempmm = m == descA0->mt-1 ? descA0->m - m * descA0->mb : descA0->mb;
+    int tempnn = n == descA0->nt-1 ? descA0->n - n * descA0->nb : descA0->nb;
+    int rank = ((int *)R)[0];
+    void *V = (void *)U + descA->mb * rank * sizeof(double); 
+
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, tempmm, tempnn, rank,
+            1.0, U, ldU, V, ldU, 0.0, D, ldD);
+}
+END
+
+extern "C" %{
+
+/** Uncompresses approximate matrix dcA into dcA0
+ *
+ * @param [in] uplo:         support PlasmaLower now
+ * @param [inout] dcA0:      the data, already distributed and allocated
+ * @param [in] dcA:          the data, already distributed and allocated
+ * @param [in] dcAr:         the rank data, already distributed and allocated
+ * @param [in] band_size:    band size
+ * @param [inout] info:      info to check result
+ * @return the parsec object to schedule
+ */
+parsec_taskpool_t*
+STARSH_check_New(int uplo,
+                  parsec_tiled_matrix_dc_t *A0,
+                  parsec_tiled_matrix_dc_t *A,
+                  parsec_tiled_matrix_dc_t *Ar,
+		  int band_size,
+                  int *info)
+{
+    parsec_taskpool_t *tp = NULL;
+    parsec_arena_t* default_arena;
+
+    /* Check input arguments */
+    if ((uplo != PlasmaUpper) && (uplo != PlasmaLower)) {
+        dplasma_error("STARSH_appr_New", "illegal value of uplo");
+        return NULL /*-1*/;
+    }
+
+    *info = 0;
+    parsec_STARSH_check_taskpool_t *starsh_check =
+        parsec_STARSH_check_new(uplo, A0, A, Ar, band_size, info);
+
+    tp = (parsec_taskpool_t*)starsh_check;
+
+    parsec_matrix_add2arena(starsh_check->arenas[PARSEC_STARSH_check_FULL_ARENA],
+                            parsec_datatype_double_t, matrix_UpperLower,
+                            1, A->mb, A->mb, A->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    parsec_matrix_add2arena(starsh_check->arenas[PARSEC_STARSH_check_UV_ARENA],
+                            parsec_datatype_double_t, matrix_UpperLower,
+                            1, A->mb, A->nb, A->mb,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    parsec_matrix_add2arena(starsh_check->arenas[PARSEC_STARSH_check_AR_ARENA],
+                            parsec_datatype_int_t, matrix_UpperLower,
+                            1, 1, 1, 1,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    return tp;
+}
+
+/* Destructor */
+void STARSH_check_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_STARSH_check_taskpool_t *STARSH_check_taskpool = (parsec_STARSH_check_taskpool_t *)taskpool;
+
+    parsec_matrix_del2arena(STARSH_check_taskpool->arenas[PARSEC_STARSH_check_FULL_ARENA]);
+    parsec_matrix_del2arena(STARSH_check_taskpool->arenas[PARSEC_STARSH_check_UV_ARENA]);
+    parsec_matrix_del2arena(STARSH_check_taskpool->arenas[PARSEC_STARSH_check_AR_ARENA]);
+
+    parsec_taskpool_free(taskpool);
+}
+
+/** Uncompresses approximate matrix dcA into dcA0
+ *
+ * @param [in] parsec:       parsec context
+ * @param [in] uplo:         support PlasmaLower now
+ * @param [inout] dcA0:      the data, already distributed and allocated
+ * @param [in] dcA:          the data, already distributed and allocated
+ * @param [in] dcAr:         the rank data, already distributed and allocated
+ * @param [in] band_size:    band size
+ * @param [inout] info:      info to check result 
+ */
+int STARSH_check( parsec_context_t *parsec,
+                int uplo,
+                parsec_tiled_matrix_dc_t *dcA0,
+                parsec_tiled_matrix_dc_t *dcA,
+                parsec_tiled_matrix_dc_t *dcAr,
+		int band_size,
+                int *info)
+{
+    parsec_taskpool_t *parsec_STARSH_check = NULL;
+
+    parsec_STARSH_check = STARSH_check_New(
+             uplo, dcA0, dcA, dcAr, band_size, info);
+
+    parsec_context_add_taskpool(parsec, parsec_STARSH_check);
+    parsec_context_start(parsec);
+    parsec_context_wait(parsec);
+
+    STARSH_check_Destruct(parsec_STARSH_check);
+
+    return 0;
+}
+
+%}

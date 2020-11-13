@@ -1,0 +1,87 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+%}
+
+descA     [ type = "parsec_tiled_matrix_dc_t*" ]
+band_size [ type = "int" ]
+indicator [ type = "int" ]
+/* indicator 0, only free band; otherwise, free off-band */ 
+
+/**************************************************
+ *                    Main task                   *
+ **************************************************/
+Free(m, n)
+
+m = %{ return (indicator == 0 ? 0 : band_size); %} .. descA->lmt-1
+n = %{ return (indicator == 0 ? parsec_imax(m-band_size+1, 0) : 0); %} .. %{ return (indicator == 0 ? m : m-band_size); %} 
+
+: descA(m, n)
+
+BODY
+{
+    if( NULL != PARSEC_DATA_COPY_GET_PTR(parsec_data_get_copy(data_of_descA(m, n), 0)) )
+        free(PARSEC_DATA_COPY_GET_PTR(parsec_data_get_copy(data_of_descA(m, n), 0)));
+}
+END
+
+extern "C" %{
+
+/**
+ * @param [inout] dcA:      the data, already distributed and allocated
+ * @param [in] band_size:   band size 
+ * @param [in] indicator:   0, only band; otherwise all 
+ * @return the parsec object to schedule.
+ */
+parsec_taskpool_t*
+parsec_band_free_New(parsec_tiled_matrix_dc_t *dcA, int band_size, int indicator)
+{
+    parsec_taskpool_t* band_free_taskpool;
+    parsec_band_free_taskpool_t* taskpool = NULL;
+
+    taskpool = parsec_band_free_new(dcA, band_size, indicator);
+    band_free_taskpool = (parsec_taskpool_t*)taskpool;
+
+    return band_free_taskpool;
+}
+
+/**
+ * @param [inout] the parsec object to destroy
+*/
+void parsec_band_free_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_band_free_taskpool_t *band_free_taskpool = (parsec_band_free_taskpool_t *)taskpool;
+    parsec_taskpool_free(taskpool);
+}
+
+/**
+ * @brief free memory 
+ * 
+ * @param [inout] dcA: the data, already distributed and allocated
+ * @param [in] band_size:   band size 
+ * @param [in] indicator:   0, only band; otherwise all 
+ */
+int parsec_band_free(parsec_context_t *parsec,
+                     parsec_tiled_matrix_dc_t *dcA,
+		     int band_size, int indicator)
+{
+    parsec_taskpool_t *parsec_band_free = NULL;
+    parsec_band_free = parsec_band_free_New(dcA, band_size, indicator); 
+
+    if( parsec_band_free != NULL ){
+        parsec_context_add_taskpool(parsec, parsec_band_free);
+        parsec_context_start(parsec);
+        parsec_context_wait(parsec);
+        parsec_band_free_Destruct(parsec_band_free);
+    }
+
+    return 0;
+}
+
+%}

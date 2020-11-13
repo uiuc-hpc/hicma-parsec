@@ -1,0 +1,1433 @@
+srun --job-name=lorapo---16 --hint=nomultithread --nodes=16 --ntasks=16 --ntasks-per-node=1 --cpus-per-task=32 --hint=nomultithread numactl --interleave=all /lustre/project/k1205/lei/lorapo/testing_dpotrf -P 4 -Q 4 -N 1080000 -t 3000 -e 1e-8 --maxrank 1500 -j 1080000 -v -c 31 --genmaxrank 1500 --compmaxrank 1500 -D 4 -Z 1 -F 0 -Y 1 -z 300 -E 1 -W 1
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 16 x 31 + 0 (496+0)
+#+++++ P x Q                : 4 x 4 (16/16)
+#+++++ M x N x K|NRHS       : 1080000 x 1080000 x 1
+#+++++ MB x NB              : 3000 x 3000
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:1080000 N:1080000 MB:3000 NB:3000 HMB:300 HNB:300
+nodes:16 P:4 Q:4 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:1.08e+06 fixed_rk:0 wave_k:1.57774e-52
+send_full_tile:0 lookahead: 1 band_size:1 max rank:1500 gen:1500 comp:1500
+397: STARSH will generate problem
+461: STARSH generated problem
+
+481: AUTO SELECT band_size, set band_size = 1 at the beginning
+
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)   1652.25558 : STARSH_gen	PxQ=   4 4   NB= 3000 N= 1080000
+[****] TIME(s)      0.05360 : Before HiCMA Check Rank	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 band_size= 1 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.00852 : Gather rank	band_size= 1  PxQ=   4 4   NB= 3000 N= 1080000
+Ranks were gathered
+-------------------------------------------number of tiles:64620
+
+***************** START Check band_size 2 ******************
+band_size: 2, nb_threads: 31, ops_sum_tlr: 1.857256e+15, ops_sum_dense: 6.850120e+13
+***************** END Check band_size 2 : 944 ******************
+
+***************** START Check band_size 3 ******************
+band_size: 3, nb_threads: 31, ops_sum_tlr: 6.245266e+14, ops_sum_dense: 6.375165e+13
+***************** END Check band_size 3 : 668 ******************
+
+***************** START Check band_size 4 ******************
+band_size: 4, nb_threads: 31, ops_sum_tlr: 3.506787e+14, ops_sum_dense: 6.150946e+13
+***************** END Check band_size 4 : 544 ******************
+
+***************** START Check band_size 5 ******************
+band_size: 5, nb_threads: 31, ops_sum_tlr: 1.527673e+14, ops_sum_dense: 5.946524e+13
+***************** END Check band_size 5 : 457 ******************
+
+***************** START Check band_size 6 ******************
+band_size: 6, nb_threads: 31, ops_sum_tlr: 1.823896e+14, ops_sum_dense: 5.933771e+13
+***************** END Check band_size 6 : 449 ******************
+
+***************** START Check band_size 7 ******************
+band_size: 7, nb_threads: 31, ops_sum_tlr: 6.353189e+13, ops_sum_dense: 5.873554e+13
+***************** END Check band_size 7 : 201 ******************
+******************* Min band_size 6 *******************
+
+***************** START Check band_size 8 ******************
+band_size: 8, nb_threads: 31, ops_sum_tlr: 6.494177e+13, ops_sum_dense: 5.800224e+13
+***************** END Check band_size 8 : 279 ******************
+
+***************** START Check band_size 9 ******************
+band_size: 9, nb_threads: 31, ops_sum_tlr: 4.757423e+13, ops_sum_dense: 5.766181e+13
+***************** END Check band_size 9 : 199 ******************
+
+**************** Find the OPT band_size : 6 ******************
+
+avg:54.8866 min:19 max:944
+[****] TIME(s)      0.00002 : Print ranks of tiles
+[****] TIME(s)      0.00482 : rank_copy	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.07939 : OPT band_size	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 send_full= 0 band_size_opt= 6
+
+[****] TIME(s)      2.17547 : band generation	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 send_full= 0 band_size= 6
+
+[****] TIME(s)      0.00001 : Allocate Sum	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 band_size= 6 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 18.688287 GB, memory_per_node_max= 272.390898 GB
+
+[****] TIME(s)      0.00001 : reorder_gemm	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 send_full= 0 band_size= 6 reorder_gemm= 0
+
+[****] TIME(s)      0.00839 : Before HiCMA Check Rank	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00425 : Gather rank	band_size= 6  PxQ=   4 4   NB= 3000 N= 1080000
+Ranks were gathered
+-------------------------------------------number of tiles:62835
+avg:46.6633 min:19 max:658
+[****] TIME(s)      0.00001 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 3, 0.83 % is finished
+In potrf, k 6, 1.67 % is finished
+In potrf, k 9, 2.50 % is finished
+In potrf, k 12, 3.33 % is finished
+In potrf, k 15, 4.17 % is finished
+In potrf, k 18, 5.00 % is finished
+In potrf, k 21, 5.83 % is finished
+In potrf, k 24, 6.67 % is finished
+In potrf, k 27, 7.50 % is finished
+In potrf, k 30, 8.33 % is finished
+In potrf, k 33, 9.17 % is finished
+In potrf, k 36, 10.00 % is finished
+In potrf, k 39, 10.83 % is finished
+In potrf, k 42, 11.67 % is finished
+In potrf, k 45, 12.50 % is finished
+In potrf, k 48, 13.33 % is finished
+In potrf, k 51, 14.17 % is finished
+In potrf, k 54, 15.00 % is finished
+In potrf, k 57, 15.83 % is finished
+In potrf, k 60, 16.67 % is finished
+In potrf, k 63, 17.50 % is finished
+In potrf, k 66, 18.33 % is finished
+In potrf, k 69, 19.17 % is finished
+In potrf, k 72, 20.00 % is finished
+In potrf, k 75, 20.83 % is finished
+In potrf, k 78, 21.67 % is finished
+In potrf, k 81, 22.50 % is finished
+In potrf, k 84, 23.33 % is finished
+In potrf, k 87, 24.17 % is finished
+In potrf, k 90, 25.00 % is finished
+In potrf, k 93, 25.83 % is finished
+In potrf, k 96, 26.67 % is finished
+In potrf, k 99, 27.50 % is finished
+In potrf, k 102, 28.33 % is finished
+In potrf, k 105, 29.17 % is finished
+In potrf, k 108, 30.00 % is finished
+In potrf, k 111, 30.83 % is finished
+In potrf, k 114, 31.67 % is finished
+In potrf, k 117, 32.50 % is finished
+In potrf, k 120, 33.33 % is finished
+In potrf, k 123, 34.17 % is finished
+In potrf, k 126, 35.00 % is finished
+In potrf, k 129, 35.83 % is finished
+In potrf, k 132, 36.67 % is finished
+In potrf, k 135, 37.50 % is finished
+In potrf, k 138, 38.33 % is finished
+In potrf, k 141, 39.17 % is finished
+In potrf, k 144, 40.00 % is finished
+In potrf, k 147, 40.83 % is finished
+In potrf, k 150, 41.67 % is finished
+In potrf, k 153, 42.50 % is finished
+In potrf, k 156, 43.33 % is finished
+In potrf, k 159, 44.17 % is finished
+In potrf, k 162, 45.00 % is finished
+In potrf, k 165, 45.83 % is finished
+In potrf, k 168, 46.67 % is finished
+In potrf, k 171, 47.50 % is finished
+In potrf, k 174, 48.33 % is finished
+In potrf, k 177, 49.17 % is finished
+In potrf, k 180, 50.00 % is finished
+In potrf, k 183, 50.83 % is finished
+In potrf, k 186, 51.67 % is finished
+In potrf, k 189, 52.50 % is finished
+In potrf, k 192, 53.33 % is finished
+In potrf, k 195, 54.17 % is finished
+In potrf, k 198, 55.00 % is finished
+In potrf, k 201, 55.83 % is finished
+In potrf, k 204, 56.67 % is finished
+In potrf, k 207, 57.50 % is finished
+In potrf, k 210, 58.33 % is finished
+In potrf, k 213, 59.17 % is finished
+In potrf, k 216, 60.00 % is finished
+In potrf, k 219, 60.83 % is finished
+In potrf, k 222, 61.67 % is finished
+In potrf, k 225, 62.50 % is finished
+In potrf, k 228, 63.33 % is finished
+In potrf, k 231, 64.17 % is finished
+In potrf, k 234, 65.00 % is finished
+In potrf, k 237, 65.83 % is finished
+In potrf, k 240, 66.67 % is finished
+In potrf, k 243, 67.50 % is finished
+In potrf, k 246, 68.33 % is finished
+In potrf, k 249, 69.17 % is finished
+In potrf, k 252, 70.00 % is finished
+In potrf, k 255, 70.83 % is finished
+In potrf, k 258, 71.67 % is finished
+In potrf, k 261, 72.50 % is finished
+In potrf, k 264, 73.33 % is finished
+In potrf, k 267, 74.17 % is finished
+In potrf, k 270, 75.00 % is finished
+In potrf, k 273, 75.83 % is finished
+In potrf, k 276, 76.67 % is finished
+In potrf, k 279, 77.50 % is finished
+In potrf, k 282, 78.33 % is finished
+In potrf, k 285, 79.17 % is finished
+In potrf, k 288, 80.00 % is finished
+In potrf, k 291, 80.83 % is finished
+In potrf, k 294, 81.67 % is finished
+In potrf, k 297, 82.50 % is finished
+In potrf, k 300, 83.33 % is finished
+In potrf, k 303, 84.17 % is finished
+In potrf, k 306, 85.00 % is finished
+In potrf, k 309, 85.83 % is finished
+In potrf, k 312, 86.67 % is finished
+In potrf, k 315, 87.50 % is finished
+In potrf, k 318, 88.33 % is finished
+In potrf, k 321, 89.17 % is finished
+In potrf, k 324, 90.00 % is finished
+In potrf, k 327, 90.83 % is finished
+In potrf, k 330, 91.67 % is finished
+In potrf, k 333, 92.50 % is finished
+In potrf, k 336, 93.33 % is finished
+In potrf, k 339, 94.17 % is finished
+In potrf, k 342, 95.00 % is finished
+In potrf, k 345, 95.83 % is finished
+In potrf, k 348, 96.67 % is finished
+In potrf, k 351, 97.50 % is finished
+In potrf, k 354, 98.33 % is finished
+In potrf, k 357, 99.17 % is finished
+Execution_time_each_thread 0 0 : 700.072013
+Execution_time_each_thread 0 1 : 696.462660
+Execution_time_each_thread 0 2 : 697.300238
+Execution_time_each_thread 0 3 : 698.898339
+Execution_time_each_thread 0 4 : 695.950914
+Execution_time_each_thread 0 5 : 699.487890
+Execution_time_each_thread 0 6 : 696.088033
+Execution_time_each_thread 0 7 : 700.354613
+Execution_time_each_thread 0 8 : 695.317687
+Execution_time_each_thread 0 9 : 696.498768
+Execution_time_each_thread 0 10 : 691.445096
+Execution_time_each_thread 0 11 : 699.003331
+Execution_time_each_thread 0 12 : 705.961641
+Execution_time_each_thread 0 13 : 696.545679
+Execution_time_each_thread 0 14 : 698.723592
+Execution_time_each_thread 0 15 : 697.693263
+Execution_time_each_thread 0 16 : 695.578597
+Execution_time_each_thread 0 17 : 704.534698
+Execution_time_each_thread 0 18 : 699.351319
+Execution_time_each_thread 0 19 : 699.797491
+Execution_time_each_thread 0 20 : 700.128471
+Execution_time_each_thread 0 21 : 702.943152
+Execution_time_each_thread 0 22 : 698.381393
+Execution_time_each_thread 0 23 : 696.720371
+Execution_time_each_thread 0 24 : 699.304229
+Execution_time_each_thread 0 25 : 699.182164
+Execution_time_each_thread 2 0 : 828.451175
+Execution_time_each_thread 2 1 : 819.409027
+Execution_time_each_thread 2 2 : 817.867344
+Execution_time_each_thread 2 3 : 827.328829
+Execution_time_each_thread 2 4 : 823.926242
+Execution_time_each_thread 2 5 : 821.504641
+Execution_time_each_thread 2 6 : 825.688284
+Execution_time_each_thread 2 7 : 820.621322
+Execution_time_each_thread 2 8 : 830.820983
+Execution_time_each_thread 2 9 : 823.549888
+Execution_time_each_thread 2 10 : 825.537488
+Execution_time_each_thread 2 11 : 822.650801
+Execution_time_each_thread 2 12 : 818.792922
+Execution_time_each_thread 2 13 : 823.739383
+Execution_time_each_thread 2 14 : 821.762363
+Execution_time_each_thread 2 15 : 824.066962
+Execution_time_each_thread 2 16 : 825.743009
+Execution_time_each_thread 2 17 : 831.390876
+Execution_time_each_thread 2 18 : 824.992905
+Execution_time_each_thread 2 19 : 820.075661
+Execution_time_each_thread 2 20 : 822.869395
+Execution_time_each_thread 2 21 : 825.081318
+Execution_time_each_thread 12 0 : 750.566053
+Execution_time_each_thread 12 1 : 743.163490
+Execution_time_each_thread 12 2 : 744.100559
+Execution_time_each_thread 12 3 : 745.457214
+Execution_time_each_thread 12 4 : 744.515419
+Execution_time_each_thread 12 5 : 743.873456
+Execution_time_each_thread 12 6 : 742.123641
+Execution_time_each_thread 12 7 : 741.141762
+Execution_time_each_thread 12 8 : 741.047966
+Execution_time_each_thread 12 9 : 746.767616
+Execution_time_each_thread 12 10 : 744.186244
+Execution_time_each_thread 12 11 : 744.367590
+Execution_time_each_thread 12 12 : 746.865005
+Execution_time_each_thread 12 13 : 748.626661
+Execution_time_each_thread 12 14 : 743.858727
+Execution_time_each_thread 12 15 : 751.806672
+Execution_time_each_thread 12 16 : 747.228876
+Execution_time_each_thread 12 17 : 741.771001
+Execution_time_each_thread 12 18 : 743.922491
+Execution_time_each_thread 12 19 : 747.422317
+Execution_time_each_thread 12 20 : 744.297276
+Execution_time_each_thread 12 21 : 742.347214
+Execution_time_each_thread 5 0 : 680.846793
+Execution_time_each_thread 5 1 : 675.831385
+Execution_time_each_thread 5 2 : 679.957392
+Execution_time_each_thread 5 3 : 679.365139
+Execution_time_each_thread 5 4 : 679.050653
+Execution_time_each_thread 5 5 : 677.456125
+Execution_time_each_thread 5 6 : 678.747798
+Execution_time_each_thread 5 7 : 673.413258
+Execution_time_each_thread 10 0 : 679.352348
+Execution_time_each_thread 10 1 : 682.682079
+Execution_time_each_thread 10 2 : 681.182441
+Execution_time_each_thread 10 3 : 677.214965
+Execution_time_each_thread 10 4 : 676.755477
+Execution_time_each_thread 10 5 : 678.753103
+Execution_time_each_thread 10 6 : 684.332510
+Execution_time_each_thread 10 7 : 681.409992
+Execution_time_each_thread 10 8 : 682.722968
+Execution_time_each_thread 10 9 : 678.448099
+Execution_time_each_thread 10 10 : 675.220253
+Execution_time_each_thread 10 11 : 684.820492
+Execution_time_each_thread 10 12 : 679.822324
+Execution_time_each_thread 10 13 : 676.772171
+Execution_time_each_thread 10 14 : 682.212127
+Execution_time_each_thread 10 15 : 680.256425
+Execution_time_each_thread 10 16 : 677.005766
+Execution_time_each_thread 10 17 : 678.216588
+Execution_time_each_thread 10 18 : 680.741312
+Execution_time_each_thread 10 19 : 680.780569
+Execution_time_each_thread 10 20 : 686.012735
+Execution_time_each_thread 10 21 : 681.305547
+[****] TIME(s)    942.37113 : HiCMA_potrf	send_full_tile= 0 band_size= 6 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   4 4   NB= 3000 N= 1080000 2flow= 1 :  445583.030148 gflops
+966: HiCMA dpotrf ended in 942.371 seconds
+Execution_time_each_thread 8 0 : 790.241398
+Execution_time_each_thread 8 1 : 789.504987
+Execution_time_each_thread 8 2 : 790.900088
+Execution_time_each_thread 8 3 : 790.628535
+Execution_time_each_thread 8 4 : 794.693842
+Execution_time_each_thread 8 5 : 793.279862
+Execution_time_each_thread 8 6 : 792.346005
+Execution_time_each_thread 8 7 : 794.557294
+Execution_time_each_thread 8 8 : 791.810729
+Execution_time_each_thread 8 9 : 792.430914
+Execution_time_each_thread 8 10 : 791.254865
+Execution_time_each_thread 8 11 : 793.108105
+Execution_time_each_thread 8 12 : 795.388248
+Execution_time_each_thread 8 13 : 793.479383
+Execution_time_each_thread 8 14 : 790.862873
+Execution_time_each_thread 8 15 : 792.962321
+Execution_time_each_thread 8 16 : 799.166980
+Execution_time_each_thread 8 17 : 796.779316
+Execution_time_each_thread 8 18 : 794.886720
+Execution_time_each_thread 8 19 : 791.226083
+Execution_time_each_thread 8 20 : 795.783704
+Execution_time_each_thread 8 21 : 793.542653
+Execution_time_each_thread 0 26 : 694.888736
+Execution_time_each_thread 0 27 : 696.293757
+Execution_time_each_thread 0 28 : 705.734863
+Execution_time_each_thread 0 29 : 700.018875
+Execution_time_each_thread 0 30 : 696.964757
+Execution_time_each_thread 14 0 : 676.335657
+Execution_time_each_thread 14 1 : 678.902948
+Execution_time_each_thread 14 2 : 676.228117
+Execution_time_each_thread 14 3 : 677.220257
+Execution_time_each_thread 14 4 : 676.621077
+Execution_time_each_thread 14 5 : 677.143635
+Execution_time_each_thread 14 6 : 678.217555
+Execution_time_each_thread 14 7 : 677.562287
+Execution_time_each_thread 14 8 : 678.146919
+Execution_time_each_thread 14 9 : 673.973403
+Execution_time_each_thread 14 10 : 674.673990
+Execution_time_each_thread 14 11 : 681.921154
+Execution_time_each_thread 14 12 : 674.887686
+Execution_time_each_thread 14 13 : 672.928502
+Execution_time_each_thread 14 14 : 677.838712
+Execution_time_each_thread 14 15 : 678.749330
+Execution_time_each_thread 14 16 : 680.832572
+Execution_time_each_thread 14 17 : 679.308216
+Execution_time_each_thread 14 18 : 675.940561
+Execution_time_each_thread 7 0 : 807.906887
+Execution_time_each_thread 7 1 : 808.093472
+Execution_time_each_thread 7 2 : 808.885279
+Execution_time_each_thread 7 3 : 809.369333
+Execution_time_each_thread 7 4 : 807.645446
+Execution_time_each_thread 7 5 : 810.820237
+Execution_time_each_thread 7 6 : 809.223711
+Execution_time_each_thread 7 7 : 811.767848
+Execution_time_each_thread 7 8 : 809.221750
+Execution_time_each_thread 7 9 : 808.578717
+Execution_time_each_thread 7 10 : 810.598893
+Execution_time_each_thread 7 11 : 811.360963
+Execution_time_each_thread 7 12 : 809.863142
+Execution_time_each_thread 7 13 : 808.661106
+Execution_time_each_thread 7 14 : 805.973552
+Execution_time_each_thread 7 15 : 808.079292
+Execution_time_each_thread 7 16 : 805.527949
+Execution_time_each_thread 7 17 : 809.859930
+Execution_time_each_thread 7 18 : 811.486432
+Execution_time_each_thread 7 19 : 806.296324
+Execution_time_each_thread 7 20 : 806.383205
+Execution_time_each_thread 7 21 : 804.611338
+Execution_time_each_thread 9 0 : 692.468002
+Execution_time_each_thread 9 1 : 690.434443
+Execution_time_each_thread 9 2 : 692.858172
+Execution_time_each_thread 9 3 : 690.267570
+Execution_time_each_thread 9 4 : 689.237310
+Execution_time_each_thread 9 5 : 693.077075
+Execution_time_each_thread 9 6 : 693.083097
+Execution_time_each_thread 9 7 : 697.453397
+Execution_time_each_thread 9 8 : 694.015760
+Execution_time_each_thread 9 9 : 692.201498
+Execution_time_each_thread 9 10 : 688.035574
+Execution_time_each_thread 9 11 : 690.581785
+Execution_time_each_thread 9 12 : 689.438703
+Execution_time_each_thread 9 13 : 692.019392
+Execution_time_each_thread 9 14 : 694.355289
+Execution_time_each_thread 9 15 : 692.311384
+Execution_time_each_thread 9 16 : 689.488980
+Execution_time_each_thread 9 17 : 694.013750
+Execution_time_each_thread 9 18 : 690.310405
+Execution_time_each_thread 9 19 : 691.451376
+Execution_time_each_thread 9 20 : 694.476208
+Execution_time_each_thread 9 21 : 689.650907
+Execution_time_each_thread 3 0 : 716.305709
+Execution_time_each_thread 3 1 : 716.624482
+Execution_time_each_thread 3 2 : 717.816139
+Execution_time_each_thread 3 3 : 713.056863
+Execution_time_each_thread 3 4 : 712.251510
+Execution_time_each_thread 3 5 : 720.085090
+Execution_time_each_thread 3 6 : 709.333600
+Execution_time_each_thread 3 7 : 714.697071
+Execution_time_each_thread 3 8 : 714.472405
+Execution_time_each_thread 3 9 : 717.118678
+Execution_time_each_thread 3 10 : 714.945555
+Execution_time_each_thread 3 11 : 711.157107
+Execution_time_each_thread 3 12 : 715.874070
+Execution_time_each_thread 3 13 : 717.500575
+Execution_time_each_thread 3 14 : 713.157037
+Execution_time_each_thread 3 15 : 708.924735
+Execution_time_each_thread 3 16 : 709.076313
+Execution_time_each_thread 3 17 : 710.327181
+Execution_time_each_thread 3 18 : 713.073706
+Execution_time_each_thread 3 19 : 713.885333
+Execution_time_each_thread 3 20 : 714.755472
+Execution_time_each_thread 3 21 : 716.138898
+Execution_time_each_thread 15 0 : 670.708479
+Execution_time_each_thread 15 1 : 668.347529
+Execution_time_each_thread 15 2 : 668.076070
+Execution_time_each_thread 15 3 : 671.829702
+Execution_time_each_thread 15 4 : 664.989763
+Execution_time_each_thread 15 5 : 666.739089
+Execution_time_each_thread 15 6 : 666.639416
+Execution_time_each_thread 15 7 : 662.684962
+Execution_time_each_thread 15 8 : 670.048361
+Execution_time_each_thread 15 9 : 665.876005
+Execution_time_each_thread 15 10 : 670.263361
+Execution_time_each_thread 15 11 : 664.581009
+Execution_time_each_thread 15 12 : 666.698858
+Execution_time_each_thread 15 13 : 665.271851
+Execution_time_each_thread 15 14 : 667.590685
+Execution_time_each_thread 15 15 : 664.979002
+Execution_time_each_thread 15 16 : 668.667503
+Execution_time_each_thread 15 17 : 661.699008
+Execution_time_each_thread 15 18 : 663.080813
+Execution_time_each_thread 15 19 : 668.714744
+Execution_time_each_thread 15 20 : 666.883554
+Execution_time_each_thread 15 21 : 665.230093
+Execution_time_each_thread 6 0 : 747.415061
+Execution_time_each_thread 6 1 : 745.674978
+Execution_time_each_thread 6 2 : 743.663614
+Execution_time_each_thread 6 3 : 743.632127
+Execution_time_each_thread 6 4 : 744.610095
+Execution_time_each_thread 6 5 : 742.987734
+Execution_time_each_thread 6 6 : 746.472492
+Execution_time_each_thread 6 7 : 743.529310
+Execution_time_each_thread 6 8 : 743.268605
+Execution_time_each_thread 6 9 : 748.434974
+Execution_time_each_thread 6 10 : 748.290439
+Execution_time_each_thread 6 11 : 750.112692
+Execution_time_each_thread 6 12 : 746.076396
+Execution_time_each_thread 6 13 : 753.459141
+Execution_time_each_thread 6 14 : 742.219094
+Execution_time_each_thread 6 15 : 742.179022
+Execution_time_each_thread 6 16 : 747.591924
+Execution_time_each_thread 6 17 : 742.622886
+Execution_time_each_thread 6 18 : 742.209089
+Execution_time_each_thread 6 19 : 742.068214
+Execution_time_each_thread 6 20 : 744.098377
+Execution_time_each_thread 6 21 : 755.080918
+Execution_time_each_thread 4 0 : 697.873737
+Execution_time_each_thread 4 1 : 692.359087
+Execution_time_each_thread 4 2 : 690.370417
+Execution_time_each_thread 4 3 : 695.253338
+Execution_time_each_thread 4 4 : 689.101039
+Execution_time_each_thread 4 5 : 694.823815
+Execution_time_each_thread 4 6 : 693.754866
+Execution_time_each_thread 4 7 : 693.603319
+Execution_time_each_thread 4 8 : 694.482980
+Execution_time_each_thread 4 9 : 696.004524
+Execution_time_each_thread 4 10 : 688.398955
+Execution_time_each_thread 4 11 : 692.854389
+Execution_time_each_thread 4 12 : 686.116641
+Execution_time_each_thread 4 13 : 690.813804
+Execution_time_each_thread 4 14 : 691.269282
+Execution_time_each_thread 4 15 : 689.822332
+Execution_time_each_thread 4 16 : 694.725586
+Execution_time_each_thread 4 17 : 693.470867
+Execution_time_each_thread 4 18 : 693.408579
+Execution_time_each_thread 4 19 : 693.679113
+Execution_time_each_thread 4 20 : 690.501889
+Execution_time_each_thread 4 21 : 689.018541
+Execution_time_each_thread 1 0 : 769.499200
+Execution_time_each_thread 1 1 : 770.974791
+Execution_time_each_thread 1 2 : 773.343040
+Execution_time_each_thread 1 3 : 776.501618
+Execution_time_each_thread 1 4 : 769.037069
+Execution_time_each_thread 1 5 : 772.940711
+Execution_time_each_thread 1 6 : 769.585618
+Execution_time_each_thread 1 7 : 769.249532
+Execution_time_each_thread 1 8 : 776.868510
+Execution_time_each_thread 1 9 : 773.967700
+Execution_time_each_thread 1 10 : 775.691833
+Execution_time_each_thread 1 11 : 766.634900
+Execution_time_each_thread 1 12 : 774.304099
+Execution_time_each_thread 1 13 : 771.551645
+Execution_time_each_thread 1 14 : 774.196626
+Execution_time_each_thread 1 15 : 774.931074
+Execution_time_each_thread 1 16 : 768.334557
+Execution_time_each_thread 1 17 : 771.407843
+Execution_time_each_thread 1 18 : 771.453451
+Execution_time_each_thread 1 19 : 777.939490
+Execution_time_each_thread 1 20 : 776.402336
+Execution_time_each_thread 1 21 : 766.953331
+Execution_time_each_thread 12 22 : 748.473394
+Execution_time_each_thread 12 23 : 742.843249
+Execution_time_each_thread 12 24 : 740.146421
+Execution_time_each_thread 10 22 : 679.801930
+Execution_time_each_thread 10 23 : 676.939445
+Execution_time_each_thread 10 24 : 679.293037
+Execution_time_each_thread 10 25 : 677.735546
+Execution_time_each_thread 10 26 : 678.315035
+Execution_time_each_thread 13 0 : 794.155251
+Execution_time_each_thread 13 1 : 792.040866
+Execution_time_each_thread 13 2 : 789.019703
+Execution_time_each_thread 13 3 : 787.530504
+Execution_time_each_thread 13 4 : 789.944502
+Execution_time_each_thread 13 5 : 789.517046
+Execution_time_each_thread 13 6 : 793.701853
+Execution_time_each_thread 13 7 : 790.210064
+Execution_time_each_thread 13 8 : 790.981394
+Execution_time_each_thread 13 9 : 785.489674
+Execution_time_each_thread 13 10 : 784.729347
+Execution_time_each_thread 13 11 : 788.097508
+Execution_time_each_thread 13 12 : 798.592443
+Execution_time_each_thread 13 13 : 788.220413
+Execution_time_each_thread 13 14 : 790.678395
+Execution_time_each_thread 13 15 : 787.306254
+Execution_time_each_thread 13 16 : 789.019006
+Execution_time_each_thread 13 17 : 793.293728
+Execution_time_each_thread 13 18 : 789.216403
+Execution_time_each_thread 13 19 : 785.780706
+Execution_time_each_thread 13 20 : 786.643759
+Execution_time_each_thread 13 21 : 790.559435
+Execution_time_each_thread 11 0 : 772.912490
+Execution_time_each_thread 11 1 : 773.845621
+Execution_time_each_thread 11 2 : 773.054775
+Execution_time_each_thread 11 3 : 776.702188
+Execution_time_each_thread 11 4 : 774.540927
+Execution_time_each_thread 11 5 : 773.973590
+Execution_time_each_thread 11 6 : 772.219078
+Execution_time_each_thread 11 7 : 770.624832
+Execution_time_each_thread 11 8 : 773.750504
+Execution_time_each_thread 11 9 : 771.240190
+Execution_time_each_thread 11 10 : 771.592525
+Execution_time_each_thread 11 11 : 771.246679
+Execution_time_each_thread 11 12 : 777.885889
+Execution_time_each_thread 11 13 : 778.827216
+Execution_time_each_thread 11 14 : 772.201113
+Execution_time_each_thread 11 15 : 774.961479
+Execution_time_each_thread 11 16 : 779.128667
+Execution_time_each_thread 11 17 : 774.288512
+Execution_time_each_thread 11 18 : 775.086972
+Execution_time_each_thread 11 19 : 771.847304
+Execution_time_each_thread 11 20 : 781.316345
+Execution_time_each_thread 11 21 : 773.017118
+Execution_time_each_thread 2 22 : 829.878837
+Execution_time_each_thread 2 23 : 820.983288
+Execution_time_each_thread 2 24 : 825.598586
+Execution_time_each_thread 2 25 : 821.741688
+Execution_time_each_thread 2 26 : 825.723422
+Execution_time_each_thread 2 27 : 826.480284
+Execution_time_each_thread 12 25 : 746.468146
+Execution_time_each_thread 12 26 : 743.775797
+Execution_time_each_thread 12 27 : 748.152323
+Execution_time_each_thread 12 28 : 749.552794
+Execution_time_each_thread 12 29 : 739.385953
+Execution_time_each_thread 12 30 : 743.607921
+Execution_time_each_thread 14 19 : 676.792625
+Execution_time_each_thread 14 20 : 680.806290
+Execution_time_each_thread 14 21 : 681.920699
+Execution_time_each_thread 14 22 : 675.439773
+Execution_time_each_thread 14 23 : 675.726687
+Execution_time_each_thread 14 24 : 677.523360
+Execution_time_each_thread 14 25 : 681.445475
+Execution_time_each_thread 14 26 : 677.125000
+Execution_time_each_thread 14 27 : 680.222625
+Execution_time_each_thread 14 28 : 679.264180
+Execution_time_each_thread 14 29 : 679.351176
+Execution_time_each_thread 14 30 : 680.162863
+Execution_time_each_thread 7 22 : 804.770210
+Execution_time_each_thread 7 23 : 811.920482
+Execution_time_each_thread 7 24 : 804.684797
+Execution_time_each_thread 7 25 : 807.562031
+Execution_time_each_thread 9 22 : 697.556794
+Execution_time_each_thread 9 23 : 693.770816
+Execution_time_each_thread 9 24 : 697.383690
+Execution_time_each_thread 9 25 : 691.694420
+Execution_time_each_thread 5 8 : 679.806690
+Execution_time_each_thread 5 9 : 675.945042
+Execution_time_each_thread 5 10 : 675.348051
+Execution_time_each_thread 5 11 : 681.438845
+Execution_time_each_thread 5 12 : 674.518105
+Execution_time_each_thread 5 13 : 676.632549
+Execution_time_each_thread 5 14 : 677.170442
+Execution_time_each_thread 5 15 : 679.080488
+Execution_time_each_thread 5 16 : 674.356142
+Execution_time_each_thread 5 17 : 677.544677
+Execution_time_each_thread 5 18 : 675.466096
+Execution_time_each_thread 5 19 : 677.423855
+Execution_time_each_thread 5 20 : 676.230903
+Execution_time_each_thread 5 21 : 682.013786
+Execution_time_each_thread 5 22 : 677.885174
+Execution_time_each_thread 5 23 : 678.360826
+Execution_time_each_thread 5 24 : 680.813721
+Execution_time_each_thread 5 25 : 677.474110
+Execution_time_each_thread 5 26 : 677.656898
+Execution_time_each_thread 5 27 : 677.946293
+Execution_time_each_thread 5 28 : 673.195882
+Execution_time_each_thread 5 29 : 677.561424
+Execution_time_each_thread 10 27 : 681.110958
+Execution_time_each_thread 10 28 : 678.592918
+Execution_time_each_thread 10 29 : 686.583780
+Execution_time_each_thread 10 30 : 682.915023
+Execution_time_each_thread 15 22 : 670.447498
+Execution_time_each_thread 15 23 : 666.013985
+Execution_time_each_thread 15 24 : 661.760144
+Execution_time_each_thread 8 22 : 793.206282
+Execution_time_each_thread 8 23 : 791.878206
+Execution_time_each_thread 8 24 : 792.895916
+Execution_time_each_thread 6 22 : 743.827247
+Execution_time_each_thread 6 23 : 747.344439
+Execution_time_each_thread 6 24 : 746.798658
+Execution_time_each_thread 6 25 : 742.972266
+Execution_time_each_thread 4 22 : 691.739158
+Execution_time_each_thread 4 23 : 688.491118
+Execution_time_each_thread 4 24 : 693.665868
+Execution_time_each_thread 1 22 : 772.748377
+Execution_time_each_thread 1 23 : 769.767954
+Execution_time_each_thread 1 24 : 771.302982
+Execution_time_each_thread 1 25 : 773.785270
+Execution_time_each_thread 2 28 : 823.457724
+Execution_time_each_thread 2 29 : 826.742379
+Execution_time_each_thread 2 30 : 826.685241
+Execution_time_each_thread 7 26 : 804.390813
+Execution_time_each_thread 7 27 : 807.081638
+Execution_time_each_thread 7 28 : 809.446003
+Execution_time_each_thread 7 29 : 809.779971
+Execution_time_each_thread 7 30 : 808.739734
+Execution_time_each_thread 9 26 : 688.002911
+Execution_time_each_thread 9 27 : 692.143073
+Execution_time_each_thread 9 28 : 696.261109
+Execution_time_each_thread 9 29 : 693.101253
+Execution_time_each_thread 9 30 : 690.702442
+Execution_time_each_thread 5 30 : 678.785581
+Execution_time_each_thread 3 22 : 720.274950
+Execution_time_each_thread 3 23 : 715.621656
+Execution_time_each_thread 3 24 : 716.015698
+Execution_time_each_thread 3 25 : 717.436944
+Execution_time_each_thread 15 25 : 661.227917
+Execution_time_each_thread 15 26 : 667.790718
+Execution_time_each_thread 15 27 : 670.084652
+Execution_time_each_thread 15 28 : 662.006493
+Execution_time_each_thread 15 29 : 665.972364
+Execution_time_each_thread 15 30 : 670.398678
+Execution_time_each_thread 13 22 : 797.183697
+Execution_time_each_thread 13 23 : 787.778410
+Execution_time_each_thread 13 24 : 787.227304
+Execution_time_each_thread 13 25 : 789.776403
+Execution_time_each_thread 13 26 : 790.752163
+Execution_time_each_thread 13 27 : 790.786466
+Execution_time_each_thread 8 25 : 796.349000
+Execution_time_each_thread 8 26 : 790.135884
+Execution_time_each_thread 8 27 : 794.125310
+Execution_time_each_thread 8 28 : 797.339057
+Execution_time_each_thread 8 29 : 793.229693
+Execution_time_each_thread 8 30 : 789.868524
+Execution_time_each_thread 6 26 : 743.108385
+Execution_time_each_thread 6 27 : 742.100976
+Execution_time_each_thread 6 28 : 748.994581
+Execution_time_each_thread 6 29 : 744.132453
+Execution_time_each_thread 6 30 : 746.439706
+Execution_time_each_thread 4 25 : 693.828743
+Execution_time_each_thread 4 26 : 690.262678
+Execution_time_each_thread 4 27 : 693.368513
+Execution_time_each_thread 4 28 : 695.499649
+Execution_time_each_thread 4 29 : 690.172266
+Execution_time_each_thread 4 30 : 689.051831
+Execution_time_each_thread 11 22 : 774.030497
+Execution_time_each_thread 11 23 : 773.261594
+Execution_time_each_thread 11 24 : 778.686599
+Execution_time_each_thread 11 25 : 778.914407
+Execution_time_each_thread 11 26 : 772.655041
+Execution_time_each_thread 1 26 : 768.337164
+Execution_time_each_thread 1 27 : 775.355800
+Execution_time_each_thread 1 28 : 770.260649
+Execution_time_each_thread 1 29 : 772.067439
+Execution_time_each_thread 1 30 : 768.841580
+Execution_time_each_thread 3 26 : 714.774386
+Execution_time_each_thread 3 27 : 716.541098
+Execution_time_each_thread 3 28 : 715.857039
+Execution_time_each_thread 3 29 : 715.342890
+Execution_time_each_thread 3 30 : 722.871821
+Execution_time_each_thread 13 28 : 791.244258
+Execution_time_each_thread 13 29 : 787.974911
+Execution_time_each_thread 13 30 : 787.304964
+Execution_time_each_thread 11 27 : 778.147086
+Execution_time_each_thread 11 28 : 776.992719
+Execution_time_each_thread 11 29 : 778.013685
+Execution_time_each_thread 11 30 : 771.931602
+[****] TIME(s)      0.00845 : After HiCMA Check Rank	PxQ=   4 4   NB= 3000 N= 1080000 maxrank= 1500 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 1652.26	time_hicma: 942.371	
+Ranks will be gathered
+[****] TIME(s)      0.02404 : Gather rank	band_size= 6  PxQ=   4 4   NB= 3000 N= 1080000
+Ranks were gathered
+-------------------------------------------number of tiles:62835
+avg:57.1064 min:3 max:823
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.00113 : Operation_counts : band_size= 6 total= 4.794282e+15 op_band= 7.019723e+14 op_offband= 4.092309e+15 ratio_band= 0.171535 op_critical_path= 3.231738e+13 op_off_critical_path= 4.761964e+15 ratio_critical_path= 0.006787
+[****] TIME(s)      0.00001 : Total_critical_path_time 214.264207, potrf 13.151190, trsm 27.846957, syrk 173.266060
+R-LO 1080000 1080000 3000 3000   300 300   16 4 4 31   4 st-3d-exp 1.0e-08 1.08e+06 0 1.57774e-52   0 6 1 0 1 1500 1500 1500   54.8866 19 944   46.6633 19 658   57.1064 3 823   18.688287 272.390898   214.264207 13.151190 27.846957 173.266060    1652.255575 942.371129 0.079389 2.175470 0.000013    4.794282e+15 7.019723e+14 4.092309e+15 3.231738e+13 4.761964e+15 0.171535 0.006787 1  d4c3baf1075969b2d1a1a3d03e94c410a9ce52a1    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 4 -Q 4 -N 1080000 -t 3000 -e 1e-8 --maxrank 1500 -j 1080000 -v -c 31 --genmaxrank 1500 --compmaxrank 1500 -D 4 -Z 1 -F 0 -Y 1 -z 300 -E 1 -W 1 "
+Time: 1080000 3000 942.371129
+
+sorted result
+942.371129
+
+Time min: 1080000 3000 min 942.371129 max 942.371129 avg 942.37112900000000000000
+Time optimal: 1080000 3000 opt 942.371129 max 942.371129 avg 942.37112900000000000000 ; var 0
+1080000 942.371129 3000 0
+srun --job-name=lorapo---16 --hint=nomultithread --nodes=16 --ntasks=16 --ntasks-per-node=1 --cpus-per-task=32 --hint=nomultithread numactl --interleave=all /lustre/project/k1205/lei/lorapo/testing_dpotrf -P 4 -Q 4 -N 2160000 -t 3375 -e 1e-8 --maxrank 1687 -j 2160000 -v -c 31 --genmaxrank 1687 --compmaxrank 1687 -D 4 -Z 1 -F 0 -Y 1 -z 300 -E 1 -W 1
+#+++++ cores detected       : 31
+#+++++ nodes x cores + gpu  : 16 x 31 + 0 (496+0)
+#+++++ P x Q                : 4 x 4 (16/16)
+#+++++ M x N x K|NRHS       : 2160000 x 2160000 x 1
+#+++++ MB x NB              : 3375 x 3375
+#+++++ HMB x HNB            : 300 x 300
+/lustre/project/k1205/lei/lorapo/testing_dpotrf is starting
+M:2160000 N:2160000 MB:3375 NB:3375 HMB:300 HNB:300
+nodes:16 P:4 Q:4 cores:31
+kind_of_problem:4 st-3d-exp
+tol:1.0e-08 add_diag:2.16e+06 fixed_rk:0 wave_k:1.57774e-52
+send_full_tile:0 lookahead: 1 band_size:1 max rank:1687 gen:1687 comp:1687
+397: STARSH will generate problem
+461: STARSH generated problem
+
+481: AUTO SELECT band_size, set band_size = 1 at the beginning
+
+541: Dense diagonal, U, V, rank Matrices are allocated
+[****] TIME(s)   7388.36028 : STARSH_gen	PxQ=   4 4   NB= 3375 N= 2160000
+[****] TIME(s)      0.02858 : Before HiCMA Check Rank	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 band_size= 1 send_full= 0 EXTRA_BUFFER= 1
+
+568: STARSH generated TLR matrix
+STARSH Matrix generation is done
+Ranks will be gathered
+[****] TIME(s)      0.01345 : Gather rank	band_size= 1  PxQ=   4 4   NB= 3375 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:204480
+
+***************** START Check band_size 2 ******************
+band_size: 2, nb_threads: 31, ops_sum_tlr: 6.743776e+15, ops_sum_dense: 2.040138e+14
+***************** END Check band_size 2 : 1027 ******************
+
+***************** START Check band_size 3 ******************
+band_size: 3, nb_threads: 31, ops_sum_tlr: 1.823793e+15, ops_sum_dense: 1.943630e+14
+***************** END Check band_size 3 : 615 ******************
+
+***************** START Check band_size 4 ******************
+band_size: 4, nb_threads: 31, ops_sum_tlr: 6.837257e+14, ops_sum_dense: 1.905309e+14
+***************** END Check band_size 4 : 472 ******************
+
+***************** START Check band_size 5 ******************
+band_size: 5, nb_threads: 31, ops_sum_tlr: 1.228663e+15, ops_sum_dense: 1.858182e+14
+***************** END Check band_size 5 : 633 ******************
+
+***************** START Check band_size 6 ******************
+band_size: 6, nb_threads: 31, ops_sum_tlr: 6.780563e+14, ops_sum_dense: 1.837152e+14
+***************** END Check band_size 6 : 536 ******************
+
+***************** START Check band_size 7 ******************
+band_size: 7, nb_threads: 31, ops_sum_tlr: 2.412357e+14, ops_sum_dense: 1.791233e+14
+***************** END Check band_size 7 : 257 ******************
+******************* Min band_size 6 *******************
+
+***************** START Check band_size 8 ******************
+band_size: 8, nb_threads: 31, ops_sum_tlr: 1.760883e+14, ops_sum_dense: 1.774648e+14
+***************** END Check band_size 8 : 226 ******************
+
+**************** Find the OPT band_size : 6 ******************
+
+avg:41.8919 min:17 max:1027
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.00621 : rank_copy	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 send_full= 0 band_size_opt= 1
+
+[****] TIME(s)      0.18874 : OPT band_size	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 send_full= 0 band_size_opt= 6
+
+[****] TIME(s)      4.40956 : band generation	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 send_full= 0 band_size= 6
+
+[****] TIME(s)      0.00001 : Allocate Sum	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 band_size= 6 send_full= 0 EXTRA_BUFFER= 1, memory_per_node= 46.873581 GB, memory_per_node_max= 1087.755192 GB
+
+[****] TIME(s)      0.00001 : reorder_gemm	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 send_full= 0 band_size= 6 reorder_gemm= 0
+
+[****] TIME(s)      0.02516 : Before HiCMA Check Rank	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+Ranks will be gathered
+[****] TIME(s)      0.00382 : Gather rank	band_size= 6  PxQ=   4 4   NB= 3375 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:201295
+avg:36.9927 min:17 max:597
+[****] TIME(s)      0.00001 : Print ranks of tiles
+928: HiCMA dpotrf is starting
+
+2flow version
+In potrf, k 0, 0.00 % is finished
+In potrf, k 6, 0.94 % is finished
+In potrf, k 12, 1.88 % is finished
+In potrf, k 18, 2.81 % is finished
+In potrf, k 24, 3.75 % is finished
+In potrf, k 30, 4.69 % is finished
+In potrf, k 36, 5.62 % is finished
+In potrf, k 42, 6.56 % is finished
+In potrf, k 48, 7.50 % is finished
+In potrf, k 54, 8.44 % is finished
+In potrf, k 60, 9.38 % is finished
+In potrf, k 66, 10.31 % is finished
+In potrf, k 72, 11.25 % is finished
+In potrf, k 78, 12.19 % is finished
+In potrf, k 84, 13.12 % is finished
+In potrf, k 90, 14.06 % is finished
+In potrf, k 96, 15.00 % is finished
+In potrf, k 102, 15.94 % is finished
+In potrf, k 108, 16.88 % is finished
+In potrf, k 114, 17.81 % is finished
+In potrf, k 120, 18.75 % is finished
+In potrf, k 126, 19.69 % is finished
+In potrf, k 132, 20.62 % is finished
+In potrf, k 138, 21.56 % is finished
+In potrf, k 144, 22.50 % is finished
+In potrf, k 150, 23.44 % is finished
+In potrf, k 156, 24.38 % is finished
+In potrf, k 162, 25.31 % is finished
+In potrf, k 168, 26.25 % is finished
+In potrf, k 174, 27.19 % is finished
+In potrf, k 180, 28.12 % is finished
+In potrf, k 186, 29.06 % is finished
+In potrf, k 192, 30.00 % is finished
+In potrf, k 198, 30.94 % is finished
+In potrf, k 204, 31.88 % is finished
+In potrf, k 210, 32.81 % is finished
+In potrf, k 216, 33.75 % is finished
+In potrf, k 222, 34.69 % is finished
+In potrf, k 228, 35.62 % is finished
+In potrf, k 234, 36.56 % is finished
+In potrf, k 240, 37.50 % is finished
+In potrf, k 246, 38.44 % is finished
+In potrf, k 252, 39.38 % is finished
+In potrf, k 258, 40.31 % is finished
+In potrf, k 264, 41.25 % is finished
+In potrf, k 270, 42.19 % is finished
+In potrf, k 276, 43.12 % is finished
+In potrf, k 282, 44.06 % is finished
+In potrf, k 288, 45.00 % is finished
+In potrf, k 294, 45.94 % is finished
+In potrf, k 300, 46.88 % is finished
+In potrf, k 306, 47.81 % is finished
+In potrf, k 312, 48.75 % is finished
+In potrf, k 318, 49.69 % is finished
+In potrf, k 324, 50.62 % is finished
+In potrf, k 330, 51.56 % is finished
+In potrf, k 336, 52.50 % is finished
+In potrf, k 342, 53.44 % is finished
+In potrf, k 348, 54.38 % is finished
+In potrf, k 354, 55.31 % is finished
+In potrf, k 360, 56.25 % is finished
+In potrf, k 366, 57.19 % is finished
+In potrf, k 372, 58.12 % is finished
+In potrf, k 378, 59.06 % is finished
+In potrf, k 384, 60.00 % is finished
+In potrf, k 390, 60.94 % is finished
+In potrf, k 396, 61.88 % is finished
+In potrf, k 402, 62.81 % is finished
+In potrf, k 408, 63.75 % is finished
+In potrf, k 414, 64.69 % is finished
+In potrf, k 420, 65.62 % is finished
+In potrf, k 426, 66.56 % is finished
+In potrf, k 432, 67.50 % is finished
+In potrf, k 438, 68.44 % is finished
+In potrf, k 444, 69.38 % is finished
+In potrf, k 450, 70.31 % is finished
+In potrf, k 456, 71.25 % is finished
+In potrf, k 462, 72.19 % is finished
+In potrf, k 468, 73.12 % is finished
+In potrf, k 474, 74.06 % is finished
+In potrf, k 480, 75.00 % is finished
+In potrf, k 486, 75.94 % is finished
+In potrf, k 492, 76.88 % is finished
+In potrf, k 498, 77.81 % is finished
+In potrf, k 504, 78.75 % is finished
+In potrf, k 510, 79.69 % is finished
+In potrf, k 516, 80.62 % is finished
+In potrf, k 522, 81.56 % is finished
+In potrf, k 528, 82.50 % is finished
+In potrf, k 534, 83.44 % is finished
+In potrf, k 540, 84.38 % is finished
+In potrf, k 546, 85.31 % is finished
+In potrf, k 552, 86.25 % is finished
+In potrf, k 558, 87.19 % is finished
+In potrf, k 564, 88.12 % is finished
+In potrf, k 570, 89.06 % is finished
+In potrf, k 576, 90.00 % is finished
+In potrf, k 582, 90.94 % is finished
+In potrf, k 588, 91.88 % is finished
+In potrf, k 594, 92.81 % is finished
+In potrf, k 600, 93.75 % is finished
+In potrf, k 606, 94.69 % is finished
+In potrf, k 612, 95.62 % is finished
+In potrf, k 618, 96.56 % is finished
+In potrf, k 624, 97.50 % is finished
+In potrf, k 630, 98.44 % is finished
+In potrf, k 636, 99.38 % is finished
+Execution_time_each_thread 6 0 : 2986.179027
+Execution_time_each_thread 6 1 : 2978.338935
+Execution_time_each_thread 6 2 : 2985.868848
+Execution_time_each_thread 6 3 : 2976.418667
+Execution_time_each_thread 6 4 : 2982.985339
+Execution_time_each_thread 6 5 : 2979.495796
+Execution_time_each_thread 6 6 : 2983.972272
+Execution_time_each_thread 6 7 : 2973.191580
+Execution_time_each_thread 6 8 : 2976.169480
+Execution_time_each_thread 6 9 : 2985.379767
+Execution_time_each_thread 6 10 : 2980.998017
+Execution_time_each_thread 6 11 : 2980.200793
+Execution_time_each_thread 6 12 : 2981.050419
+Execution_time_each_thread 6 13 : 2978.283781
+Execution_time_each_thread 6 14 : 2990.681178
+Execution_time_each_thread 6 15 : 2985.999568
+Execution_time_each_thread 6 16 : 2983.108694
+Execution_time_each_thread 6 17 : 2983.020490
+Execution_time_each_thread 6 18 : 2981.001486
+Execution_time_each_thread 6 19 : 2978.162457
+Execution_time_each_thread 6 20 : 2981.048947
+Execution_time_each_thread 6 21 : 2981.835478
+Execution_time_each_thread 2 0 : 3491.666328
+Execution_time_each_thread 2 1 : 3484.036927
+Execution_time_each_thread 2 2 : 3480.999733
+Execution_time_each_thread 2 3 : 3489.267236
+Execution_time_each_thread 2 4 : 3483.497634
+Execution_time_each_thread 2 5 : 3481.783282
+Execution_time_each_thread 2 6 : 3488.244338
+Execution_time_each_thread 2 7 : 3480.618721
+Execution_time_each_thread 2 8 : 3483.116329
+Execution_time_each_thread 2 9 : 3484.774225
+Execution_time_each_thread 2 10 : 3481.508254
+Execution_time_each_thread 2 11 : 3482.947961
+Execution_time_each_thread 2 12 : 3492.795756
+Execution_time_each_thread 2 13 : 3485.734674
+Execution_time_each_thread 2 14 : 3486.701694
+Execution_time_each_thread 2 15 : 3490.105206
+Execution_time_each_thread 2 16 : 3482.634124
+Execution_time_each_thread 2 17 : 3484.907322
+Execution_time_each_thread 2 18 : 3480.739026
+Execution_time_each_thread 2 19 : 3484.727320
+Execution_time_each_thread 2 20 : 3486.663841
+Execution_time_each_thread 2 21 : 3487.922819
+Execution_time_each_thread 0 0 : 3089.342006
+Execution_time_each_thread 0 1 : 3090.084831
+Execution_time_each_thread 0 2 : 3089.624454
+Execution_time_each_thread 0 3 : 3090.586043
+Execution_time_each_thread 0 4 : 3087.167678
+Execution_time_each_thread 0 5 : 3089.633327
+Execution_time_each_thread 0 6 : 3096.363140
+Execution_time_each_thread 0 7 : 3091.319788
+Execution_time_each_thread 0 8 : 3089.787354
+Execution_time_each_thread 0 9 : 3091.840807
+Execution_time_each_thread 0 10 : 3088.569834
+Execution_time_each_thread 0 11 : 3100.946015
+Execution_time_each_thread 0 12 : 3095.069119
+Execution_time_each_thread 0 13 : 3099.224034
+Execution_time_each_thread 0 14 : 3082.110710
+Execution_time_each_thread 0 15 : 3093.905878
+Execution_time_each_thread 0 16 : 3088.347976
+Execution_time_each_thread 0 17 : 3096.448024
+Execution_time_each_thread 0 18 : 3085.227812
+Execution_time_each_thread 0 19 : 3084.150726
+Execution_time_each_thread 0 20 : 3085.341712
+Execution_time_each_thread 0 21 : 3097.615322
+Execution_time_each_thread 12 0 : 2944.485596
+Execution_time_each_thread 12 1 : 2938.054372
+Execution_time_each_thread 12 2 : 2936.598058
+Execution_time_each_thread 12 3 : 2936.693407
+Execution_time_each_thread 12 4 : 2947.354100
+Execution_time_each_thread 12 5 : 2938.104282
+Execution_time_each_thread 12 6 : 2943.076988
+Execution_time_each_thread 12 7 : 2942.462059
+Execution_time_each_thread 12 8 : 2942.143139
+Execution_time_each_thread 12 9 : 2939.493467
+Execution_time_each_thread 12 10 : 2944.668745
+Execution_time_each_thread 12 11 : 2941.338280
+Execution_time_each_thread 12 12 : 2943.267393
+Execution_time_each_thread 12 13 : 2942.046870
+Execution_time_each_thread 12 14 : 2939.863436
+Execution_time_each_thread 12 15 : 2943.597659
+Execution_time_each_thread 12 16 : 2948.318253
+Execution_time_each_thread 12 17 : 2935.812659
+Execution_time_each_thread 12 18 : 2943.546361
+Execution_time_each_thread 12 19 : 2935.284267
+Execution_time_each_thread 12 20 : 2938.568682
+Execution_time_each_thread 14 0 : 3410.570372
+Execution_time_each_thread 14 1 : 3418.407095
+Execution_time_each_thread 14 2 : 3411.292182
+Execution_time_each_thread 14 3 : 3406.021304
+Execution_time_each_thread 14 4 : 3407.930490
+Execution_time_each_thread 14 5 : 3407.417556
+Execution_time_each_thread 14 6 : 3411.539931
+Execution_time_each_thread 14 7 : 3417.094923
+Execution_time_each_thread 14 8 : 3414.469381
+Execution_time_each_thread 14 9 : 3415.480308
+Execution_time_each_thread 14 10 : 3414.603712
+Execution_time_each_thread 14 11 : 3410.408451
+Execution_time_each_thread 14 12 : 3413.723140
+Execution_time_each_thread 14 13 : 3410.531253
+Execution_time_each_thread 14 14 : 3410.437988
+Execution_time_each_thread 14 15 : 3417.160135
+Execution_time_each_thread 14 16 : 3409.705917
+Execution_time_each_thread 14 17 : 3405.573769
+Execution_time_each_thread 14 18 : 3406.494071
+[****] TIME(s)   3730.08889 : HiCMA_potrf	send_full_tile= 0 band_size= 6 lookahead= 1 reorder_gemm= 0 kind_of_problem= 4 HMB= 300 PxQ=   4 4   NB= 3375 N= 2160000 2flow= 1 :  900577.554835 gflops
+966: HiCMA dpotrf ended in 3730.09 seconds
+Execution_time_each_thread 9 0 : 3518.752374
+Execution_time_each_thread 9 1 : 3519.675635
+Execution_time_each_thread 9 2 : 3513.860744
+Execution_time_each_thread 9 3 : 3519.550422
+Execution_time_each_thread 9 4 : 3515.848454
+Execution_time_each_thread 9 5 : 3513.612738
+Execution_time_each_thread 9 6 : 3518.905118
+Execution_time_each_thread 9 7 : 3516.143649
+Execution_time_each_thread 9 8 : 3515.571539
+Execution_time_each_thread 9 9 : 3518.061369
+Execution_time_each_thread 9 10 : 3515.549826
+Execution_time_each_thread 9 11 : 3517.946216
+Execution_time_each_thread 9 12 : 3518.897529
+Execution_time_each_thread 9 13 : 3517.114683
+Execution_time_each_thread 9 14 : 3517.155562
+Execution_time_each_thread 9 15 : 3519.218709
+Execution_time_each_thread 9 16 : 3519.814166
+Execution_time_each_thread 9 17 : 3512.277028
+Execution_time_each_thread 9 18 : 3514.559201
+Execution_time_each_thread 9 19 : 3522.392633
+Execution_time_each_thread 9 20 : 3507.922053
+Execution_time_each_thread 9 21 : 3521.203614
+Execution_time_each_thread 0 22 : 3084.933152
+Execution_time_each_thread 0 23 : 3086.026801
+Execution_time_each_thread 0 24 : 3090.155334
+Execution_time_each_thread 0 25 : 3091.624319
+Execution_time_each_thread 15 0 : 2950.011124
+Execution_time_each_thread 15 1 : 2945.381480
+Execution_time_each_thread 15 2 : 2951.844601
+Execution_time_each_thread 15 3 : 2948.546605
+Execution_time_each_thread 15 4 : 2949.416818
+Execution_time_each_thread 15 5 : 2952.540161
+Execution_time_each_thread 15 6 : 2952.640960
+Execution_time_each_thread 15 7 : 2944.558962
+Execution_time_each_thread 15 8 : 2954.608242
+Execution_time_each_thread 15 9 : 2951.512861
+Execution_time_each_thread 15 10 : 2942.428537
+Execution_time_each_thread 15 11 : 2947.742966
+Execution_time_each_thread 15 12 : 2950.118092
+Execution_time_each_thread 15 13 : 2963.642027
+Execution_time_each_thread 15 14 : 2947.920026
+Execution_time_each_thread 15 15 : 2952.168790
+Execution_time_each_thread 15 16 : 2962.661991
+Execution_time_each_thread 15 17 : 2950.334350
+Execution_time_each_thread 15 18 : 2949.997114
+Execution_time_each_thread 15 19 : 2957.027850
+Execution_time_each_thread 15 20 : 2952.913918
+Execution_time_each_thread 11 0 : 3013.737656
+Execution_time_each_thread 11 1 : 3013.770561
+Execution_time_each_thread 11 2 : 3006.527134
+Execution_time_each_thread 11 3 : 3005.090016
+Execution_time_each_thread 11 4 : 3007.424389
+Execution_time_each_thread 11 5 : 3010.485288
+Execution_time_each_thread 11 6 : 3002.369120
+Execution_time_each_thread 11 7 : 3008.048200
+Execution_time_each_thread 11 8 : 3005.415822
+Execution_time_each_thread 11 9 : 3007.933347
+Execution_time_each_thread 11 10 : 3009.036722
+Execution_time_each_thread 11 11 : 3009.645030
+Execution_time_each_thread 11 12 : 3003.860926
+Execution_time_each_thread 11 13 : 3014.503604
+Execution_time_each_thread 11 14 : 3014.580634
+Execution_time_each_thread 11 15 : 3006.548540
+Execution_time_each_thread 11 16 : 3009.152621
+Execution_time_each_thread 11 17 : 3001.986403
+Execution_time_each_thread 11 18 : 3016.595654
+Execution_time_each_thread 11 19 : 3013.426404
+Execution_time_each_thread 11 20 : 3009.348397
+Execution_time_each_thread 12 21 : 2942.776187
+Execution_time_each_thread 12 22 : 2937.319971
+Execution_time_each_thread 12 23 : 2946.253846
+Execution_time_each_thread 12 24 : 2946.330263
+Execution_time_each_thread 4 0 : 3347.545131
+Execution_time_each_thread 4 1 : 3344.718240
+Execution_time_each_thread 4 2 : 3334.620809
+Execution_time_each_thread 4 3 : 3345.713327
+Execution_time_each_thread 4 4 : 3337.716387
+Execution_time_each_thread 4 5 : 3328.018199
+Execution_time_each_thread 4 6 : 3334.953626
+Execution_time_each_thread 4 7 : 3337.337716
+Execution_time_each_thread 4 8 : 3336.529778
+Execution_time_each_thread 4 9 : 3340.314235
+Execution_time_each_thread 4 10 : 3338.632598
+Execution_time_each_thread 4 11 : 3336.925499
+Execution_time_each_thread 4 12 : 3338.234191
+Execution_time_each_thread 4 13 : 3333.955239
+Execution_time_each_thread 4 14 : 3332.561658
+Execution_time_each_thread 4 15 : 3337.071956
+Execution_time_each_thread 4 16 : 3338.905021
+Execution_time_each_thread 4 17 : 3334.358946
+Execution_time_each_thread 4 18 : 3336.282192
+Execution_time_each_thread 4 19 : 3333.366108
+Execution_time_each_thread 4 20 : 3339.843843
+Execution_time_each_thread 4 21 : 3332.224492
+Execution_time_each_thread 10 0 : 3114.137960
+Execution_time_each_thread 10 1 : 3124.532447
+Execution_time_each_thread 10 2 : 3126.637145
+Execution_time_each_thread 10 3 : 3120.375405
+Execution_time_each_thread 10 4 : 3123.119472
+Execution_time_each_thread 10 5 : 3116.642246
+Execution_time_each_thread 10 6 : 3125.090877
+Execution_time_each_thread 10 7 : 3115.143478
+Execution_time_each_thread 10 8 : 3124.011639
+Execution_time_each_thread 10 9 : 3128.928032
+Execution_time_each_thread 10 10 : 3128.106939
+Execution_time_each_thread 10 11 : 3117.548609
+Execution_time_each_thread 10 12 : 3118.193233
+Execution_time_each_thread 10 13 : 3124.818153
+Execution_time_each_thread 10 14 : 3124.726545
+Execution_time_each_thread 10 15 : 3123.849977
+Execution_time_each_thread 10 16 : 3128.023782
+Execution_time_each_thread 10 17 : 3120.546032
+Execution_time_each_thread 10 18 : 3130.767171
+Execution_time_each_thread 10 19 : 3122.000722
+Execution_time_each_thread 10 20 : 3126.454135
+Execution_time_each_thread 14 19 : 3416.236458
+Execution_time_each_thread 14 20 : 3405.298551
+Execution_time_each_thread 14 21 : 3411.004345
+Execution_time_each_thread 14 22 : 3409.971315
+Execution_time_each_thread 14 23 : 3406.395603
+Execution_time_each_thread 14 24 : 3408.627913
+Execution_time_each_thread 14 25 : 3406.108087
+Execution_time_each_thread 14 26 : 3411.261811
+Execution_time_each_thread 14 27 : 3405.715960
+Execution_time_each_thread 14 28 : 3413.468956
+Execution_time_each_thread 14 29 : 3414.373284
+Execution_time_each_thread 14 30 : 3413.284883
+Execution_time_each_thread 8 0 : 3424.805593
+Execution_time_each_thread 8 1 : 3414.439748
+Execution_time_each_thread 8 2 : 3408.228606
+Execution_time_each_thread 8 3 : 3422.136231
+Execution_time_each_thread 8 4 : 3420.654397
+Execution_time_each_thread 8 5 : 3421.034477
+Execution_time_each_thread 8 6 : 3417.940782
+Execution_time_each_thread 8 7 : 3415.759649
+Execution_time_each_thread 8 8 : 3414.696225
+Execution_time_each_thread 8 9 : 3415.457245
+Execution_time_each_thread 8 10 : 3413.201050
+Execution_time_each_thread 8 11 : 3418.374488
+Execution_time_each_thread 8 12 : 3427.786772
+Execution_time_each_thread 8 13 : 3420.045635
+Execution_time_each_thread 8 14 : 3413.332185
+Execution_time_each_thread 8 15 : 3419.318581
+Execution_time_each_thread 8 16 : 3414.784761
+Execution_time_each_thread 8 17 : 3419.471779
+Execution_time_each_thread 8 18 : 3419.043680
+Execution_time_each_thread 8 19 : 3417.581046
+Execution_time_each_thread 8 20 : 3419.916103
+Execution_time_each_thread 8 21 : 3417.607381
+Execution_time_each_thread 9 22 : 3512.834414
+Execution_time_each_thread 9 23 : 3519.804402
+Execution_time_each_thread 9 24 : 3526.596275
+Execution_time_each_thread 9 25 : 3518.559853
+Execution_time_each_thread 9 26 : 3515.215537
+Execution_time_each_thread 9 27 : 3516.719306
+Execution_time_each_thread 9 28 : 3512.311787
+Execution_time_each_thread 9 29 : 3518.837653
+Execution_time_each_thread 9 30 : 3522.243113
+Execution_time_each_thread 13 0 : 3371.425694
+Execution_time_each_thread 13 1 : 3371.973976
+Execution_time_each_thread 13 2 : 3370.013314
+Execution_time_each_thread 13 3 : 3355.869047
+Execution_time_each_thread 13 4 : 3366.762758
+Execution_time_each_thread 13 5 : 3373.040083
+Execution_time_each_thread 13 6 : 3355.196158
+Execution_time_each_thread 13 7 : 3365.554992
+Execution_time_each_thread 13 8 : 3372.792923
+Execution_time_each_thread 13 9 : 3368.523094
+Execution_time_each_thread 13 10 : 3369.634339
+Execution_time_each_thread 13 11 : 3373.192353
+Execution_time_each_thread 13 12 : 3362.712901
+Execution_time_each_thread 13 13 : 3370.160386
+Execution_time_each_thread 13 14 : 3363.634878
+Execution_time_each_thread 13 15 : 3368.603861
+Execution_time_each_thread 13 16 : 3369.175478
+Execution_time_each_thread 13 17 : 3363.640251
+Execution_time_each_thread 13 18 : 3367.551039
+Execution_time_each_thread 13 19 : 3368.609876
+Execution_time_each_thread 13 20 : 3371.609473
+Execution_time_each_thread 6 22 : 2981.300237
+Execution_time_each_thread 6 23 : 2985.451284
+Execution_time_each_thread 2 22 : 3483.662174
+Execution_time_each_thread 2 23 : 3484.698999
+Execution_time_each_thread 2 24 : 3487.911438
+Execution_time_each_thread 1 0 : 3053.031986
+Execution_time_each_thread 1 1 : 3049.340833
+Execution_time_each_thread 1 2 : 3047.768365
+Execution_time_each_thread 1 3 : 3048.847937
+Execution_time_each_thread 1 4 : 3048.811135
+Execution_time_each_thread 1 5 : 3048.609781
+Execution_time_each_thread 1 6 : 3051.562731
+Execution_time_each_thread 1 7 : 3049.933586
+Execution_time_each_thread 1 8 : 3047.888940
+Execution_time_each_thread 1 9 : 3047.248623
+Execution_time_each_thread 1 10 : 3053.640533
+Execution_time_each_thread 1 11 : 3050.391912
+Execution_time_each_thread 1 12 : 3050.340797
+Execution_time_each_thread 1 13 : 3052.969750
+Execution_time_each_thread 1 14 : 3051.429275
+Execution_time_each_thread 1 15 : 3052.366616
+Execution_time_each_thread 1 16 : 3053.168965
+Execution_time_each_thread 1 17 : 3049.894073
+Execution_time_each_thread 1 18 : 3051.832190
+Execution_time_each_thread 1 19 : 3043.887316
+Execution_time_each_thread 1 20 : 3055.162682
+Execution_time_each_thread 1 21 : 3051.413168
+Execution_time_each_thread 7 0 : 3316.298592
+Execution_time_each_thread 7 1 : 3305.607035
+Execution_time_each_thread 7 2 : 3305.278544
+Execution_time_each_thread 7 3 : 3308.656454
+Execution_time_each_thread 7 4 : 3311.687205
+Execution_time_each_thread 7 5 : 3305.758078
+Execution_time_each_thread 7 6 : 3311.467086
+Execution_time_each_thread 7 7 : 3311.653045
+Execution_time_each_thread 7 8 : 3305.603381
+Execution_time_each_thread 7 9 : 3308.393113
+Execution_time_each_thread 7 10 : 3305.771130
+Execution_time_each_thread 7 11 : 3315.127041
+Execution_time_each_thread 7 12 : 3310.609545
+Execution_time_each_thread 7 13 : 3307.956685
+Execution_time_each_thread 7 14 : 3311.132573
+Execution_time_each_thread 7 15 : 3316.060542
+Execution_time_each_thread 7 16 : 3306.145285
+Execution_time_each_thread 7 17 : 3307.001938
+Execution_time_each_thread 7 18 : 3306.211445
+Execution_time_each_thread 7 19 : 3310.118805
+Execution_time_each_thread 7 20 : 3311.043573
+Execution_time_each_thread 7 21 : 3313.982670
+Execution_time_each_thread 0 26 : 3092.184454
+Execution_time_each_thread 0 27 : 3086.556945
+Execution_time_each_thread 0 28 : 3091.148198
+Execution_time_each_thread 0 29 : 3093.085896
+Execution_time_each_thread 0 30 : 3092.920959
+Execution_time_each_thread 15 21 : 2950.794985
+Execution_time_each_thread 15 22 : 2954.359418
+Execution_time_each_thread 15 23 : 2955.828856
+Execution_time_each_thread 15 24 : 2961.204881
+Execution_time_each_thread 15 25 : 2949.804692
+Execution_time_each_thread 15 26 : 2951.279252
+Execution_time_each_thread 15 27 : 2955.053049
+Execution_time_each_thread 15 28 : 2952.210596
+Execution_time_each_thread 15 29 : 2951.566128
+Execution_time_each_thread 15 30 : 2954.448053
+Execution_time_each_thread 11 21 : 3004.275405
+Execution_time_each_thread 11 22 : 3007.023988
+Execution_time_each_thread 11 23 : 3010.698308
+Execution_time_each_thread 11 24 : 3009.045482
+Execution_time_each_thread 11 25 : 3010.026329
+Execution_time_each_thread 11 26 : 3008.480234
+Execution_time_each_thread 11 27 : 3012.091222
+Execution_time_each_thread 11 28 : 3009.511922
+Execution_time_each_thread 11 29 : 3015.157616
+Execution_time_each_thread 11 30 : 3003.232852
+Execution_time_each_thread 12 25 : 2938.048263
+Execution_time_each_thread 12 26 : 2938.251860
+Execution_time_each_thread 12 27 : 2941.556833
+Execution_time_each_thread 12 28 : 2936.968719
+Execution_time_each_thread 12 29 : 2936.287552
+Execution_time_each_thread 12 30 : 2940.999419
+Execution_time_each_thread 5 0 : 3071.489754
+Execution_time_each_thread 5 1 : 3075.631798
+Execution_time_each_thread 5 2 : 3064.824596
+Execution_time_each_thread 5 3 : 3058.572684
+Execution_time_each_thread 5 4 : 3069.203390
+Execution_time_each_thread 5 5 : 3069.412687
+Execution_time_each_thread 5 6 : 3060.825445
+Execution_time_each_thread 5 7 : 3067.074229
+Execution_time_each_thread 5 8 : 3076.423998
+Execution_time_each_thread 5 9 : 3075.975674
+Execution_time_each_thread 5 10 : 3063.350249
+Execution_time_each_thread 5 11 : 3074.512544
+Execution_time_each_thread 5 12 : 3063.677878
+Execution_time_each_thread 5 13 : 3064.757817
+Execution_time_each_thread 5 14 : 3061.881133
+Execution_time_each_thread 5 15 : 3069.290553
+Execution_time_each_thread 5 16 : 3071.371777
+Execution_time_each_thread 5 17 : 3065.938627
+Execution_time_each_thread 5 18 : 3064.795770
+Execution_time_each_thread 5 19 : 3067.676677
+Execution_time_each_thread 5 20 : 3069.255999
+Execution_time_each_thread 5 21 : 3068.584509
+Execution_time_each_thread 4 22 : 3335.672811
+Execution_time_each_thread 4 23 : 3337.088628
+Execution_time_each_thread 4 24 : 3336.418078
+Execution_time_each_thread 4 25 : 3338.626324
+Execution_time_each_thread 4 26 : 3336.721821
+Execution_time_each_thread 10 21 : 3119.933235
+Execution_time_each_thread 10 22 : 3122.010256
+Execution_time_each_thread 10 23 : 3119.613789
+Execution_time_each_thread 3 0 : 3319.354600
+Execution_time_each_thread 3 1 : 3316.312151
+Execution_time_each_thread 3 2 : 3310.107069
+Execution_time_each_thread 3 3 : 3314.401760
+Execution_time_each_thread 3 4 : 3301.428771
+Execution_time_each_thread 3 5 : 3312.147966
+Execution_time_each_thread 3 6 : 3317.568079
+Execution_time_each_thread 3 7 : 3310.221371
+Execution_time_each_thread 3 8 : 3314.464264
+Execution_time_each_thread 3 9 : 3314.356254
+Execution_time_each_thread 3 10 : 3313.594672
+Execution_time_each_thread 3 11 : 3317.683972
+Execution_time_each_thread 3 12 : 3313.308582
+Execution_time_each_thread 3 13 : 3315.526026
+Execution_time_each_thread 3 14 : 3311.090930
+Execution_time_each_thread 3 15 : 3317.453404
+Execution_time_each_thread 3 16 : 3309.166606
+Execution_time_each_thread 3 17 : 3313.881258
+Execution_time_each_thread 3 18 : 3307.120855
+Execution_time_each_thread 3 19 : 3324.412015
+Execution_time_each_thread 3 20 : 3313.994609
+Execution_time_each_thread 3 21 : 3312.247681
+Execution_time_each_thread 8 22 : 3423.544866
+Execution_time_each_thread 8 23 : 3413.217859
+Execution_time_each_thread 8 24 : 3420.372116
+Execution_time_each_thread 13 21 : 3368.922550
+Execution_time_each_thread 13 22 : 3359.984973
+Execution_time_each_thread 13 23 : 3361.027145
+Execution_time_each_thread 13 24 : 3363.996292
+Execution_time_each_thread 13 25 : 3366.042987
+Execution_time_each_thread 13 26 : 3369.021535
+Execution_time_each_thread 13 27 : 3364.148786
+Execution_time_each_thread 13 28 : 3368.498057
+Execution_time_each_thread 13 29 : 3363.486743
+Execution_time_each_thread 13 30 : 3360.267730
+Execution_time_each_thread 6 24 : 2976.240487
+Execution_time_each_thread 6 25 : 2976.526642
+Execution_time_each_thread 6 26 : 2981.910851
+Execution_time_each_thread 6 27 : 2980.987845
+Execution_time_each_thread 6 28 : 2980.601075
+Execution_time_each_thread 6 29 : 2986.241061
+Execution_time_each_thread 6 30 : 2988.870453
+Execution_time_each_thread 2 25 : 3480.563968
+Execution_time_each_thread 2 26 : 3488.400977
+Execution_time_each_thread 2 27 : 3482.799983
+Execution_time_each_thread 2 28 : 3490.146030
+Execution_time_each_thread 2 29 : 3476.793023
+Execution_time_each_thread 2 30 : 3485.279711
+Execution_time_each_thread 1 22 : 3048.957155
+Execution_time_each_thread 1 23 : 3043.862173
+Execution_time_each_thread 1 24 : 3047.991772
+Execution_time_each_thread 1 25 : 3049.820493
+Execution_time_each_thread 1 26 : 3048.989208
+Execution_time_each_thread 1 27 : 3046.890390
+Execution_time_each_thread 1 28 : 3049.343163
+Execution_time_each_thread 1 29 : 3049.260753
+Execution_time_each_thread 1 30 : 3044.812295
+Execution_time_each_thread 7 22 : 3311.324821
+Execution_time_each_thread 7 23 : 3300.127955
+Execution_time_each_thread 7 24 : 3309.921387
+Execution_time_each_thread 7 25 : 3309.848170
+Execution_time_each_thread 7 26 : 3313.693167
+Execution_time_each_thread 7 27 : 3308.463698
+Execution_time_each_thread 7 28 : 3306.058655
+Execution_time_each_thread 7 29 : 3306.820720
+Execution_time_each_thread 7 30 : 3308.136015
+Execution_time_each_thread 5 22 : 3064.505995
+Execution_time_each_thread 5 23 : 3069.653756
+Execution_time_each_thread 5 24 : 3067.417532
+Execution_time_each_thread 5 25 : 3071.263264
+Execution_time_each_thread 5 26 : 3066.167990
+Execution_time_each_thread 5 27 : 3067.769675
+Execution_time_each_thread 5 28 : 3066.222118
+Execution_time_each_thread 5 29 : 3062.167691
+Execution_time_each_thread 5 30 : 3070.038300
+Execution_time_each_thread 4 27 : 3328.171232
+Execution_time_each_thread 4 28 : 3341.023692
+Execution_time_each_thread 4 29 : 3336.916108
+Execution_time_each_thread 4 30 : 3340.711372
+Execution_time_each_thread 10 24 : 3125.899664
+Execution_time_each_thread 10 25 : 3119.510194
+Execution_time_each_thread 10 26 : 3133.480528
+Execution_time_each_thread 10 27 : 3120.236060
+Execution_time_each_thread 10 28 : 3129.586229
+Execution_time_each_thread 10 29 : 3129.391867
+Execution_time_each_thread 10 30 : 3117.377476
+Execution_time_each_thread 3 22 : 3320.814112
+Execution_time_each_thread 3 23 : 3306.744037
+Execution_time_each_thread 3 24 : 3301.971159
+Execution_time_each_thread 3 25 : 3312.451751
+Execution_time_each_thread 3 26 : 3313.762583
+Execution_time_each_thread 3 27 : 3315.696085
+Execution_time_each_thread 3 28 : 3311.283442
+Execution_time_each_thread 3 29 : 3307.436407
+Execution_time_each_thread 3 30 : 3313.908422
+Execution_time_each_thread 8 25 : 3418.824080
+Execution_time_each_thread 8 26 : 3417.926891
+Execution_time_each_thread 8 27 : 3418.971145
+Execution_time_each_thread 8 28 : 3412.783777
+Execution_time_each_thread 8 29 : 3416.043301
+Execution_time_each_thread 8 30 : 3429.075843
+[****] TIME(s)      0.02604 : After HiCMA Check Rank	PxQ=   4 4   NB= 3375 N= 2160000 maxrank= 1687 band_size= 6 send_full= 0 EXTRA_BUFFER= 1
+
+time_starsh: 7388.36	time_hicma: 3730.09	
+Ranks will be gathered
+[****] TIME(s)      0.02577 : Gather rank	band_size= 6  PxQ=   4 4   NB= 3375 N= 2160000
+Ranks were gathered
+-------------------------------------------number of tiles:201295
+avg:46.9906 min:2 max:772
+[****] TIME(s)      0.00001 : Print ranks of tiles
+[****] TIME(s)      0.00299 : Operation_counts : band_size= 6 total= 1.822559e+16 op_band= 2.068737e+15 op_offband= 1.615686e+16 ratio_band= 0.128041 op_critical_path= 8.189353e+13 op_off_critical_path= 1.814370e+16 ratio_critical_path= 0.004514
+[****] TIME(s)      0.00001 : Total_critical_path_time 1017.577986, potrf 27.516203, trsm 64.616956, syrk 925.444827
+R-LO 2160000 2160000 3375 3375   300 300   16 4 4 31   4 st-3d-exp 1.0e-08 2.16e+06 0 1.57774e-52   0 6 1 0 1 1687 1687 1687   41.8919 17 1027   36.9927 17 597   46.9906 2 772   46.873581 1087.755192   1017.577986 27.516203 64.616956 925.444827    7388.360276 3730.088891 0.188744 4.409562 0.000009    1.822559e+16 2.068737e+15 1.615686e+16 8.189353e+13 1.814370e+16 0.128041 0.004514 1  d4c3baf1075969b2d1a1a3d03e94c410a9ce52a1    "/lustre/project/k1205/lei/lorapo/testing_dpotrf -P 4 -Q 4 -N 2160000 -t 3375 -e 1e-8 --maxrank 1687 -j 2160000 -v -c 31 --genmaxrank 1687 --compmaxrank 1687 -D 4 -Z 1 -F 0 -Y 1 -z 300 -E 1 -W 1 "
+Time: 2160000 3375 3730.088891
+
+sorted result
+3730.088891
+
+Time min: 2160000 3375 min 3730.088891 max 3730.088891 avg 3730.08889100000000000000
+Time optimal: 2160000 3375 opt 3730.088891 max 3730.088891 avg 3730.08889100000000000000 ; var 0
+2160000 3730.088891 3375 0

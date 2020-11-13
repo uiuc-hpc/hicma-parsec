@@ -1,0 +1,125 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+#include "hicma_parsec.h"
+
+/* Use for gathering rank */
+extern int *G;
+
+%}
+
+/** Gather from dcAr to G (global)
+*/
+descY    [ type = "parsec_tiled_matrix_dc_t*" ]
+num_col  [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descY)->grid.cols * ((two_dim_block_cyclic_t *)descY)->grid.kcols" ]
+NT       [ type = "int" hidden=on default="(descY->lnt-1)/num_col" ]
+
+/**************************************************
+ *                      send                      *
+ **************************************************/
+send(m, n, batch)
+
+batch = 0 .. NT
+m = 0 .. descY->lmt-1
+n = %{ return batch*num_col; %} .. %{ return parsec_imin((batch+1)*num_col-1, m); %}
+
+: descY(m, n)
+
+READ Y <- descY(m, n)
+       -> Y get(m, n, batch)
+
+CTL ctl <- (batch > 0)? ctl get(m, n-num_col, batch-1)
+
+BODY
+{
+}
+END
+
+/**************************************************
+ *                      get                       *
+ **************************************************/
+get(m, n, batch)
+
+batch = 0 .. NT
+m = 0 .. descY->lmt-1
+n = %{ return batch*num_col; %} .. %{ return parsec_imin((batch+1)*num_col-1, m); %}
+
+: descY(0, 0)
+
+READ Y <- Y send(m, n, batch)
+
+CTL ctl -> (batch < NT)? ctl send(m, n+num_col, batch+1)
+
+BODY
+{
+    G[n*descY->lmt+m] = *((int *)Y);
+
+}
+END
+
+extern "C" %{
+
+/**
+ * @brief New function
+ *
+ * @param [in] Y: the data, already distributed and allocated
+ * @return the parsec object to schedule.
+ */
+parsec_taskpool_t*
+parsec_matrix_gather_New(parsec_tiled_matrix_dc_t *Y)
+{
+    parsec_taskpool_t* matrix_gather_taskpool;
+    parsec_matrix_gather_taskpool_t* taskpool = NULL;
+
+    taskpool = parsec_matrix_gather_new(Y);
+    matrix_gather_taskpool = (parsec_taskpool_t*)taskpool;
+
+    parsec_matrix_add2arena(taskpool->arenas[PARSEC_matrix_gather_DEFAULT_ARENA],
+                            parsec_datatype_int_t, matrix_UpperLower,
+                            1, 1, 1, 1,
+                            PARSEC_ARENA_ALIGNMENT_SSE, -1 );
+
+    return matrix_gather_taskpool;
+}
+
+/**
+ * @param [inout] the parsec object to destroy
+ */
+void parsec_matrix_gather_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_matrix_gather_taskpool_t *matrix_gather_taskpool = (parsec_matrix_gather_taskpool_t *)taskpool;
+    parsec_matrix_del2arena(matrix_gather_taskpool->arenas[PARSEC_matrix_gather_DEFAULT_ARENA]);
+    parsec_taskpool_free(taskpool);
+}
+
+/**
+ * @brief Gather dcY to G
+ *
+ * @param [in] dcY: the data, already distributed and allocated
+ */
+int parsec_matrix_gather_rank(parsec_context_t *parsec,
+                              parsec_tiled_matrix_dc_t *dcY)
+{
+    parsec_taskpool_t *parsec_matrix_gather = NULL;
+
+    if( dcY->mb != 1 || dcY->nb != 1 ) {
+        if( 0 == dcY->super.myrank )
+            fprintf(stderr, "ERROR: Only gather rank in Ar\n");
+        return PARSEC_ERR_BAD_PARAM;
+    }
+
+    parsec_matrix_gather = parsec_matrix_gather_New(
+                                  (parsec_tiled_matrix_dc_t *)dcY);
+
+    parsec_context_add_taskpool(parsec, parsec_matrix_gather);
+    parsec_context_start(parsec);
+    parsec_context_wait(parsec);
+    parsec_matrix_gather_Destruct(parsec_matrix_gather);
+
+    return 0;
+}
+
+%}

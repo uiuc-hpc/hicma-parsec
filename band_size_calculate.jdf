@@ -1,0 +1,328 @@
+extern "C" %{
+/**
+ * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
+
+#include "hicma_parsec.h"
+
+static int opt_band_size_min = 0;
+static int band_indicator_min = 0;
+
+%}
+
+/** Auto band size tuning
+ */
+descAr          [ type = "parsec_tiled_matrix_dc_t *" ]
+descFake        [ type = "parsec_tiled_matrix_dc_t *" ]
+Ar_copy         [ type = "int *" ]
+NB              [ type = "int" ]
+disp            [ type = "int *" ]
+nb_elem_r       [ type = "int *" ]
+band_size       [ type = "int" ]
+ops_trsm_tlr    [ type = "long long int *" ]
+ops_trsm_dense  [ type = "long long int *" ]
+ops_gemm_tlr    [ type = "long long int *" ]
+ops_gemm_dense  [ type = "long long int *" ]
+band_maxrank_thread  [ type = "int *" ]
+rows            [ type = "int" hidden = on default = "((two_dim_block_cyclic_t *)descAr)->grid.rows" ]
+cols            [ type = "int" hidden = on default = "((two_dim_block_cyclic_t *)descAr)->grid.cols" ]
+
+
+/**************************************************
+ **************************************************/
+trsm_ops(m, k)
+
+m = band_size-1 .. descAr->lmt-1 
+k = m+1-band_size .. m+1-band_size
+
+procs_id = m % ( rows * cols )
+
+: descFake(0, procs_id)
+
+BODY
+{
+    int procs = descAr->super.rank_of(&descAr->super, m, k);
+    int local_m = m / rows; 
+    int local_k = k / cols; 
+    int Arank = Ar_copy[disp[procs] + local_k * nb_elem_r[procs] + local_m];
+    int info = 0;
+
+    if( -999 == Arank ) { 
+        fprintf(stderr, "ERROR in trsm_ops (%d, %d): Arank %d\n", m, k, Arank);
+        info = 1;
+    }
+
+    int myid = es->th_id;
+    ops_trsm_tlr[myid] += (long long int)NB * NB * Arank; 
+    ops_trsm_dense[myid] += (long long int)NB * NB * NB;
+
+    if( info || DEBUG_INFO ) {
+        printf("trsm_ops %d, %d: Arank %d\n", m, k, Arank);
+        printf("trsm (%d, %d): ops_trsm_tlr %lld, ops_trsm_dense %lld, Ar %d, NB %d\n",
+                m, k, ops_trsm_tlr[myid], ops_trsm_dense[myid], Arank, NB); 
+    }
+}
+END
+
+
+/**************************************************
+ **************************************************/
+gemm_ops(m, n, k) 
+k = 0   .. descAr->lmt-3
+m = k+band_size .. descAr->lmt-1
+n = m+1-band_size .. m+1-band_size  
+
+procs_id = m % ( rows * cols )
+
+: descFake(0, procs_id)
+
+BODY
+{
+    int Aprocs = descAr->super.rank_of(&descAr->super, m, k);
+    int Bprocs = descAr->super.rank_of(&descAr->super, n, k);
+    int Cprocs = descAr->super.rank_of(&descAr->super, m, n);
+    int local_m = m / rows;
+    int local_n_B = n / rows;
+    int local_n_C = n / cols;
+    int local_k = k / cols;
+    int Arank = Ar_copy[disp[Aprocs] + local_k * nb_elem_r[Aprocs] + local_m];
+    int Brank = Ar_copy[disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B];
+    int Crank = Ar_copy[disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m];
+    int myid = es->th_id;
+    int info = 0;
+
+    if( -999 == Arank || -999 == Brank || -999 == Crank ) {
+        fprintf(stderr, "ERROR in gemm_ops (%d, %d, %d): Arank %d, Brank %d, Crank %d\n", m, n, k, Arank, Brank, Crank);
+        info = 1;
+    }
+
+    /* Update maxrank for that thread */
+    if( band_maxrank_thread[myid] < Crank )
+            band_maxrank_thread[myid] = Crank;
+
+    /* Caculate FLOPS */
+    int Crank_Arank = Crank + Arank;
+    /// QR([CU AU])
+    unsigned long int qraflop = ka_counts('q', NB, Crank_Arank, 0, 0);///ASSUMPTION:NB is not totally correct if nrowsC<ncolsC
+    /// AV*BV^T
+    unsigned long int qrbflop = ka_counts('m', Arank, Brank, NB, 0);
+    /// (AV*BV^T) * BU^T
+    qrbflop += ka_counts('m', Arank, NB, Brank, 0);
+    qrbflop += ka_counts('q', NB, Crank_Arank, 0, 0);
+    int rA_nrows  = NB < Crank_Arank ? NB : Crank_Arank;
+    unsigned long int svdflop = ka_counts('r', Crank_Arank, Crank_Arank, 2, 0);// trmm is used
+    svdflop += ka_counts('s', Crank_Arank, 0, 0, 0);
+    svdflop += Crank_Arank * Crank;
+    unsigned long int newuflop = ka_counts('o', NB, Crank, Crank_Arank, 1);
+    unsigned long int newvflop = ka_counts('o', Crank, NB, Crank_Arank, 2);
+
+    ops_gemm_tlr[myid] += (long long int)qraflop + qrbflop + svdflop + newuflop + newvflop;
+
+    if( m-k < band_size )
+        ops_gemm_dense[myid] += (long long int)2 * NB * NB * NB;
+    else if( n-k < band_size && m-n < band_size )
+        ops_gemm_dense[myid] += (long long int)4 * NB * NB * Arank; 
+    else if( m-n < band_size )
+        ops_gemm_dense[myid] += (long long int)2 * NB * NB * parsec_imin(Arank, Brank) + (long long int)4 * NB * Arank * Brank; 
+
+   if( info || DEBUG_INFO ) {
+        printf("GEMM %d %d %d: Arank %d posA %d, Brank %d posB %d, Crank %d posC %d; "
+               "Anb_elem_r %d, Adisp %d, Bnb_elem_r %d, Bdisp %d, Cnb_elem_r %d, Cdisp %d; "
+               "Aprocs %d, Cprocs %d, Bprocs %d, local_m %d, local_n_B %d, local_n_C %d, local_k %d\n",
+                m, n, k, Arank, disp[Aprocs] + local_k * nb_elem_r[Aprocs] + local_m,
+                         Brank, disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B,
+                         Crank, disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m,
+                         nb_elem_r[Aprocs], disp[Aprocs], nb_elem_r[Bprocs], disp[Bprocs],
+                         nb_elem_r[Cprocs], disp[Cprocs], Aprocs, Bprocs, Cprocs,
+                         local_m, local_n_B, local_n_C, local_k);
+
+        printf("gemm (%d, %d, %d): ops_gemm_tlr %lld, ops_gemm_dense %lld, Ar %d, Br %d, Cr %d, NB %d\n",
+                m, n, k, ops_gemm_tlr[myid], ops_gemm_dense[myid], Arank, Brank, Crank, NB);
+    }
+
+}
+END
+
+
+extern "C" %{
+
+/**
+ * Band size auto tuning
+ *
+ * @param [in] dcAr:         the data, already distributed and allocated
+ * @param [in] dcFake:       used for distribution
+ * @param [in] Ar_copy:      Rank info
+ * @param [in] NB:           tile size
+ * @param [in] disp:         displacement for each process in memory
+ * @param [in] nb_elem_r:    number of elements in row
+ * @param [in] band_size:    the subdiagonal to measure 
+ * @param [in] ops_trsm_tlr:   operation in trsm if run in TLR 
+ * @param [in] ops_trsm_dense: operation in trsm if run in dense 
+ * @param [in] ops_gemm_tlr:   operation in gemm if run in TLR 
+ * @param [in] ops_gemm_dense: operation in gemm if run in dense 
+ * @param [in] band_maxrank_thread: used to get maxrank for each subdiagonal 
+ * @return the parsec object to schedule
+ */
+parsec_taskpool_t*
+parsec_band_size_calculate_New(parsec_tiled_matrix_dc_t *dcAr,
+			parsec_tiled_matrix_dc_t *dcFake,
+			int *Ar_copy,
+			int NB,
+			int *disp,
+			int *nb_elem_r,
+			int band_size,
+			long long int *ops_trsm_tlr,
+			long long int *ops_trsm_dense,
+			long long int *ops_gemm_tlr,
+			long long int *ops_gemm_dense,
+			int *band_maxrank_thread)
+{
+    parsec_band_size_calculate_taskpool_t* taskpool = NULL;
+    taskpool = parsec_band_size_calculate_new(dcAr, dcFake, Ar_copy, NB, disp, nb_elem_r, band_size,
+                                              ops_trsm_tlr, ops_trsm_dense, ops_gemm_tlr,
+					      ops_gemm_dense, band_maxrank_thread); 
+    return (parsec_taskpool_t*)taskpool; 
+}
+
+/**
+ * @param [inout] the parsec object to destroy
+*/
+void parsec_band_size_calculate_Destruct(parsec_taskpool_t *taskpool)
+{
+    parsec_band_size_calculate_taskpool_t *band_size_calculate_taskpool = (parsec_band_size_calculate_taskpool_t *)taskpool;
+    parsec_taskpool_free(taskpool);
+}
+
+/**
+ * Band size auto tuning
+ *
+ * @param [in] parsec:       parsec context
+ * @param [in] dcAr:         the data, already distributed and allocated
+ * @param [in] dcFake:       used for distribution
+ * @param [in] Ar_copy:      Rank info 
+ * @param [in] NB:           tile size 
+ * @param [in] disp:         displacement for each process in memory
+ * @param [in] nb_elem_r:    number of elements in row 
+ */
+int parsec_band_size_calculate(parsec_context_t *parsec,
+                          parsec_tiled_matrix_dc_t *dcAr,
+                          parsec_tiled_matrix_dc_t *dcFake,
+                          int *Ar_copy,
+			  int NB,
+                          int *disp,
+			  int *nb_elem_r)
+{
+    parsec_taskpool_t *parsec_band_size_calculate = NULL;
+    int root = dcAr->super.rank_of(&dcAr->super, 0, 0);
+    int band_size, i;
+    
+    /* Only for 1 vp */
+    assert( parsec->nb_vp == 1 );
+    int nb_threads = parsec->virtual_processes[0]->nb_cores;
+
+    long long int *ops_trsm_tlr = (long long int *)calloc(sizeof(long long int), nb_threads);
+    long long int *ops_trsm_dense = (long long int *)calloc(sizeof(long long int), nb_threads);
+    long long int *ops_gemm_tlr = (long long int *)calloc(sizeof(long long int), nb_threads);
+    long long int *ops_gemm_dense = (long long int *)calloc(sizeof(long long int), nb_threads);
+    long long int ops_total_tlr, ops_total_dense, sum_tlr, sum_dense;
+
+    /* For maxrank of each band */
+    int *band_maxrank_thread = (int *)calloc(sizeof(int), nb_threads);
+    int *band_maxrank_receive = (int *)calloc( sizeof(int), dcAr->super.nodes );
+
+    /* band_size starts from 2 */
+    for(band_size = 2; band_size < dcAr->lmt; band_size++) {
+
+        /* init ops to 0 each iteration */
+        for( i = 0; i < nb_threads; i++ ) {
+            ops_trsm_tlr[i] = 0LL;
+            ops_trsm_dense[i] = 0LL;
+            ops_gemm_tlr[i] = 0LL;
+            ops_gemm_dense[i] = 0LL;
+            band_maxrank_thread[i] = 0;
+        }
+
+        if( root == dcAr->super.myrank )
+            fprintf(stderr, "\n***************** START Check band_size %d ******************\n", band_size);
+
+        parsec_band_size_calculate = parsec_band_size_calculate_New(dcAr, dcFake, Ar_copy, NB, disp, nb_elem_r,
+                                                      band_size, ops_trsm_tlr, ops_trsm_dense,
+                                                      ops_gemm_tlr, ops_gemm_dense, band_maxrank_thread); 
+
+        if( parsec_band_size_calculate != NULL ){
+            parsec_context_add_taskpool(parsec, parsec_band_size_calculate);
+            parsec_context_start(parsec);
+            parsec_context_wait(parsec);
+            parsec_band_size_calculate_Destruct(parsec_band_size_calculate);
+        }
+
+        /* Init value */
+        ops_total_tlr = 0LL;
+        ops_total_dense = 0LL;
+        sum_tlr = 0LL;
+        sum_dense = 0LL;
+	int band_maxrank_process = band_maxrank_thread[0];
+
+        for( i = 0; i < nb_threads; i++ ) {
+            ops_total_tlr += ops_trsm_tlr[i] + ops_gemm_tlr[i]; 
+            ops_total_dense += ops_trsm_dense[i] + ops_gemm_dense[i]; 
+
+            if( band_maxrank_process < band_maxrank_thread[i] )
+                    band_maxrank_process = band_maxrank_thread[i];
+        }
+
+        MPI_Barrier( MPI_COMM_WORLD );
+
+        MPI_Allreduce(&ops_total_tlr, &sum_tlr, 1, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD); 
+        MPI_Allreduce(&ops_total_dense, &sum_dense, 1, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD); 
+	MPI_Gather( &band_maxrank_process, 1, MPI_INT, band_maxrank_receive, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+        MPI_Barrier( MPI_COMM_WORLD ); 
+
+        if( root == dcAr->super.myrank ) {
+            int band_maxrank = band_maxrank_receive[0];
+            for( int i = 1; i < dcAr->super.nodes; i++ ) {
+                if( band_maxrank < band_maxrank_receive[i] )
+		    band_maxrank = band_maxrank_receive[i];
+            }
+
+            fprintf(stderr, "band_size: %d, nb_threads: %d, ops_sum_tlr: %lle, ops_sum_dense: %lle\n",
+                             band_size, nb_threads, (long double)sum_tlr, (long double)sum_dense);
+            fprintf(stderr, "***************** END Check band_size %d : %d ******************\n", band_size, band_maxrank);
+        }
+
+	/* Min band size based on FLUCTUATION */
+        if( sum_tlr * FLUCTUATION <= sum_dense && 0 == band_indicator_min ) { 
+            band_indicator_min = 1;
+            opt_band_size_min = band_size - 1;
+            if( root == dcAr->super.myrank ) {
+                fprintf(stderr, "\n#############################      Min band_size %d      ##############################\n", opt_band_size_min);
+            }
+        }
+
+        /* Finding ends */
+        if( sum_tlr <= sum_dense ) { 
+            int opt_band_size = band_size - 1; 
+            if( root == dcAr->super.myrank ) { 
+                fprintf(stderr, "\n############################# Find the OPT band_size : %d #############################\n\n", opt_band_size_min);
+            }
+
+	    /* Free memory */
+	    free( ops_trsm_tlr );
+	    free( ops_trsm_dense );
+	    free( ops_gemm_tlr );
+	    free( ops_gemm_dense );
+	    free( band_maxrank_thread );
+	    free( band_maxrank_receive );
+
+	    return opt_band_size_min;
+        }
+    }
+
+    fprintf(stderr, "\nMatrix is not sparse, and go back to dense !!!\n\n");
+    return dcAr->lmt;
+}
+
+%}

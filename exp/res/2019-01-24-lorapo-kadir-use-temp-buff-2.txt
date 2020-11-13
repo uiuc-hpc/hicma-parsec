@@ -1,0 +1,120 @@
+[****] TIME(s)     20.84775 : STARSH_gen	PxQ=   8 8   NB= 2700 N= 1080000
+[****] TIME(s)    151.48319 : HiCMA_potrf	PxQ=   8 8   NB= 2700 N= 1080000 : 2771954.980845 gflops
+avg:23.7887 min:11 max:41
+[****] TIME(s)     20.63181 : STARSH_gen	PxQ=   8 8   NB= 3000 N= 1080000
+[****] TIME(s)    165.68929 : HiCMA_potrf	PxQ=   8 8   NB= 3000 N= 1080000 : 2534289.276855 gflops
+avg:24.7486 min:11 max:43
+[****] TIME(s)     21.04119 : STARSH_gen	PxQ=   8 8   NB= 3375 N= 1080000
+[****] TIME(s)    189.51143 : HiCMA_potrf	PxQ=   8 8   NB= 3375 N= 1080000 : 2215721.722564 gflops
+avg:25.613 min:12 max:43
+[****] TIME(s)     20.37682 : STARSH_gen	PxQ=   8 8   NB= 4500 N= 1080000
+[****] TIME(s)    285.95861 : HiCMA_potrf	PxQ=   8 8   NB= 4500 N= 1080000 : 1468410.332229 gflops
+avg:28.87 min:13 max:47
+[****] TIME(s)     11.19824 : STARSH_gen	PxQ=   8 16  NB= 2700 N= 1080000
+[****] TIME(s)    133.41318 : HiCMA_potrf	PxQ=   8 16  NB= 2700 N= 1080000 : 3147399.624237 gflops
+avg:23.7887 min:11 max:41
+[****] TIME(s)     10.82447 : STARSH_gen	PxQ=  16 8   NB= 2700 N= 1080000
+[****] TIME(s)    136.92619 : HiCMA_potrf	PxQ=  16 8   NB= 2700 N= 1080000 : 3066649.097066 gflops
+avg:23.7887 min:11 max:41
+[****] TIME(s)     12.77514 : STARSH_gen	PxQ=   8 16  NB= 3000 N= 1080000
+[****] TIME(s)    150.79402 : HiCMA_potrf	PxQ=   8 16  NB= 3000 N= 1080000 : 2784623.519841 gflops
+avg:24.7486 min:11 max:43
+[****] TIME(s)     10.69255 : STARSH_gen	PxQ=  16 8   NB= 3000 N= 1080000
+[****] TIME(s)    158.04574 : HiCMA_potrf	PxQ=  16 8   NB= 3000 N= 1080000 : 2656854.803519 gflops
+avg:24.7486 min:11 max:43
+[****] TIME(s)     13.35511 : STARSH_gen	PxQ=   8 16  NB= 3375 N= 1080000
+[****] TIME(s)    175.93505 : HiCMA_potrf	PxQ=   8 16  NB= 3375 N= 1080000 : 2386702.240704 gflops
+avg:25.613 min:12 max:43
+[****] TIME(s)     10.84788 : STARSH_gen	PxQ=  16 8   NB= 3375 N= 1080000
+[****] TIME(s)    186.40607 : HiCMA_potrf	PxQ=  16 8   NB= 3375 N= 1080000 : 2252633.647402 gflops
+avg:25.613 min:12 max:43
+[****] TIME(s)     13.49232 : STARSH_gen	PxQ=   8 16  NB= 4500 N= 1080000
+[****] TIME(s)    280.10468 : HiCMA_potrf	PxQ=   8 16  NB= 4500 N= 1080000 : 1499098.803397 gflops
+avg:28.87 min:13 max:47
+[****] TIME(s)     11.23895 : STARSH_gen	PxQ=  16 8   NB= 4500 N= 1080000
+[****] TIME(s)    295.11352 : HiCMA_potrf	PxQ=  16 8   NB= 4500 N= 1080000 : 1422857.841438 gflops
+avg:28.87 min:13 max:47
+[****] TIME(s)      7.06058 : STARSH_gen	PxQ=  16 16  NB= 2700 N= 1080000
+[****] TIME(s)    138.04057 : HiCMA_potrf	PxQ=  16 16  NB= 2700 N= 1080000 : 3041892.514716 gflops
+avg:23.7887 min:11 max:41
+[****] TIME(s)      7.19737 : STARSH_gen	PxQ=  16 16  NB= 3000 N= 1080000
+[****] TIME(s)    160.46503 : HiCMA_potrf	PxQ=  16 16  NB= 3000 N= 1080000 : 2616798.085652 gflops
+avg:24.7486 min:11 max:43
+[****] TIME(s)      6.97608 : STARSH_gen	PxQ=  16 16  NB= 3375 N= 1080000
+[****] TIME(s)    188.24480 : HiCMA_potrf	PxQ=  16 16  NB= 3375 N= 1080000 : 2230630.464463 gflops
+avg:25.613 min:12 max:43
+[****] TIME(s)      9.58716 : STARSH_gen	PxQ=  16 16  NB= 4500 N= 1080000
+[****] TIME(s)    299.97622 : HiCMA_potrf	PxQ=  16 16  NB= 4500 N= 1080000 : 1399792.896969 gflops
+avg:28.87 min:13 max:47
+[****] TIME(s)     27.60703 : STARSH_gen	PxQ=  16 16  NB= 2700 N= 2295000
+[****] TIME(s)    362.42330 : HiCMA_potrf	PxQ=  16 16  NB= 2700 N= 2295000 : 11117598.560035 gflops
+avg:18.8886 min:9 max:33
+[****] TIME(s)     27.04810 : STARSH_gen	PxQ=  16 16  NB= 3000 N= 2295000
+[****] TIME(s)    393.26160 : HiCMA_potrf	PxQ=  16 16  NB= 3000 N= 2295000 : 10245792.597318 gflops
+avg:19.5657 min:10 max:35
+[****] TIME(s)     24.42050 : STARSH_gen	PxQ=  16 16  NB= 3375 N= 2295000
+[****] TIME(s)    444.07581 : HiCMA_potrf	PxQ=  16 16  NB= 3375 N= 2295000 : 9073398.414254 gflops
+avg:20.3697 min:10 max:36
+[****] TIME(s)     26.01242 : STARSH_gen	PxQ=  16 16  NB= 4500 N= 2295000
+[****] TIME(s)    661.55993 : HiCMA_potrf	PxQ=  16 16  NB= 4500 N= 2295000 : 6090569.521602 gflops
+avg:22.5574 min:10 max:40
+[****] TIME(s)      8.93697 : STARSH_gen	PxQ=  16 32  NB= 2700 N= 1080000
+[****] TIME(s)    135.24763 : HiCMA_potrf	PxQ=  16 32  NB= 2700 N= 1080000 : 3104709.453419 gflops
+avg:23.7887 min:11 max:41
+[****] TIME(s)      4.97336 : STARSH_gen	PxQ=  32 16  NB= 2700 N= 1080000
+[****] TIME(s)    156.20108 : HiCMA_potrf	PxQ=  32 16  NB= 2700 N= 1080000 : 2688230.914146 gflops
+avg:23.7887 min:11 max:41
+[****] TIME(s)      8.35320 : STARSH_gen	PxQ=  16 32  NB= 3000 N= 1080000
+[****] TIME(s)    156.95637 : HiCMA_potrf	PxQ=  16 32  NB= 3000 N= 1080000 : 2675295.011824 gflops
+avg:24.7486 min:11 max:43
+[****] TIME(s)      4.75712 : STARSH_gen	PxQ=  32 16  NB= 3000 N= 1080000
+[****] TIME(s)    178.54280 : HiCMA_potrf	PxQ=  32 16  NB= 3000 N= 1080000 : 2351842.754835 gflops
+avg:24.7486 min:11 max:43
+[****] TIME(s)      8.47873 : STARSH_gen	PxQ=  16 32  NB= 3375 N= 1080000
+[****] TIME(s)    191.17133 : HiCMA_potrf	PxQ=  16 32  NB= 3375 N= 1080000 : 2196483.049384 gflops
+avg:25.613 min:12 max:43
+[****] TIME(s)      4.67809 : STARSH_gen	PxQ=  32 16  NB= 3375 N= 1080000
+[****] TIME(s)    211.05162 : HiCMA_potrf	PxQ=  32 16  NB= 3375 N= 1080000 : 1989582.353919 gflops
+avg:25.613 min:12 max:43
+[****] TIME(s)      8.68017 : STARSH_gen	PxQ=  16 32  NB= 4500 N= 1080000
+[****] TIME(s)    306.77785 : HiCMA_potrf	PxQ=  16 32  NB= 4500 N= 1080000 : 1368757.825878 gflops
+avg:28.87 min:13 max:47
+[****] TIME(s)      4.78967 : STARSH_gen	PxQ=  32 16  NB= 4500 N= 1080000
+[****] TIME(s)    332.71698 : HiCMA_potrf	PxQ=  32 16  NB= 4500 N= 1080000 : 1262047.336479 gflops
+avg:28.87 min:13 max:47
+[****] TIME(s)     14.37926 : STARSH_gen	PxQ=  16 32  NB= 2700 N= 2295000
+[****] TIME(s)    319.34590 : HiCMA_potrf	PxQ=  16 32  NB= 2700 N= 2295000 : 12617280.537846 gflops
+avg:18.8886 min:9 max:33
+[****] TIME(s)     13.65634 : STARSH_gen	PxQ=  32 16  NB= 2700 N= 2295000
+[****] TIME(s)    361.96443 : HiCMA_potrf	PxQ=  32 16  NB= 2700 N= 2295000 : 11131692.544632 gflops
+avg:18.8886 min:9 max:33
+[****] TIME(s)     14.65582 : STARSH_gen	PxQ=  16 32  NB= 3000 N= 2295000
+[****] TIME(s)    358.55428 : HiCMA_potrf	PxQ=  16 32  NB= 3000 N= 2295000 : 11237564.375416 gflops
+avg:19.5657 min:10 max:35
+[****] TIME(s)     13.37973 : STARSH_gen	PxQ=  32 16  NB= 3000 N= 2295000
+[****] TIME(s)    400.22608 : HiCMA_potrf	PxQ=  32 16  NB= 3000 N= 2295000 : 10067501.769775 gflops
+avg:19.5657 min:10 max:35
+[****] TIME(s)     15.10031 : STARSH_gen	PxQ=  16 32  NB= 3375 N= 2295000
+[****] TIME(s)    416.70979 : HiCMA_potrf	PxQ=  16 32  NB= 3375 N= 2295000 : 9669263.518198 gflops
+avg:20.3697 min:10 max:36
+[****] TIME(s)     13.59828 : STARSH_gen	PxQ=  32 16  NB= 3375 N= 2295000
+[****] TIME(s)    464.64363 : HiCMA_potrf	PxQ=  32 16  NB= 3375 N= 2295000 : 8671757.155316 gflops
+avg:20.3697 min:10 max:36
+[****] TIME(s)     16.45005 : STARSH_gen	PxQ=  16 32  NB= 4500 N= 2295000
+[****] TIME(s)    642.55494 : HiCMA_potrf	PxQ=  16 32  NB= 4500 N= 2295000 : 6270711.675776 gflops
+avg:22.5574 min:10 max:40
+[****] TIME(s)     14.28912 : STARSH_gen	PxQ=  32 16  NB= 4500 N= 2295000
+[****] TIME(s)    709.90664 : HiCMA_potrf	PxQ=  32 16  NB= 4500 N= 2295000 : 5675784.045657 gflops
+avg:22.5574 min:10 max:40
+[****] TIME(s)     32.71435 : STARSH_gen	PxQ=  16 32  NB= 2700 N= 3510000
+[****] TIME(s)    565.28703 : HiCMA_potrf	PxQ=  16 32  NB= 2700 N= 3510000 : 25499476.047567 gflops
+[****] TIME(s)     28.95581 : STARSH_gen	PxQ=  16 32  NB= 3000 N= 3510000
+[****] TIME(s)    603.18068 : HiCMA_potrf	PxQ=  16 32  NB= 3000 N= 3510000 : 23897521.441247 gflops
+[****] TIME(s)     31.41314 : STARSH_gen	PxQ=  16 32  NB= 3375 N= 3510000
+[****] TIME(s)    687.76169 : HiCMA_potrf	PxQ=  16 32  NB= 3375 N= 3510000 : 20958601.579086 gflops
+[****] TIME(s)     31.85490 : STARSH_gen	PxQ=  16 32  NB= 4500 N= 3510000
+[****] TIME(s)   1033.65986 : HiCMA_potrf	PxQ=  16 32  NB= 4500 N= 3510000 : 13945131.997390 gflops
+avg:19.848 min:10 max:35
+[****] TIME(s)     28.27743 : STARSH_gen	PxQ=  32 16  NB= 4500 N= 3510000
+[****] TIME(s)   1122.25388 : HiCMA_potrf	PxQ=  32 16  NB= 4500 N= 3510000 : 12844262.237866 gflops
+avg:19.848 min:10 max:35

@@ -1,0 +1,12 @@
+	    CC = mpicc
+	    LD = mpicc
+            #NVCC = nvcc
+
+	    BUILD_TYPE = build
+
+	    LDFLAGS = -lmkl_intel_lp64 -lmkl_sequential -lgsl
+
+	    DPLASMA_SRC = /home/qcao3/test/my_test/dplasma
+            DPLASMA_BUILD = ${DPLASMA_SRC}/${BUILD_TYPE}
+	    PARSEC_SRC = ${DPLASMA_SRC}/parsec
+	    DPLASMA_INSTALL = ${DPLASMA_SRC}/${BUILD_TYPE}/install
