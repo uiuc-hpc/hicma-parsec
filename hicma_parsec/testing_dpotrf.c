@@ -1119,7 +1119,7 @@ int main(int argc, char ** argv)
 #ifdef GITHASH
         printf("%s    ", xstr(GITHASH));
 #else
-        printf("GITHASH:N/A    ")
+        printf("GITHASH:N/A    ");
 #endif
         printf("\"");
         for(int i=0; i<argc; i++){

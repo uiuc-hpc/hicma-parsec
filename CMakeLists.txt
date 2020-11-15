@@ -54,6 +54,7 @@ STRING(COMPARE EQUAL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} DTR
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dplasma/cmake_modules/")
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dplasma/parsec/cmake_modules/")
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dplasma/tools/PrecisionGenerator/")
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
 #set(BLA_VENDOR CACHE STRING "Possible valid values are: Intel10_64lp_seq, IBMESSL, Apple, or All, which will default to something like Goto or ATLAS")
 # Goto, ATLAS, PhiPACK, CXML, DXML, SunPerf, SCSL, SGIMATH, IBMESSL, Intel10_64lp_seq, ACML, ACML_MP, ACML_GPU, Apple, NAS, Generic
@@ -80,6 +81,46 @@ endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/dplasma/CMakeLists.txt")
 
 #option(PARSEC_WITH_DEVEL_HEADERS "" ON)
 add_subdirectory(dplasma)
+
+include(GenPkgConfig)
+
+# HICMA depends on STARSH
+# -------------------------------
+find_package( STARSH REQUIRED )
+if( STARSH_FOUND )
+    include_directories(${STARSH_INCLUDE_DIRS_DEP})
+    if(STARSH_LINKER_FLAGS)
+        list(APPEND CMAKE_EXE_LINKER_FLAGS "${STARSH_LINKER_FLAGS}")
+    endif()
+    if(STARSH_LIBRARY_DIRS)
+        # the RPATH to be used when installing
+        list(APPEND CMAKE_INSTALL_RPATH "${STARSH_LIBRARY_DIRS}")
+    endif()
+    if (STARSH_LIBRARIES)
+        # look for gsl
+        find_library( _STARSH_LIB NAME starsh PATHS ${STARSH_LIBRARY_DIRS} )
+        if( _STARSH_LIB AND NOT "${STARSH_LIBRARIES_DEP}" MATCHES "gsl" )
+            execute_process( COMMAND nm ${_STARSH_LIB} COMMAND grep -q gsl RESULT_VARIABLE GSL_IN_STARSH )
+            if ( ${GSL_IN_STARSH} EQUAL 0)
+                message( STATUS "STARSH depends on gsl. Adding it to dependency list")
+                find_package(GSL REQUIRED)
+                if (STARSH_LIBRARIES_DEP)
+                    list( APPEND STARSH_LIBRARIES_DEP ${GSL_LIBRARIES})
+                else()
+                    list( APPEND STARSH_LIBRARIES ${GSL_LIBRARIES})
+                endif()
+            endif()
+        endif()
+        # insert to dependencies
+        if (STARSH_LIBRARIES_DEP)
+            list(APPEND HICMA_DEP ${STARSH_LIBRARIES_DEP})
+        else()
+            list(APPEND HICMA_DEP ${STARSH_LIBRARIES})
+        endif()
+    endif()
+endif()
+
+add_subdirectory(hicma_parsec)
 
 # cmake config files
 #include(CMakePackageConfigHelpers)
