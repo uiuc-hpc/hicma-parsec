@@ -1,6 +1,8 @@
 cmake_policy(SET CMP0074 NEW)
 include(FindPkgConfig)
 
+OPTION(LINK_WITH_MKL "Link with MKL" ON)
+
 include(ParsecCompilePTG)
 include_directories("${PROJECT_SOURCE_DIR}/dplasma/parsec")
 include_directories("${PROJECT_SOURCE_DIR}/dplasma")
@@ -41,5 +43,10 @@ set( CMAKE_C_FLAGS
    )
 
 add_executable(testing_dpotrf_tlr ${SRC} testing_dpotrf.c)
-target_link_libraries(testing_dpotrf_tlr parsec dplasma stdc++ lapacke ${HICMA_DEP})
+if( LINK_WITH_MKL ) 
+    target_link_libraries(testing_dpotrf_tlr mkl_intel_lp64 mkl_sequential parsec dplasma lapacke ${HICMA_DEP})
+else( LINK_WITH_MKL )
+    target_link_libraries(testing_dpotrf_tlr parsec dplasma lapacke ${HICMA_DEP})
+endif( LINK_WITH_MKL )
+
 target_ptg_sources(testing_dpotrf_tlr PRIVATE ${JDF} )
