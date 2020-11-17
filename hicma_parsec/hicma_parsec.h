@@ -23,6 +23,7 @@
  * @param [in] hmb:                hierarchical mb; the sub tile size used in the recursive kernel 
  * @param [in] compmaxrank:        max rank threshold used in computation 
  * @param [in] send_full_tile:     whether send full tile during factorization; default is false to give better performance 
+ * @param [in] two_flow:           force to run two_flow version even if band_size == 1
  * @param [in] tileopcounters:     count the number of tiles 
  * @param [in] opcounters:         count operations during factorization 
  * @param [in] critical_path_time: measure the critical path time 
@@ -46,6 +47,7 @@ int HiCMA_dpotrf_L( parsec_context_t* parsec,
               int hmb,
 	      int compmaxrank,
               int send_full_tile,
+              int two_flow, 
               unsigned long* tileopcounters,
               unsigned long* opcounters,
               double *critical_path_time

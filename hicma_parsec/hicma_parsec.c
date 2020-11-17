@@ -176,7 +176,7 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 	iparam[IPARAM_HNB] = 300;
 	iparam[IPARAM_AUTO_BAND] = 1;
 	iparam[IPARAM_REORDER_GEMM] = 0;
-	iparam[IPARAM_TWO_FLOW] = 1;
+	iparam[IPARAM_TWO_FLOW] = 0;
 	iparam[IPARAM_P] = 0;
 	iparam[IPARAM_N] = 0;
 	iparam[IPARAM_NB] = 0;
@@ -417,6 +417,7 @@ void cleanup_parsec(parsec_context_t* parsec, int *iparam)
  * @param [in] hmb:                hierarchical mb; the sub tile size used in the recursive kernel 
  * @param [in] compmaxrank:        max rank threshold used in computation 
  * @param [in] send_full_tile:     whether send full tile during factorization; default is false to give better performance 
+ * @param [in] two_flow:           force to run two_flow version even if band_size == 1 
  * @param [in] tileopcounters:     count the number of tiles 
  * @param [in] opcounters:         count operations during factorization 
  * @param [in] critical_path_time: measure the critical path time 
@@ -439,6 +440,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		int hmb,
 		int compmaxrank,
 		int send_full_tile,
+		int two_flow, 
 		unsigned long* tileopcounters,
 		unsigned long* opcounters,
 		double *critical_path_time
@@ -477,7 +479,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	 *
 	 * WARNING : to get best performance, the PARSEC_DIST_COLLECTIVES in DPLASMA should be ON !!!
 	 */ 
-	if( 1 == band_size ) {
+	if( 1 == band_size && !two_flow ) {
 		int nodes = A->super.nodes;
 		int rank = A->super.myrank;
 		int MB = A->mb;

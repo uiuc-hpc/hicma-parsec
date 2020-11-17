@@ -896,7 +896,8 @@ int main(int argc, char ** argv)
 			(parsec_tiled_matrix_dc_t*)&dcAr,
 			(parsec_tiled_matrix_dc_t*)&dcRG,
 			(parsec_tiled_matrix_dc_t*)&dcRank,
-			tol, fixedrk, maxrank, lookahead, band_size, HNB, compmaxrank, send_full_tile,
+			tol, fixedrk, maxrank, lookahead, band_size,
+			HNB, compmaxrank, send_full_tile, two_flow,
 			tileopcounters, opcounters, critical_path_time
 			);
 
