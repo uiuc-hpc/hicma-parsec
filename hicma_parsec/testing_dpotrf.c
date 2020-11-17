@@ -7,7 +7,7 @@
 #include "hicma_parsec.h"
 
 /* Problem types */
-char* str_problem[6]={"randtlr", "ed-2d-sin", "st-2d-sqexp", "st-3d-sqexp", "st-3d-exp", "ed-3d-sin"};
+char* str_problem[8]={"randtlr", "ed-2d-sin", "st-2d-sqexp", "st-3d-sqexp", "st-3d-exp", "ed-3d-sin",  "md-3d-virus", "md-3d-cube"};
 
 /* Gathers distributed rank matrix and show statistics */
 int tp_display_rank_stat = 1;
@@ -396,6 +396,22 @@ int main(int argc, char ** argv)
         kernel = starsh_eddata_block_sin_kernel_3d;
         info = starsh_eddata_generate((STARSH_eddata **)&data, N, ndim, wave_k,
                 add_diag, place);
+    }
+    else if(kind_of_problem == 6){
+        int ndim = 3;
+        printf("\nRBF, %s, %d, %d, %d, %d, %f, %f\n", mesh_file, N, rbf_kernel, numobj, order, radius, density);
+        kernel = starsh_generate_3d_virus;
+	starsh_generate_3d_rbf_mesh_coordinates_virus((STARSH_mddata **)&data, 
+                mesh_file, N, ndim, rbf_kernel, numobj, 1, add_diag, 
+                radius, density, order);
+
+    }
+    else if(kind_of_problem == 7){
+        int ndim = 3;
+        kernel = starsh_generate_3d_cube;
+        starsh_generate_3d_rbf_mesh_coordinates_cube((STARSH_mddata **)&data, 
+                N, ndim, rbf_kernel, 1, add_diag, radius, order);
+
     }
     else
     {
@@ -1116,6 +1132,10 @@ int main(int argc, char ** argv)
         printf("%lf %lf %lf %lf %lf    ", time_starsh, time_hicma, time_opt_band, time_regenerate, time_reorder);
         printf("%le %le %le %le %le ", (double)total_numop, (double)total_band, (double)total_offband, (double)total_path, (double)total_offpath);
         printf("%lf %lf %d  ", (double)total_band/total_offband, (double)total_path/total_offpath, two_flow);
+       if (kind_of_problem== 6 || kind_of_problem==7){
+        printf("%d %d %d   ", order, numobj, rbf_kernel);
+        printf("%g %g %d   ", radius, density);
+        }
 #ifdef GITHASH
         printf("%s    ", xstr(GITHASH));
 #else
@@ -1169,6 +1189,10 @@ int main(int argc, char ** argv)
     else if(kind_of_problem == 2 || kind_of_problem == 3 || kind_of_problem == 4)
     {
         starsh_ssdata_free(data);
+    }
+    else if(kind_of_problem == 6 || kind_of_problem == 7)
+    {
+        starsh_mddata_free(data);
     }
     return ret;
 }

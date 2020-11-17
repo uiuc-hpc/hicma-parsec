@@ -65,12 +65,20 @@ static void print_usage(void)
 			"                         3: statistics-3d-sqexp \n"
 			"                         4: statistics-3d-exp \n"
 			"                         5: electrodynamics-3d-sin \n"
+                        "                         6: md-3d-virus \n"
+                        "                         7: md-3d-cube \n"
+                        " -M --mesh_file       : path to mesh file\n"
+                        " -K --numobj          : numnber of objects (number of viurses within a population)\n"
+                        " -B --rbf_kernel      : type of RBF basis function (0:Gaussian, 1:Expon, 2:InvQUAD, 3:InvMQUAD, 4:Maternc1, 5:Maternc2, 6:TPS, 7:CTPS, and 8:Wendland)\n"
+                        " -R --radius          : radius of influential nodes\n"
+                        " -O --order              : No, Morton, or Hilbert ordering (0, 1, or 2, respectively) starsh supports only Morton ordering. For Hilbert ordering, you need to use python code by importing Hilbert package. SOON will be provides by starsh\n"
+                        " -S --density               : denstiy of sphere packing for rbf application. if you want random distibution, type -1 \n"
 			" -h --help             : this message\n"
 			"\n");
 	parsec_usage();
 }
 
-#define GETOPT_STRING "c:g:P:Q:N:t:h::f:e:u:G:U::w:j:Z:D:F:Y:E:I:W:"
+#define GETOPT_STRING "c:g:P:Q:N:t:h::f:e:u:G:U::w:j:Z:D:F:Y:E:I:W:M:K:B:R:O:S"
 
 #if defined(PARSEC_HAVE_GETOPT_LONG)
 static struct option long_options[] =
@@ -132,7 +140,18 @@ static struct option long_options[] =
 	{"I",           required_argument,  0, 'I'},
 	{"two-flow",    required_argument,  0, 'W'},
 	{"W",           required_argument,  0, 'W'},
-
+        {"mesh_file",    required_argument, 0, 'M'},
+        {"M",            required_argument,  0, 'M'},
+        {"numobj",       required_argument, 0, 'K'},
+        {"K",           required_argument,  0, 'K'},
+        {"rbf_kernel",  required_argument, 0, 'B'},
+        {"B",           required_argument,  0, 'B'},
+        {"radius",     required_argument, 0, 'R'},
+        {"R",           required_argument,  0, 'R'},
+        {"order",    required_argument, 0, 'O'},
+        {"O",           required_argument,  0, 'O'},
+        {"density",    required_argument, 0, 'S'},
+        {"S",           required_argument,  0, 'S'},
 	{0, 0, 0, 0}
 };
 #endif  /* defined(PARSEC_HAVE_GETOPT_LONG) */
@@ -216,7 +235,12 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 			case 'E': iparam[IPARAM_AUTO_BAND]  = atoi(optarg); break;
 			case 'I': iparam[IPARAM_REORDER_GEMM]  = atoi(optarg); break;
 			case 'W': iparam[IPARAM_TWO_FLOW]  = atoi(optarg); break;
-
+                        case 'M' : mesh_file = optarg; break;
+                        case 'K': iparam[IPARAM_NUMOBJ]  = atoi(optarg); break;
+                        case 'B': iparam[IPARAM_RBFKERNEL]  = atoi(optarg); break;
+                        case 'O': iparam[IPARAM_ORDER]  = atoi(optarg); break;
+                        case 'R': dparam[DPARAM_RAD]    = atof(optarg); break;
+                        case 'S': dparam[DPARAM_DENST]  = atof(optarg); break;
 			case 'h': print_usage(); exit(0);
 				  break;
 

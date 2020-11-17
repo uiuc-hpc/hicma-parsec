@@ -39,6 +39,7 @@
 #include <starsh-randtlr.h>
 #include <starsh-electrodynamics.h>
 #include <starsh-spatial.h>
+#include <starsh-rbf.h>
 
 /* Local headers */
 #include "auxdescutil.h" // _printmat
@@ -132,6 +133,9 @@
 /* Print more info for debugging */
 #define DEBUG_INFO 0
 
+/* path to mesh file */
+char *mesh_file;
+
 /* Update PASTE_CODE_PROGRESS_KERNEL below if you change this list */
 enum iparam_t {
   IPARAM_RANK,         /* Rank                              */
@@ -170,6 +174,9 @@ enum iparam_t {
   IPARAM_AUTO_BAND,
   IPARAM_REORDER_GEMM,
   IPARAM_TWO_FLOW,
+  IPARAM_NUMOBJ,
+  IPARAM_RBFKERNEL,
+  IPARAM_ORDER,
   IPARAM_SIZEOF
 };
 
@@ -177,6 +184,8 @@ enum dparam_t {
   DPARAM_FIXED_ACC,
   DPARAM_WAVEK,
   DPARAM_ADD_DIAG,
+  DPARAM_RAD,
+  DPARAM_DENST,
   DPARAM_SIZEOF
 };
 
@@ -204,7 +213,12 @@ enum dparam_t {
     int send_full_tile = iparam[IPARAM_SEND_FULL_TILE];                \
     int reorder_gemm = iparam[IPARAM_REORDER_GEMM];                    \
     int two_flow = iparam[IPARAM_TWO_FLOW];                            \
-    int auto_band = iparam[IPARAM_AUTO_BAND];
+    int auto_band = iparam[IPARAM_AUTO_BAND];                          \
+    double radius = dparam[DPARAM_RAD];                                   \
+    double density = dparam[DPARAM_DENST];                                   \
+    int numobj  = iparam[IPARAM_NUMOBJ];                                \
+    int rbf_kernel  = iparam[IPARAM_RBFKERNEL];                          \
+    int order  = iparam[IPARAM_ORDER]; 
 
 #define PASTE_CODE_DPARAM_LOCALS(dparam) \
     double tol = dparam[DPARAM_FIXED_ACC];     \
