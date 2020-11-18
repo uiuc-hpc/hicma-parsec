@@ -437,7 +437,7 @@ int main(int argc, char ** argv)
     assert(lookahead >= 0);
 
     /* Make sure band >= 0 */
-    assert(band_size >= 0);
+    assert(band_size >= 1);
 
     /* Make sure NB_BAND >= NB_UV, meaning NB >= 2 * maxrank */
     assert(NB_BAND >= NB_UV);

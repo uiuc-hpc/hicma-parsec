@@ -250,6 +250,13 @@ STARSH_gen_New(int uplo,
         return NULL /*-1*/;
     }
 
+    /* Check band_size */ 
+    if( band_size < 1 ) {
+        if( 0 == A->super.myrank )
+            fprintf(stderr, "\nERROR: band_size should be not less that 1 : %d\n\n", band_size);
+	exit(1);
+    }
+
     /* Calculate workspace */
     int rsvd_oversample = 10;
     int mn = rsvd_oversample + maxrank;
