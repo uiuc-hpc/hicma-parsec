@@ -1532,11 +1532,11 @@ void HiCMA_HCORE_dgemm_qr_svd(int transA, int transB,
     int _Ark = (int)(Ark[0]);
     int _Brk = (int)(Brk[0]);
     int _Crk = (int)(Crk[0]);
-    if(_Ark == 0 || _Brk == 0 || _Crk == 0){
+    /*if(_Ark == 0 || _Brk == 0 || _Crk == 0){
         fprintf(stderr, "%s %d: _Ark=%d _Brk=%d _Crk=%d. These rank values should not be zero.\n", __FILE__, __LINE__, _Ark, _Brk, _Crk);
         exit(-1);
         //return MORSE_ERR_ILLEGAL_VALUE; 
-    }
+    }*/
 
     int _M = M; int _N = N;
     double* _CU = CU; int ld_CU = LDC;

@@ -30,7 +30,7 @@ READ Ar <- descAr(m, n)
 
 BODY
 {
-    if( ((int *)Ar)[0] <= 0 && n < m )
+    if( ((int *)Ar)[0] < 0 && n < m )
         fprintf(stderr, "ERROR rank of (%d, %d) : %d\n", m, n, ((int *)Ar)[0]);
 }
 END

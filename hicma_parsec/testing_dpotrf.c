@@ -1134,8 +1134,8 @@ int main(int argc, char ** argv)
         printf("%le %le %le %le %le ", (double)total_numop, (double)total_band, (double)total_offband, (double)total_path, (double)total_offpath);
         printf("%lf %lf %d  ", (double)total_band/total_offband, (double)total_path/total_offpath, two_flow);
        if (kind_of_problem== 6 || kind_of_problem==7){
-        printf("%d %d %d   ", order, numobj, rbf_kernel);
-        printf("%g %g %d   ", radius, density);
+        printf("%d %d %d  ", order, numobj, rbf_kernel);
+        printf("%g %g ", radius, density);
         }
 #ifdef GITHASH
         printf("%s    ", xstr(GITHASH));
