@@ -281,6 +281,12 @@ CTL ctl <- (lookahead > 0 && m > lookahead+k)? ctl potrf_dsyrk(k, k+1)
 BODY
 {
     if(enable_trsm == 0) return PARSEC_HOOK_RETURN_DONE;
+    /* If rank is 0, return and set communication count to 0 */
+    if( 0 == *((int *)Cr) ) {
+        this_task->locals.size.value = 0;
+        return PARSEC_HOOK_RETURN_DONE;
+    }
+
     int tempmm = m == descAv->mt-1 ? descAv->m - m * descAv->mb : descAv->mb;
     int ldak = BLKLDD( descAg, k );
     int ldam = BLKLDD( descAv, m );
@@ -345,6 +351,11 @@ CTL ctl -> (lookahead > 0 && m == k+1)? ctl potrf_dtrsm(lookahead+m .. descAg->m
 BODY
 {
     if(enable_syrk == 0) return PARSEC_HOOK_RETURN_DONE;
+    /* If rank is 0, return */
+    if( 0 == *((int *)Ar) ) {
+        return PARSEC_HOOK_RETURN_DONE;
+    } 
+
     int tempmm = m == descAg->mt-1 ? descAg->m - m*descAg->mb : descAg->mb;
     int ldam = BLKLDD( descAg, m );
     int ldau = BLKLDD( descAu, m );
@@ -447,6 +458,12 @@ BODY
 #endif
 
     if(enable_gemm == 0) return PARSEC_HOOK_RETURN_DONE;
+    /* If rank is 0, return */
+    if( 0 == *((int *)Ar) || 0 == *((int *)Br) ) {
+        this_task->locals.size.value = ((int *)Cr)[0] * descAu->mb;
+        return PARSEC_HOOK_RETURN_DONE;
+    }
+
     int tempmmu = m == descAu->mt-1 ? descAu->m - m * descAu->mb : descAu->mb;
     int tempmmv = m == descAv->mt-1 ? descAv->m - m * descAv->mb : descAv->mb;
     int ldamu = BLKLDD( descAu, m );

@@ -465,6 +465,12 @@ END
 BODY
 {
     if(enable_trsm == 0) return PARSEC_HOOK_RETURN_DONE;
+    /* If rank is 0, return and set communication count to 0 */
+    if( 0 == *((int *)Cr) ) {
+        this_task->locals.size.value = 0;
+        return PARSEC_HOOK_RETURN_DONE;
+    }
+
     if( m-k < band_size ) {
         int tempmm = m == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
         int ldak = BLKLDD( descA, k );
@@ -693,6 +699,11 @@ END
 BODY
 {
     if(enable_syrk == 0) return PARSEC_HOOK_RETURN_DONE;
+    /* If rank is 0, return */
+    if( 0 == *((int *)Ar) ) {
+        return PARSEC_HOOK_RETURN_DONE;
+    } 
+
     int tempmm = m == descA->mt-1 ? descA->m - m*descA->mb : descA->mb;
     int ldam = BLKLDD( descA, m );
 
@@ -1028,6 +1039,11 @@ BODY
 #endif
 
     if(enable_gemm == 0) return PARSEC_HOOK_RETURN_DONE;
+    /* If rank is 0, return */
+    if( 0 == *((int *)Ar) || 0 == *((int *)Br) ) {
+        this_task->locals.size.value = ((int *)Cr)[0] * descA->mb;
+        return PARSEC_HOOK_RETURN_DONE;
+    } 
     if(DEBUG_INFO) printf("GEMM (%d, %d, %d): k_pre %d, k_next %d\n", m, n, k, k_pre, k_next);
 
     /* No recursive */
