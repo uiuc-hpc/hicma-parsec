@@ -632,7 +632,7 @@ BODY
         if( ((int *)Cr)[0] > ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] )
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] = ((int *)Cr)[0];
 
-        if( descA->mt-3 == k )
+        if( descAg->mt-3 == k )
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[3] = ((int *)Cr)[0];
     }
 #endif
