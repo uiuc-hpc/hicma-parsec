@@ -88,7 +88,7 @@
 /* Show rank statistics */
 #define PRINT_RANK 0
 
-/* Statistic rank info in dcRank
+/* Array to store rank info, it needs to be 4 
  * Need PRINT_RANK 1
  * [0] : the initial rank distribution
  * [1] : the minimum rank distribution during factorization
