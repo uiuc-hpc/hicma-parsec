@@ -128,7 +128,7 @@
  * Otherwise, use JDF to gather, but much slover
  * when matrix is large
  */
-#define GATHER 1
+#define USE_MPI_GATHER 1
 
 /* Print more info for debugging */
 #define DEBUG_INFO 0

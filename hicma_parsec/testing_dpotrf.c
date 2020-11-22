@@ -93,7 +93,7 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
         /* Timer start */
         SYNC_TIME_START();
 
-#if GATHER
+#if USE_MPI_GATHER 
         if( rank == root ){
             MPI_Comm_size(MPI_COMM_WORLD, &size_rank);
             num = (int *)malloc(sizeof(int) * size_rank);
@@ -127,7 +127,7 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
         HICMA_stat_t rankstat;
 
         if( rank  == root ){
-#if GATHER
+#if USE_MPI_GATHER 
             printf("-------------------------------------------");
             /* As in G, it contains diagonal ranks, which is random */
             HICMA_get_stat2(G, num[size_rank-1] + disp[size_rank-1], maxrank, &rankstat);
@@ -142,7 +142,7 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
         fminrk = rankstat.min;
         fmaxrk = rankstat.max;
 
-#if !GATHER && PRINT_RANK 
+#if !USE_MPI_GATHER && PRINT_RANK 
         if(rank == 0){ // Takes too much time for big matrices
             printf("%s %d %d\n", strid, NT, NT);
             int i, j;
