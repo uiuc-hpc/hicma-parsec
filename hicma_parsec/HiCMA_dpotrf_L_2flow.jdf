@@ -464,6 +464,20 @@ END
 
 BODY
 {
+#if PRINT_RANK
+    /* Gather rank */
+    if( 0 == k && m-k >= band_size && descRank->super.myrank == sym_twoDBC_band_rank_of(&descRank->super, m, k) ) {
+        /* New data_copy and allocate memory for descRank(m, n) */
+        parsec_data_copy_t *my_data_copy = parsec_data_copy_new(descRank->super.data_of(&descRank->super, m, k), 0);
+        my_data_copy->device_private = calloc(RANK_MAP_BUFF, sizeof(int));
+
+        ((int *)((descRank->super.data_of(&descRank->super, m, k))->device_copies[0]->device_private))[0] = ((int *)Cr)[0];
+        ((int *)((descRank->super.data_of(&descRank->super, m, k))->device_copies[0]->device_private))[1] = ((int *)Cr)[0];
+        ((int *)((descRank->super.data_of(&descRank->super, m, k))->device_copies[0]->device_private))[2] = ((int *)Cr)[0];
+        ((int *)((descRank->super.data_of(&descRank->super, m, k))->device_copies[0]->device_private))[3] = ((int *)Cr)[0];
+    }
+#endif
+
     if(enable_trsm == 0) return PARSEC_HOOK_RETURN_DONE;
     if( m-k < band_size ) {
         int tempmm = m == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
@@ -1451,7 +1465,7 @@ BODY
         if( ((int *)Cr)[0] > ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] ) 
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] = ((int *)Cr)[0];
 
-        if( descA->mt-3 == k ) 
+        if( n-1 == k ) 
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[3] = ((int *)Cr)[0];
     }
 #endif

@@ -30,9 +30,9 @@ set( JDF
      band_size_calculate.jdf
      HiCMA_dpotrf_L_2flow.jdf
      HiCMA_dpotrf_L_3flow.jdf
-     matrix_gather.jdf
-     rank_check.jdf
      rank_gather.jdf
+     rank_check.jdf
+     rank_print.jdf
      STARSH_check.jdf
      STARSH_gen.jdf
    )

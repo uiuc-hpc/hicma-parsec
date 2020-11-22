@@ -121,8 +121,8 @@ int parsec_band_size_calculate(parsec_context_t *parsec,
  *
  * @param [in] dcY: the data, already distributed and allocated
  */
-int parsec_matrix_gather_rank(parsec_context_t *parsec,
-                              parsec_tiled_matrix_dc_t *dcY);
+int parsec_rank_gather(parsec_context_t *parsec,
+                       parsec_tiled_matrix_dc_t *dcY);
 
 /**
  * Check rank correctness and set -999 to tiles on band
@@ -142,9 +142,9 @@ int parsec_rank_check(parsec_context_t *parsec,
  * @param [inout] dcRank:    the rank data, already distributed and allocated
  * @param [in] band_size:    band size
  */
-int parsec_rank_gather(parsec_context_t *parsec,
-                       parsec_tiled_matrix_dc_t *dcRank,
-                       int band_size);
+int parsec_rank_print(parsec_context_t *parsec,
+                      parsec_tiled_matrix_dc_t *dcRank,
+                      int band_size);
 
 /** Uncompresses approximate matrix dcA into dcA0 
  *

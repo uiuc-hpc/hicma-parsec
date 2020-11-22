@@ -115,7 +115,7 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
 
 #else
         /* Gather from dcAr to G (global) */
-        parsec_matrix_gather_rank(parsec, (parsec_tiled_matrix_dc_t*)&dcAr);
+        parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr);
 #endif
 
         /* Timer end */
@@ -149,11 +149,11 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
             for(i = 0; i < dcAr.super.lm; i++){
                 for(j = 0; j < dcAr.super.lm; j++){//ASSUMPTION MT==NT
                     if( i < j )
-                        printf("%d ", 0); //%-3d
+                        printf("%3d ", 0); //%-3d
                     else if( i == j )
-                        printf("%d ", NB);
+                        printf("%3d ", 0);
                     else
-                        printf("%d ", G[j*dcAr.super.lm+i]);
+                        printf("%3d ", G[j*dcAr.super.lm+i]);
                 }
                 printf("\n");
             }
@@ -925,10 +925,10 @@ int main(int argc, char ** argv)
             /* Timer start */
             SYNC_TIME_START();
 
-            parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcRank, band_size);
+            parsec_rank_print(parsec, (parsec_tiled_matrix_dc_t*)&dcRank, band_size);
 
             /* Timer end */
-            SYNC_TIME_PRINT(rank, ("rank_gather" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+            SYNC_TIME_PRINT(rank, ("rank_print" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
                                    "send_full= %d band_size= %d reorder_gemm= %d\n\n",
                                    P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
         }

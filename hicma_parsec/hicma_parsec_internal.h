@@ -108,10 +108,18 @@
  */
 #define RANK_MAP_TYPE 0
 
+/* Using MPI routines to gather rank
+ * only to calculate the average, min, and max rank,
+ * because the rank order for each tile is not correct.
+ * Otherwise, use JDF to gather, but much slover
+ * when matrix is large
+ */
+#define USE_MPI_GATHER 1
+
 /* Print thread execution time */
 #define PRINT_THREAD_EXE_TIME 0
 
-/* Print starting time of task in the critical path */ 
+/* Print starting time of task in the critical path */
 #define PRINT_CRITICAL_PATH_TIME 0
 
 /* Contiguous memory for band
@@ -121,14 +129,6 @@
 
 /* Memory threshold */
 #define THRESHOLD_MEMORY_PER_NODE 70
-
-/* Using MPI routines to gather rank
- * only to calculate the average, min, and max rank,
- * because the rank order for each tile is not correct.
- * Otherwise, use JDF to gather, but much slover
- * when matrix is large
- */
-#define USE_MPI_GATHER 1
 
 /* Print more info for debugging */
 #define DEBUG_INFO 0
