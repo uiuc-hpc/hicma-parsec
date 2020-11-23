@@ -490,10 +490,6 @@ int main(int argc, char ** argv)
     for(int i = 0; i < dcAr.super.nb_local_tiles; i++) 
         ((int *)dcAr.mat)[i] = -1; 
 
-    /* Used for critical path time */
-    double *g_time = calloc(6, sizeof(double)); 
-    double *critical_path_time = calloc(6, sizeof(double));
-
     if(rank == 0) if(loud > 3) { printf("%d: Dense diagonal, U, V, rank Matrices are allocated\n", __LINE__);fflush(stdout);}
 
     /* Timer start */
@@ -856,119 +852,119 @@ int main(int argc, char ** argv)
     tlr_rank_stat("init_rank_tile", rank_array, band_size, parsec, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
 
     double time_hicma = 0.0;
-    {
-        info = 0;
-        if(check) {
-            /* Timer start */
-            SYNC_TIME_START();
+    info = 0;
+    if(check) {
+	    /* Timer start */
+	    SYNC_TIME_START();
 
-            /* Uncompresses approximate matrix into dcA0 */
-            STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA0,
-                                 (parsec_tiled_matrix_dc_t*)&dcA,
-                                 (parsec_tiled_matrix_dc_t*)&dcAr,
-				 band_size, &info);
+	    /* Uncompresses approximate matrix into dcA0 */
+	    STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA0,
+			    (parsec_tiled_matrix_dc_t*)&dcA,
+			    (parsec_tiled_matrix_dc_t*)&dcAr,
+			    band_size, &info);
 
-            /* Timer end */
-            SYNC_TIME_PRINT(rank, ("STARSH_check" "\tPxQ= %3d %-3d NB= %4d N= %7d\n\n",
-                                   P, Q, NB, N));
+	    /* Timer end */
+	    SYNC_TIME_PRINT(rank, ("STARSH_check" "\tPxQ= %3d %-3d NB= %4d N= %7d\n\n",
+				    P, Q, NB, N));
 
-            /* Timer start */
-            SYNC_TIME_START();
+	    /* Timer start */
+	    SYNC_TIME_START();
 
-            /* Dense Cholesky on Approximate A0 */
-            dplasma_dpotrf(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA0); 
+	    /* Dense Cholesky on Approximate A0 */
+	    dplasma_dpotrf(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA0); 
 
-            /* Timer end */
-            SYNC_TIME_PRINT(rank, ("Dense_potrf" "\tPxQ= %3d %-3d NB= %4d N= %7d : %14f gflops\n",
-                                   P, Q, NB, N, gflops=(flops/1e9)/sync_time_elapsed));
-        }
-
-        if(rank == 0) if(loud > 3) { printf("%d: HiCMA dpotrf is starting\n", __LINE__);fflush(stdout);}
-
-        /* Timer start */
-        SYNC_TIME_START();
-
-        /* HiCMA Cholesky */
-	info = HiCMA_dpotrf_L(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA,
-			(parsec_tiled_matrix_dc_t*)&dcAr,
-			(parsec_tiled_matrix_dc_t*)&dcRG,
-			(parsec_tiled_matrix_dc_t*)&dcRank,
-			tol, fixedrk, maxrank, lookahead, band_size,
-			HNB, compmaxrank, send_full_tile, two_flow,
-			tileopcounters, opcounters, critical_path_time
-			);
-
-	/* Timer end */
-	SYNC_TIME_PRINT(rank, ("HiCMA_potrf" "\tsend_full_tile= %d band_size= %d lookahead= %d "
-				"reorder_gemm= %d kind_of_problem= %d HNB= %d PxQ= %3d %-3d "
-                               "NB= %4d N= %7d 2flow= %d : %14f gflops\n",
-                               send_full_tile, band_size, lookahead, reorder_gemm, kind_of_problem,
-                               HNB, P, Q, NB, N, two_flow, gflops=(flops/1e9)/sync_time_elapsed));
-        /* Record time */
-        time_hicma = sync_time_elapsed;
-
-        if(rank == 0) if(loud > 3) {
-            printf("%d: HiCMA dpotrf ended in %g seconds\n", __LINE__,
-                    time_hicma
-                  );
-            fflush(stdout);
-        }
-
-        if (info != 0) {
-            printf("HiCMA_dpotrf failed with error code %d\n", info);
-        }
-
-        if( PRINT_RANK ) {
-            /* Timer start */
-            SYNC_TIME_START();
-
-            parsec_rank_print(parsec, (parsec_tiled_matrix_dc_t*)&dcRank, band_size);
-
-            /* Timer end */
-            SYNC_TIME_PRINT(rank, ("rank_print" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                                   "send_full= %d band_size= %d reorder_gemm= %d\n\n",
-                                   P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
-        }
-
-        /* Timer start */
-        SYNC_TIME_START();
-    
-        /* Check correctness of rank */
-        parsec_rank_check(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, band_size); 
-        
-        /* Timer end */
-        SYNC_TIME_PRINT(rank, ("After HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                               "band_size= %d send_full= %d\n\n",
-                               P, Q, NB, N, maxrank, band_size, send_full_tile));
-
+	    /* Timer end */
+	    SYNC_TIME_PRINT(rank, ("Dense_potrf" "\tPxQ= %3d %-3d NB= %4d N= %7d : %14f gflops\n",
+				    P, Q, NB, N, gflops=(flops/1e9)/sync_time_elapsed));
     }
+
+    if(rank == 0) if(loud > 3) { printf("%d: HiCMA dpotrf is starting\n", __LINE__);fflush(stdout);}
+
+    double *g_time = calloc(6, sizeof(double));
+    double *critical_path_time = calloc(6, sizeof(double));
+
+    /* Timer start */
+    SYNC_TIME_START();
+
+    /* HiCMA Cholesky */
+    info = HiCMA_dpotrf_L(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA,
+		    (parsec_tiled_matrix_dc_t*)&dcAr,
+		    (parsec_tiled_matrix_dc_t*)&dcRG,
+		    (parsec_tiled_matrix_dc_t*)&dcRank,
+		    tol, fixedrk, maxrank, lookahead, band_size,
+		    HNB, compmaxrank, send_full_tile, two_flow,
+		    tileopcounters, opcounters, critical_path_time
+		    );
+
+    /* Timer end */
+    SYNC_TIME_PRINT(rank, ("HiCMA_potrf" "\tsend_full_tile= %d band_size= %d lookahead= %d "
+			    "reorder_gemm= %d kind_of_problem= %d HNB= %d PxQ= %3d %-3d "
+			    "NB= %4d N= %7d 2flow= %d : %14f gflops\n",
+			    send_full_tile, band_size, lookahead, reorder_gemm, kind_of_problem,
+			    HNB, P, Q, NB, N, two_flow, gflops=(flops/1e9)/sync_time_elapsed));
+    /* Record time */
+    time_hicma = sync_time_elapsed;
 
     if(rank == 0) if(loud > 3) {
-        printf("time_starsh: %g\t", time_starsh);
-        printf("time_hicma: %g\t", time_hicma);
-        printf("\n");
+	    printf("%d: HiCMA dpotrf ended in %g seconds\n", __LINE__,
+			    time_hicma
+		  );
+	    fflush(stdout);
     }
-    
+
+    if (info != 0) {
+	    printf("HiCMA_dpotrf failed with error code %d\n", info);
+    }
+
+    if( PRINT_RANK ) {
+	    /* Timer start */
+	    SYNC_TIME_START();
+
+	    parsec_rank_print(parsec, (parsec_tiled_matrix_dc_t*)&dcRank, band_size);
+
+	    /* Timer end */
+	    SYNC_TIME_PRINT(rank, ("rank_print" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+				    "send_full= %d band_size= %d reorder_gemm= %d\n\n",
+				    P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
+    }
+
+    /* Timer start */
+    SYNC_TIME_START();
+
+    /* Check correctness of rank */
+    parsec_rank_check(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, band_size); 
+
+    /* Timer end */
+    SYNC_TIME_PRINT(rank, ("After HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+			    "band_size= %d send_full= %d\n\n",
+			    P, Q, NB, N, maxrank, band_size, send_full_tile));
+
+    if(rank == 0) if(loud > 3) {
+	    printf("time_starsh: %g\t", time_starsh);
+	    printf("time_hicma: %g\t", time_hicma);
+	    printf("\n");
+    }
+
     if( 0 == rank && info != 0 ) {
-        printf("-- Factorization is suspicious (info = %d) ! \n", info);
-        ret |= 1;
+	    printf("-- Factorization is suspicious (info = %d) ! \n", info);
+	    ret |= 1;
     }
 
     if( check ) {
-        if(rank == 0) printf("\nCHECK RESULT:\n\n");
+	    if(rank == 0) printf("\nCHECK RESULT:\n\n");
 
-        /* Equality of two matrices coming from dense and low rank potrf
-         */
-        /* Uncompresses approximate matrix into dcAd */
-        if(rank == 0) printf("Uncompress dcAd\n");
+	    /* Equality of two matrices coming from dense and low rank potrf
+	    */
+	    /* Uncompresses approximate matrix into dcAd */
+	    if(rank == 0) printf("Uncompress dcAd\n");
 
-        STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcAd,
-                             (parsec_tiled_matrix_dc_t*)&dcA,
-                             (parsec_tiled_matrix_dc_t*)&dcAr,
-			     band_size, &info);
+	    STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcAd,
+			    (parsec_tiled_matrix_dc_t*)&dcA,
+			    (parsec_tiled_matrix_dc_t*)&dcAr,
+			    band_size, &info);
 
-        if(rank == 0) {
-            printf("+++++++++++++++++++++++++++\n");
+	    if(rank == 0) {
+		    printf("+++++++++++++++++++++++++++\n");
             printf("Checking HiCMA L vs dense L\n");
             printf("dcAd is uncompressed matrix L obtained from HiCMA_dpotrf_L.jdf on approximate A.\n");
             printf("dcA0  is L factor obtained from dense cholesky (dpotrf_L.jdf in this repo) on approximate A.\n");
@@ -1102,6 +1098,7 @@ int main(int argc, char ** argv)
         assert(total_path + total_offpath == total_numop);
 
     }
+
     SYNC_TIME_PRINT(rank, ("Operation_counts : band_size= %d total= %le op_band= %le "
                            "op_offband= %le ratio_band= %lf op_critical_path= %le "
                            "op_off_critical_path= %le ratio_critical_path= %lf\n",
@@ -1155,6 +1152,8 @@ int main(int argc, char ** argv)
     free(alltileopcounters);
     free(allopcounters);
     free(rank_array);
+    free(g_time);
+    free(critical_path_time);
 
     if( NULL == dcA.band.mat )
         parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcA, band_size, indicator_band);
