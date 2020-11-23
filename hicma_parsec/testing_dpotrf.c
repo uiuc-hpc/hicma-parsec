@@ -532,7 +532,6 @@ int main(int argc, char ** argv)
     }
     if(rank == 0) if(loud > 3) printf("STARSH Matrix generation is done\n");
 
-
     /* Gathering rank info */
     int imaxrk = -1, iminrk=-1;
     double iavgrk = -1.0;
@@ -595,9 +594,9 @@ int main(int argc, char ** argv)
         SYNC_TIME_START();
 
         /* Find the best band_size */
-        band_size_opt = parsec_band_size_calculate(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
-                                                           (parsec_tiled_matrix_dc_t*)&dcFake,
-                                                           Ar_copy, NB, disp, nb_elem_r);
+        band_size_opt = parsec_band_size_auto_tuning(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
+                                                    (parsec_tiled_matrix_dc_t*)&dcFake,
+                                                    Ar_copy, NB, disp, nb_elem_r);
 
         /* Timer end */
         SYNC_TIME_PRINT(rank, ("OPT band_size" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "

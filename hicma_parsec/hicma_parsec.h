@@ -108,7 +108,7 @@ int parsec_band_gen( parsec_context_t *parsec,
  * @param [in] disp:         displacement for each process in memory
  * @param [in] nb_elem_r:    number of elements in row
  */
-int parsec_band_size_calculate(parsec_context_t *parsec,
+int parsec_band_size_auto_tuning(parsec_context_t *parsec,
                           parsec_tiled_matrix_dc_t *dcAr,
                           parsec_tiled_matrix_dc_t *dcFake,
                           int *Ar_copy,

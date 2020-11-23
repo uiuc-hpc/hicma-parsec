@@ -12,7 +12,7 @@ static int band_indicator_min = 0;
 
 %}
 
-/** Auto band size tuning
+/** Auto band size auto_tuning
  */
 descAr          [ type = "parsec_tiled_matrix_dc_t *" ]
 descFake        [ type = "parsec_tiled_matrix_dc_t *" ]
@@ -149,7 +149,7 @@ END
 extern "C" %{
 
 /**
- * Band size auto tuning
+ * Band size auto auto_tuning
  *
  * @param [in] dcAr:         the data, already distributed and allocated
  * @param [in] dcFake:       used for distribution
@@ -166,7 +166,7 @@ extern "C" %{
  * @return the parsec object to schedule
  */
 parsec_taskpool_t*
-parsec_band_size_calculate_New(parsec_tiled_matrix_dc_t *dcAr,
+parsec_band_size_auto_tuning_New(parsec_tiled_matrix_dc_t *dcAr,
 			parsec_tiled_matrix_dc_t *dcFake,
 			int *Ar_copy,
 			int NB,
@@ -179,8 +179,8 @@ parsec_band_size_calculate_New(parsec_tiled_matrix_dc_t *dcAr,
 			long long int *ops_gemm_dense,
 			int *band_maxrank_thread)
 {
-    parsec_band_size_calculate_taskpool_t* taskpool = NULL;
-    taskpool = parsec_band_size_calculate_new(dcAr, dcFake, Ar_copy, NB, disp, nb_elem_r, band_size,
+    parsec_band_size_auto_tuning_taskpool_t* taskpool = NULL;
+    taskpool = parsec_band_size_auto_tuning_new(dcAr, dcFake, Ar_copy, NB, disp, nb_elem_r, band_size,
                                               ops_trsm_tlr, ops_trsm_dense, ops_gemm_tlr,
 					      ops_gemm_dense, band_maxrank_thread); 
     return (parsec_taskpool_t*)taskpool; 
@@ -189,14 +189,14 @@ parsec_band_size_calculate_New(parsec_tiled_matrix_dc_t *dcAr,
 /**
  * @param [inout] the parsec object to destroy
 */
-void parsec_band_size_calculate_Destruct(parsec_taskpool_t *taskpool)
+void parsec_band_size_auto_tuning_Destruct(parsec_taskpool_t *taskpool)
 {
-    parsec_band_size_calculate_taskpool_t *band_size_calculate_taskpool = (parsec_band_size_calculate_taskpool_t *)taskpool;
+    parsec_band_size_auto_tuning_taskpool_t *band_size_auto_tuning_taskpool = (parsec_band_size_auto_tuning_taskpool_t *)taskpool;
     parsec_taskpool_free(taskpool);
 }
 
 /**
- * Band size auto tuning
+ * Band size auto auto_tuning
  *
  * @param [in] parsec:       parsec context
  * @param [in] dcAr:         the data, already distributed and allocated
@@ -206,7 +206,7 @@ void parsec_band_size_calculate_Destruct(parsec_taskpool_t *taskpool)
  * @param [in] disp:         displacement for each process in memory
  * @param [in] nb_elem_r:    number of elements in row 
  */
-int parsec_band_size_calculate(parsec_context_t *parsec,
+int parsec_band_size_auto_tuning(parsec_context_t *parsec,
                           parsec_tiled_matrix_dc_t *dcAr,
                           parsec_tiled_matrix_dc_t *dcFake,
                           int *Ar_copy,
@@ -214,7 +214,7 @@ int parsec_band_size_calculate(parsec_context_t *parsec,
                           int *disp,
 			  int *nb_elem_r)
 {
-    parsec_taskpool_t *parsec_band_size_calculate = NULL;
+    parsec_taskpool_t *parsec_band_size_auto_tuning = NULL;
     int root = dcAr->super.rank_of(&dcAr->super, 0, 0);
     int band_size, i;
     
@@ -247,15 +247,15 @@ int parsec_band_size_calculate(parsec_context_t *parsec,
         if( root == dcAr->super.myrank )
             fprintf(stderr, "\n***************** START Check band_size %d ******************\n", band_size);
 
-        parsec_band_size_calculate = parsec_band_size_calculate_New(dcAr, dcFake, Ar_copy, NB, disp, nb_elem_r,
+        parsec_band_size_auto_tuning = parsec_band_size_auto_tuning_New(dcAr, dcFake, Ar_copy, NB, disp, nb_elem_r,
                                                       band_size, ops_trsm_tlr, ops_trsm_dense,
                                                       ops_gemm_tlr, ops_gemm_dense, band_maxrank_thread); 
 
-        if( parsec_band_size_calculate != NULL ){
-            parsec_context_add_taskpool(parsec, parsec_band_size_calculate);
+        if( parsec_band_size_auto_tuning != NULL ){
+            parsec_context_add_taskpool(parsec, parsec_band_size_auto_tuning);
             parsec_context_start(parsec);
             parsec_context_wait(parsec);
-            parsec_band_size_calculate_Destruct(parsec_band_size_calculate);
+            parsec_band_size_auto_tuning_Destruct(parsec_band_size_auto_tuning);
         }
 
         /* Init value */
