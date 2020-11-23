@@ -16,9 +16,9 @@ num_col       [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descY
 NT            [ type = "int" hidden=on default="(descY->lnt-1)/num_col" ]
 
 /**************************************************
- *                      send                      *
+ *                   my_task                      *
  **************************************************/
-send(m, n, batch)
+my_task(m, n, batch)
 
 batch = 0 .. NT
 m = 0 .. descY->lmt-1
@@ -27,34 +27,13 @@ n = %{ return batch*num_col; %} .. %{ return parsec_imin((batch+1)*num_col-1, m)
 : descY(m, n)
 
 READ Y <- descY(m, n)
-       -> Y get(m, n, batch)
 
-CTL ctl <- (batch > 0)? ctl get(m, n-num_col, batch-1)
-
-BODY
-{
-}
-END
-
-/**************************************************
- *                      get                       *
- **************************************************/
-get(m, n, batch)
-
-batch = 0 .. NT
-m = 0 .. descY->lmt-1
-n = %{ return batch*num_col; %} .. %{ return parsec_imin((batch+1)*num_col-1, m); %}
-
-: descY(0, 0)
-
-READ Y <- Y send(m, n, batch)
-
-CTL ctl -> (batch < NT)? ctl send(m, n+num_col, batch+1)
+CTL ctl1 <- (batch > 0)? ctl2 my_task(m, n-num_col, batch-1)
+CTL ctl2 -> (batch < NT)? ctl1 my_task(m, n+num_col, batch+1)
 
 BODY
 {
     rank_array[n*descY->lmt+m] = *((int *)Y);
-
 }
 END
 
@@ -111,13 +90,19 @@ int parsec_rank_gather(parsec_context_t *parsec,
             fprintf(stderr, "ERROR: Only gather rank in Ar\n");
         return PARSEC_ERR_BAD_PARAM;
     }
-
-    parsec_rank_gather = parsec_rank_gather_New( dcY, rank_array );
+   
+    /* A tempory buff to gather rank info for each process */ 
+    int *rank_array_tmp = (int *)calloc(dcY->lm * dcY->ln, sizeof(int) );
+    
+    parsec_rank_gather = parsec_rank_gather_New( dcY, rank_array_tmp );
 
     parsec_context_add_taskpool(parsec, parsec_rank_gather);
     parsec_context_start(parsec);
     parsec_context_wait(parsec);
     parsec_rank_gather_Destruct(parsec_rank_gather);
+
+    /* Call MPI_Allreduce to reduce rank_array */
+    MPI_Allreduce( rank_array_tmp, rank_array, dcY->lm * dcY->ln, MPI_INT, MPI_SUM, MPI_COMM_WORLD ); 
 
     return 0;
 }
