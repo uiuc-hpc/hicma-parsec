@@ -8,7 +8,7 @@ cd hicma-x-dev && mkdir -p build
 
 git checkout band_tlr_pasc 
 
-cd build && cmake .. -DPARSEC_GPU_WITH_CUDA=OF -DDPLASMA_PRECISIONS="d" -DPARSEC_DIST_EAGER_LIMIT=0 -DPARSEC_DIST_SHORT_LIMIT=0
+cd build && cmake .. -DPARSEC_GPU_WITH_CUDA=OFF -DDPLASMA_PRECISIONS="d" -DPARSEC_DIST_EAGER_LIMIT=0 -DPARSEC_DIST_SHORT_LIMIT=0
 
 In addtion, (1) if gonna to run a more dense case, e.g., 3d-exp, add -DPARSEC_DIST_COLLECTIVES=OFF; (2) intel compiler, add -DCMAKE_Fortran_FLAGS="-nofor-main".
 
