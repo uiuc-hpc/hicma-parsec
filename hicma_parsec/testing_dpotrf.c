@@ -547,7 +547,6 @@ int main(int argc, char ** argv)
 
     /* Gather rank into Ar_copy */
     int *Ar_copy, *num, *disp, *nb_elem_r;
-    int band_size_opt = 1;
     int root = dcAr.super.super.rank_of(&dcAr.super.super, 0, 0);
 
     /* Allocate memory to hold Ar_copy */
@@ -573,8 +572,8 @@ int main(int argc, char ** argv)
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("rank_copy" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                           "send_full= %d band_size_opt= %d\n\n",
-                           P, Q, NB, N, maxrank, send_full_tile, band_size_opt));
+                           "send_full= %d band_size= %d\n\n",
+                           P, Q, NB, N, maxrank, send_full_tile, band_size));
 
     if( auto_band ) {
         /* Make sure band_size starts from 1 */
@@ -594,7 +593,7 @@ int main(int argc, char ** argv)
         SYNC_TIME_START();
 
         /* Find the best band_size */
-        band_size_opt = parsec_band_size_auto_tuning(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
+        int band_size_opt = parsec_band_size_auto_tuning(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
                                                     (parsec_tiled_matrix_dc_t*)&dcFake,
                                                     Ar_copy, NB, disp, nb_elem_r);
 
