@@ -117,12 +117,14 @@ int parsec_band_size_calculate(parsec_context_t *parsec,
                           int *nb_elem_r);
 
 /**
- * @brief Gather dcY to G
+ * @brief Gather dcY to rank_array
  *
  * @param [in] dcY: the data, already distributed and allocated
+ * @param [in] rank_array: array of rank
  */
 int parsec_rank_gather(parsec_context_t *parsec,
-                       parsec_tiled_matrix_dc_t *dcY);
+                parsec_tiled_matrix_dc_t *dcY,
+                int *rank_array);
 
 /**
  * Check rank correctness and set -999 to tiles on band

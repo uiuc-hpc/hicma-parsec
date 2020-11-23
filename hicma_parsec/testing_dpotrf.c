@@ -12,9 +12,6 @@ char* str_problem[8]={"randtlr", "ed-2d-sin", "st-2d-sqexp", "st-3d-sqexp", "st-
 /* Gathers distributed rank matrix and show statistics */
 int tp_display_rank_stat = 1;
 
-/* Used for gathering rank */
-int *G;
-
 /* Used for gather operation count */
 unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 
@@ -74,7 +71,7 @@ static int starsh_generate_map(parsec_context_t *parsec, int uplo,
 }
 
 /* Rank statistics */
-void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int MT, int NT, int band_size,  parsec_context_t* parsec, int rank, two_dim_block_cyclic_t* pdcAr, int* pminrk, int* pmaxrk, double* pavgrk, int maxrank){
+void tlr_rank_stat(char* strid, int *rank_array, int P, int Q, int M, int N, int MB, int NB, int MT, int NT, int band_size,  parsec_context_t* parsec, int rank, two_dim_block_cyclic_t* pdcAr, int* pminrk, int* pmaxrk, double* pavgrk, int maxrank){
     two_dim_block_cyclic_t dcAr = *pdcAr;
     int fmaxrk = -1, fminrk=-1;
     double favgrk = -1.0;
@@ -84,11 +81,6 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
         int *num, *disp;
         int size_rank;
         int root = dcAr.super.super.rank_of(&dcAr.super.super, 0, 0);
-
-        /* Allocate memory for global array */
-        if( rank == root ){
-            G = (int *)malloc(dcAr.super.lmt * dcAr.super.lnt * sizeof(int));
-        }
 
         /* Timer start */
         SYNC_TIME_START();
@@ -111,11 +103,11 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
 
         /* Gather without order */
         MPI_Gatherv((int *)dcAr.mat, dcAr.super.nb_local_tiles, MPI_INT,
-                    G, num, disp, MPI_INT, root, MPI_COMM_WORLD);
+                    rank_array, num, disp, MPI_INT, root, MPI_COMM_WORLD);
 
 #else
         /* Gather from dcAr to G (global) */
-        parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr);
+        parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, rank_array);
 #endif
 
         /* Timer end */
@@ -130,9 +122,9 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
 #if USE_MPI_GATHER 
             printf("-------------------------------------------");
             /* As in G, it contains diagonal ranks, which is random */
-            HICMA_get_stat2(G, num[size_rank-1] + disp[size_rank-1], maxrank, &rankstat);
+            HICMA_get_stat2(rank_array, num[size_rank-1] + disp[size_rank-1], maxrank, &rankstat);
 #else
-            HICMA_get_stat('L', G, dcAr.super.lm, dcAr.super.ln, dcAr.super.lm, &rankstat);
+            HICMA_get_stat('L', rank_array, dcAr.super.lm, dcAr.super.ln, dcAr.super.lm, &rankstat);
 #endif
             HICMA_print_stat(rankstat);
         }
@@ -153,7 +145,7 @@ void tlr_rank_stat(char* strid, int P, int Q, int M, int N, int MB, int NB, int 
                     else if( i == j )
                         printf("%3d ", 0);
                     else
-                        printf("%3d ", G[j*dcAr.super.lm+i]);
+                        printf("%3d ", rank_array[j*dcAr.super.lm+i]);
                 }
                 printf("\n");
             }
@@ -546,9 +538,17 @@ int main(int argc, char ** argv)
         exit(-1);
     }
     if(rank == 0) if(loud > 3) printf("STARSH Matrix generation is done\n");
+
+
+    /* Gathering rank info */
     int imaxrk = -1, iminrk=-1;
     double iavgrk = -1.0;
-    tlr_rank_stat("init_rank_tile", P, Q, N, N, NB, NB, NT, NT, band_size, parsec, rank, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
+
+    /* Used for gathering rank */
+    int *rank_array = (int *)calloc(dcAr.super.lmt * dcAr.super.lnt, sizeof(int));
+
+    tlr_rank_stat("init_rank_tile", rank_array, P, Q, N, N, NB, NB, NT, NT, band_size, parsec, rank, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
+
     int imaxrk_before = imaxrk;
     int iminrk_before = iminrk;
     double iavgrk_before = iavgrk;
@@ -856,7 +856,7 @@ int main(int argc, char ** argv)
 
     imaxrk = -1, iminrk=-1;
     iavgrk = -1.0;
-    tlr_rank_stat("init_rank_tile", P, Q, N, N, NB, NB, NT, NT, band_size, parsec, rank, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
+    tlr_rank_stat("init_rank_tile", rank_array, P, Q, N, N, NB, NB, NT, NT, band_size, parsec, rank, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
 
     double time_hicma = 0.0;
     {
@@ -1034,7 +1034,7 @@ int main(int argc, char ** argv)
 
     int fmaxrk = -1, fminrk=-1;
     double favgrk = -1.0;
-    tlr_rank_stat("rank_tile", P, Q, N, N, NB, NB, NT, NT, band_size, parsec, rank, &dcAr, &fminrk, &fmaxrk, &favgrk, maxrank);
+    tlr_rank_stat("rank_tile", rank_array, P, Q, N, N, NB, NB, NT, NT, band_size, parsec, rank, &dcAr, &fminrk, &fmaxrk, &favgrk, maxrank);
 
     SYNC_TIME_START();
     unsigned long* alltileopcounters = calloc(nelm_tileopcounters, sizeof(unsigned long));
@@ -1157,6 +1157,7 @@ int main(int argc, char ** argv)
     free(op_offpath);
     free(alltileopcounters);
     free(allopcounters);
+    free(rank_array);
 
     if( NULL == dcA.band.mat )
         parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcA, band_size, indicator_band);

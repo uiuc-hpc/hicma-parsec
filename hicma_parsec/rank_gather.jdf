@@ -6,16 +6,14 @@ extern "C" %{
  **/
 #include "hicma_parsec.h"
 
-/* Use for gathering rank */
-extern int *G;
-
 %}
 
-/** Gather from dcAr to G (global)
+/** Gather from dcAr to rank_array 
 */
-descY    [ type = "parsec_tiled_matrix_dc_t*" ]
-num_col  [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descY)->grid.cols * ((two_dim_block_cyclic_t *)descY)->grid.kcols" ]
-NT       [ type = "int" hidden=on default="(descY->lnt-1)/num_col" ]
+descY         [ type = "parsec_tiled_matrix_dc_t *" ]
+rank_array    [ type = "int *" ]
+num_col       [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descY)->grid.cols * ((two_dim_block_cyclic_t *)descY)->grid.kcols" ]
+NT            [ type = "int" hidden=on default="(descY->lnt-1)/num_col" ]
 
 /**************************************************
  *                      send                      *
@@ -55,7 +53,7 @@ CTL ctl -> (batch < NT)? ctl send(m, n+num_col, batch+1)
 
 BODY
 {
-    G[n*descY->lmt+m] = *((int *)Y);
+    rank_array[n*descY->lmt+m] = *((int *)Y);
 
 }
 END
@@ -66,15 +64,16 @@ extern "C" %{
  * @brief New function
  *
  * @param [in] Y: the data, already distributed and allocated
+ * @param [in] rank_array: array of rank 
  * @return the parsec object to schedule.
  */
 parsec_taskpool_t*
-parsec_rank_gather_New(parsec_tiled_matrix_dc_t *Y)
+parsec_rank_gather_New(parsec_tiled_matrix_dc_t *Y, int *rank_array)
 {
     parsec_taskpool_t* rank_gather_taskpool;
     parsec_rank_gather_taskpool_t* taskpool = NULL;
 
-    taskpool = parsec_rank_gather_new(Y);
+    taskpool = parsec_rank_gather_new(Y, rank_array);
     rank_gather_taskpool = (parsec_taskpool_t*)taskpool;
 
     parsec_matrix_add2arena(taskpool->arenas[PARSEC_rank_gather_DEFAULT_ARENA],
@@ -96,12 +95,14 @@ void parsec_rank_gather_Destruct(parsec_taskpool_t *taskpool)
 }
 
 /**
- * @brief Gather dcY to G
+ * @brief Gather dcY to rank_array 
  *
  * @param [in] dcY: the data, already distributed and allocated
+ * @param [in] rank_array: array of rank 
  */
 int parsec_rank_gather(parsec_context_t *parsec,
-                       parsec_tiled_matrix_dc_t *dcY)
+		parsec_tiled_matrix_dc_t *dcY,
+		int *rank_array)
 {
     parsec_taskpool_t *parsec_rank_gather = NULL;
 
@@ -111,8 +112,7 @@ int parsec_rank_gather(parsec_context_t *parsec,
         return PARSEC_ERR_BAD_PARAM;
     }
 
-    parsec_rank_gather = parsec_rank_gather_New(
-                                  (parsec_tiled_matrix_dc_t *)dcY);
+    parsec_rank_gather = parsec_rank_gather_New( dcY, rank_array );
 
     parsec_context_add_taskpool(parsec, parsec_rank_gather);
     parsec_context_start(parsec);
