@@ -89,7 +89,7 @@ int parsec_band_free(parsec_context_t *parsec,
  * @param [in] index:        index in generate matrix
  * @param [in] band_size:    band size
  */
-int parsec_band_gen( parsec_context_t *parsec,
+int parsec_band_regenerate( parsec_context_t *parsec,
                 int uplo,
                 parsec_tiled_matrix_dc_t *dcA,
                 void *data,

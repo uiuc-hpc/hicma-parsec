@@ -26,7 +26,7 @@ set( SRC
 set( JDF
      Av_memory.jdf
      band_free.jdf
-     band_gen.jdf
+     band_regenerate.jdf
      band_size_auto_tuning.jdf
      HiCMA_dpotrf_L_2flow.jdf
      HiCMA_dpotrf_L_3flow.jdf

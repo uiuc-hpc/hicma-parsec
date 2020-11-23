@@ -643,8 +643,8 @@ int main(int argc, char ** argv)
             dcA.super.super.super.rank_of_key = sym_twoDBC_band_rank_of_key;
 
             /* band generation */
-            parsec_band_gen(parsec, uplo, (parsec_tiled_matrix_dc_t *)&dcA,
-                            data, kernel, index, band_size);
+            parsec_band_regenerate(parsec, uplo, (parsec_tiled_matrix_dc_t *)&dcA,
+			    data, kernel, index, band_size);
         }
 
         /* Timer end */
