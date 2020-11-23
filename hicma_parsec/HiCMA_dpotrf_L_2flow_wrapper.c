@@ -188,7 +188,7 @@ static float evaluate_gpu_syrk(parsec_task_t* task) {
     int m = ((__parsec_HiCMA_dpotrf_L_2flow_potrf_dsyrk_task_t *)task)->locals.m.value;
     int k = ((__parsec_HiCMA_dpotrf_L_2flow_potrf_dsyrk_task_t *)task)->locals.k.value;
     int band_size = ((__parsec_HiCMA_dpotrf_L_2flow_potrf_dsyrk_task_t *)task)->locals.band_size_local.value;
-    if( m-k < band_size )
+    if( 1 || m-k < band_size )
         return PARSEC_HOOK_RETURN_DONE;
     else
         return PARSEC_HOOK_RETURN_NEXT;

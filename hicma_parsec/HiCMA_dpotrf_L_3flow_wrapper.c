@@ -164,53 +164,6 @@ static int wrap_gemm_complete(parsec_execution_stream_t * es,
 
 #if defined(PARSEC_HAVE_CUDA)
 
-/* Select GPU trsm kernel 
- * Can not pass internal_taskpool, so band_size_local instead
- */
-static float evaluate_gpu_potrf(parsec_task_t* task) {
-    return PARSEC_HOOK_RETURN_DONE;
-}
-
-static float evaluate_gpu_trsm(parsec_task_t* task) {
-    int m = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dtrsm_task_t *)task)->locals.m.value;
-    int k = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dtrsm_task_t *)task)->locals.k.value;
-    int band_size = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dtrsm_task_t *)task)->locals.band_size_local.value;
-    if( m-k < band_size )
-        return PARSEC_HOOK_RETURN_DONE;
-    else
-        return PARSEC_HOOK_RETURN_NEXT;
-}
-
-/* Select GPU syrk kernel 
- * Can not pass internal_taskpool, so band_size_local instead
- */
-static float evaluate_gpu_syrk(parsec_task_t* task) {
-    int m = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dsyrk_task_t *)task)->locals.m.value;
-    int k = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dsyrk_task_t *)task)->locals.k.value;
-    int band_size = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dsyrk_task_t *)task)->locals.band_size_local.value;
-    if( m-k < band_size )
-        return PARSEC_HOOK_RETURN_DONE;
-    else
-        return PARSEC_HOOK_RETURN_NEXT;
-}
-
-/* Select GPU gemm kernel 
- * Can not pass internal_taskpool, so band_size_local instead
- */
-static float evaluate_gpu_gemm(parsec_task_t* task) {
-    int m = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dgemm_task_t *)task)->locals.m.value;
-    int n = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dgemm_task_t *)task)->locals.n.value;
-    int k = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dgemm_task_t *)task)->locals.k.value;
-    int band_size = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dgemm_task_t *)task)->locals.band_size_local.value;
-    int send_full = ((__parsec_HiCMA_dpotrf_L_3flow_potrf_dgemm_task_t *)task)->locals.send_full_tile_local.value;
-    //if( m-k < band_size || (m-n < band_size && send_full) )
-    //if( m-k < band_size || (n-k < band_size && m-n < band_size) )
-    if( m-n < band_size )
-        return PARSEC_HOOK_RETURN_DONE;
-    else
-        return PARSEC_HOOK_RETURN_NEXT;
-}
-
 /* Allocate memory for workspace */
 static parsec_potrf_workspace_t* workspace_memory_allocate( parsec_potrf_workspace_t *ws ) {
     ws = (parsec_potrf_workspace_t *)malloc( sizeof(parsec_potrf_workspace_t) );
@@ -307,10 +260,6 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
 {
     parsec_taskpool_t *tp = NULL;
     void** hook;
-    void** eval_gpu_potrf;
-    void** eval_gpu_trsm;
-    void** eval_gpu_syrk;
-    void** eval_gpu_gemm;
 
     /* Check input arguments */
     if ((uplo != PlasmaUpper) && (uplo != PlasmaLower)) {
@@ -476,16 +425,6 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
             *hook = &wrap_syrk;
             hook  = (void *)&hicma_dpotrf->super.task_classes_array[gemm_id]->incarnations[0].hook;
             *hook = &wrap_gemm;
-
-            /* GPU evaluate of chores */
-            eval_gpu_potrf = (void *)&hicma_dpotrf->super.task_classes_array[potrf_id]->incarnations[0].evaluate;
-            eval_gpu_trsm  = (void *)&hicma_dpotrf->super.task_classes_array[trsm_id]->incarnations[0].evaluate;
-            eval_gpu_syrk  = (void *)&hicma_dpotrf->super.task_classes_array[syrk_id]->incarnations[0].evaluate;
-            eval_gpu_gemm  = (void *)&hicma_dpotrf->super.task_classes_array[gemm_id]->incarnations[0].evaluate;
-            *eval_gpu_potrf = &evaluate_gpu_potrf;
-            *eval_gpu_trsm  = &evaluate_gpu_trsm;
-            *eval_gpu_syrk  = &evaluate_gpu_syrk;
-            *eval_gpu_gemm  = &evaluate_gpu_gemm;
 #endif
 
           /* Recursive */
