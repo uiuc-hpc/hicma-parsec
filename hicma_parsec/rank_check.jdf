@@ -9,7 +9,7 @@ extern "C" %{
 
 %}
 
-/** Check the rank correctness and set -999 to tile on band
+/** Check the rank correctness and set -1 to tile on band
  */
 descAr          [ type = "parsec_tiled_matrix_dc_t*" ]
 band_size       [ type = "int" ]
@@ -52,8 +52,8 @@ RW Ar <- descAr(m, n)
 
 BODY
 {
-    /* Set on band rank to -999 */
-    ((int *)Ar)[0] = -999; 
+    /* Set on band rank to -1 */
+    ((int *)Ar)[0] = -1; 
 }
 END
 
@@ -61,7 +61,7 @@ END
 extern "C" %{
 
 /**
- * Check rank correctness and set -999 to tiles on band 
+ * Check rank correctness and set -1 to tiles on band 
  *
  * @param [inout] dcAr:      the rank data, already distributed and allocated
  * @param [in] band_size:    band size
@@ -91,7 +91,7 @@ void parsec_rank_check_Destruct(parsec_taskpool_t *taskpool)
 }
 
 /**
- * Check rank correctness and set -999 to tiles on band
+ * Check rank correctness and set -1 to tiles on band
  *
  * @param [in] parsec:       parsec context
  * @param [inout] dcAr:      the rank data, already distributed and allocated

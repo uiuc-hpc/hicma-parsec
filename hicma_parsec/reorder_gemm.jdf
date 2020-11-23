@@ -75,8 +75,8 @@ BODY
         int Brank = Ar_copy[disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B];
         int Crank = Ar_copy[disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m];
 
-        if( -999 == Arank || -999 == Brank || -999 == Crank ) {
-            if( !(-999 == Brank && n-k < band_size) )
+        if( -1 == Arank || -1 == Brank || -1 == Crank ) {
+            if( !(-1 == Brank && n-k < band_size) )
             fprintf(stderr, "ERROR in gemm_ops (%d, %d, %d): Arank %d, Brank %d, Crank %d\n", m, n, k, Arank, Brank, Crank);
         }
 

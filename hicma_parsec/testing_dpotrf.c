@@ -488,7 +488,7 @@ int main(int argc, char ** argv)
 
     /* Initialize dcAr to negtive, used to gather rank using MPI_Gather / MPI_Gatherv */
     for(int i = 0; i < dcAr.super.nb_local_tiles; i++) 
-        ((int *)dcAr.mat)[i] = -999; 
+        ((int *)dcAr.mat)[i] = -1; 
 
     /* Used for critical path time */
     double *g_time = calloc(6, sizeof(double)); 

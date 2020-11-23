@@ -127,7 +127,7 @@ int parsec_rank_gather(parsec_context_t *parsec,
                 int *rank_array);
 
 /**
- * Check rank correctness and set -999 to tiles on band
+ * Check rank correctness and set -1 to tiles on band
  *
  * @param [in] parsec:       parsec context 
  * @param [inout] dcAr:      the rank data, already distributed and allocated

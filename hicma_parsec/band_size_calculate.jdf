@@ -49,7 +49,7 @@ BODY
     int Arank = Ar_copy[disp[procs] + local_k * nb_elem_r[procs] + local_m];
     int info = 0;
 
-    if( -999 == Arank ) { 
+    if( -1 == Arank ) { 
         fprintf(stderr, "ERROR in trsm_ops (%d, %d): Arank %d\n", m, k, Arank);
         info = 1;
     }
@@ -93,7 +93,7 @@ BODY
     int myid = es->th_id;
     int info = 0;
 
-    if( -999 == Arank || -999 == Brank || -999 == Crank ) {
+    if( -1 == Arank || -1 == Brank || -1 == Crank ) {
         fprintf(stderr, "ERROR in gemm_ops (%d, %d, %d): Arank %d, Brank %d, Crank %d\n", m, n, k, Arank, Brank, Crank);
         info = 1;
     }
