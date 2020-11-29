@@ -44,7 +44,7 @@ set( CMAKE_C_FLAGS
 
 add_executable(testing_dpotrf_tlr ${SRC} testing_dpotrf.c)
 if( LINK_WITH_MKL ) 
-    target_link_libraries(testing_dpotrf_tlr mkl_intel_lp64 mkl_sequential parsec dplasma lapacke ${HICMA_DEP})
+    target_link_libraries(testing_dpotrf_tlr mkl_intel_lp64 mkl_sequential parsec dplasma ${HICMA_DEP})
 else( LINK_WITH_MKL )
     target_link_libraries(testing_dpotrf_tlr parsec dplasma lapacke ${HICMA_DEP})
 endif( LINK_WITH_MKL )
