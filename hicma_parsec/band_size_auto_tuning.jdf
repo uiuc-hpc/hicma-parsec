@@ -46,7 +46,8 @@ BODY
     int procs = descAr->super.rank_of(&descAr->super, m, k);
     int local_m = m / rows; 
     int local_k = k / cols; 
-    int Arank = Ar_copy[disp[procs] + local_k * nb_elem_r[procs] + local_m];
+    //int Arank = Ar_copy[disp[procs] + local_k * nb_elem_r[procs] + local_m];
+    int Arank = Ar_copy[k*descAr->lm+m];
     int info = 0;
 
     if( -1 == Arank ) { 
@@ -87,9 +88,12 @@ BODY
     int local_n_B = n / rows;
     int local_n_C = n / cols;
     int local_k = k / cols;
-    int Arank = Ar_copy[disp[Aprocs] + local_k * nb_elem_r[Aprocs] + local_m];
-    int Brank = Ar_copy[disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B];
-    int Crank = Ar_copy[disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m];
+    //int Arank = Ar_copy[disp[Aprocs] + local_k * nb_elem_r[Aprocs] + local_m];
+    //int Brank = Ar_copy[disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B];
+    //int Crank = Ar_copy[disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m];
+    int Arank = Ar_copy[k*descAr->lm+m];
+    int Brank = Ar_copy[k*descAr->lm+n];
+    int Crank = Ar_copy[n*descAr->lm+m];
     int myid = es->th_id;
     int info = 0;
 

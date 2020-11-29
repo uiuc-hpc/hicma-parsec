@@ -106,7 +106,7 @@
  * [4] : [2] - [1] 
  * [5] : All, 0 - 4 
  */
-#define RANK_MAP_TYPE 0
+#define RANK_MAP_TYPE 5
 
 /* Using MPI routines to gather rank
  * only to calculate the average, min, and max rank,
@@ -114,7 +114,7 @@
  * Otherwise, use JDF to gather, but much slover
  * when matrix is large
  */
-#define USE_MPI_GATHER 1
+#define USE_MPI_GATHER 0
 
 /* Print thread execution time */
 #define PRINT_THREAD_EXE_TIME 0

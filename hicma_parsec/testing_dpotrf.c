@@ -595,7 +595,7 @@ int main(int argc, char ** argv)
         /* Find the best band_size */
         int band_size_opt = parsec_band_size_auto_tuning(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
                                                     (parsec_tiled_matrix_dc_t*)&dcFake,
-                                                    Ar_copy, NB, disp, nb_elem_r);
+                                                    rank_array, NB, disp, nb_elem_r);
 
         /* Timer end */
         SYNC_TIME_PRINT(rank, ("OPT band_size" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
