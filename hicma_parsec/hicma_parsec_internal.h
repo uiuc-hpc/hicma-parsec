@@ -85,7 +85,13 @@
 /* Fluctuation, used in auto-band tuning */
 #define FLUCTUATION 0.66666667
 
-/* Show rank statistics */
+/* Show rank statistics
+ * Gathering Rank info durint Cholesky
+ * The rank is stored in dcRank with 4 (RANK_MAP_BUFF) integers
+ * of each tile storing rank info details in RANK_MAP_BUFF
+ *
+ * Also, print rank info based on RANK_MAP_TYPE
+ */
 #define PRINT_RANK 0
 
 /* Array to store rank info, it needs to be 4 
