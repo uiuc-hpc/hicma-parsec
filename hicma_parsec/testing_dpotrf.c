@@ -72,41 +72,14 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
     two_dim_block_cyclic_t dcAr = *pdcAr;
     int NT = dcAr.super.lm;
     int rank = dcAr.super.super.myrank;
-    int fmaxrk = -1, fminrk=-1;
-    double favgrk = -1.0;
-    if(0 == rank) printf("Ranks will be gathered\n");
-
-    int *num, *disp;
-    int size_rank;
     int root = dcAr.super.super.rank_of(&dcAr.super.super, 0, 0);
 
+    if(0 == rank) printf("Ranks will be gathered\n");
     /* Timer start */
     SYNC_TIME_START();
 
-#if USE_MPI_GATHER 
-    if( rank == root ){
-	    MPI_Comm_size(MPI_COMM_WORLD, &size_rank);
-	    num = (int *)malloc(sizeof(int) * size_rank);
-	    disp = (int *)calloc(size_rank, sizeof(int));
-    }
-
-    /* gather size */
-    MPI_Gather(&dcAr.super.nb_local_tiles, 1, MPI_INT, num, 1, MPI_INT, root, MPI_COMM_WORLD);
-
-    if( rank == root ){
-	    for(int i = 0; i < size_rank; i++)
-		    for(int j = 0; j < i; j++)
-			    disp[i] += num[j];
-    }
-
-    /* Gather without order */
-    MPI_Gatherv((int *)dcAr.mat, dcAr.super.nb_local_tiles, MPI_INT,
-		    rank_array, num, disp, MPI_INT, root, MPI_COMM_WORLD);
-
-#else
     /* Gather from dcAr to G (global) */
     parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, rank_array);
-#endif
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("Gather rank" "\tband_size= %d  NT= %4d\n", band_size, NT));
@@ -116,22 +89,13 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
     HICMA_stat_t rankstat;
 
     if( rank  == root ){
-#if USE_MPI_GATHER 
 	    printf("-------------------------------------------");
-	    /* As in rank_array, it contains diagonal ranks, which is random */
-	    HICMA_get_stat2(rank_array, num[size_rank-1] + disp[size_rank-1], maxrank, &rankstat);
-#else
 	    HICMA_get_stat('L', rank_array, dcAr.super.lm, dcAr.super.ln, dcAr.super.lm, &rankstat);
-#endif
 	    HICMA_print_stat(rankstat);
     }
 
+#if PRINT_RANK 
     SYNC_TIME_START();
-    favgrk = rankstat.avg;
-    fminrk = rankstat.min;
-    fmaxrk = rankstat.max;
-
-#if !USE_MPI_GATHER && PRINT_RANK 
     if(rank == 0){ // Takes too much time for big matrices
 	    printf("%s %d %d\n", strid, NT, NT);
 	    int i, j;
@@ -147,12 +111,12 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
 		    printf("\n");
 	    }
     }
-#endif
     SYNC_TIME_PRINT(rank, ("Print ranks of tiles\n"));
+#endif
 
-    *pminrk = fminrk;
-    *pmaxrk = fmaxrk;
-    *pavgrk = favgrk;
+    *pminrk = rankstat.min; 
+    *pmaxrk = rankstat.max; 
+    *pavgrk = rankstat.avg; 
 }
 
 /* Check difference of ||L*L'-A|| */
@@ -545,36 +509,6 @@ int main(int argc, char ** argv)
     int iminrk_before = iminrk;
     double iavgrk_before = iavgrk;
 
-    /* Gather rank into Ar_copy */
-    int *Ar_copy, *num, *disp, *nb_elem_r;
-    int root = dcAr.super.super.rank_of(&dcAr.super.super, 0, 0);
-
-    /* Allocate memory to hold Ar_copy */
-    Ar_copy = (int *)calloc(dcAr.super.lm * dcAr.super.ln, sizeof(int)); 
-    num = (int *)malloc(sizeof(int) * nodes);
-    nb_elem_r = (int *)malloc(sizeof(int) * nodes);
-    disp = (int *)calloc(nodes, sizeof(int));
-
-    /* Timer start */
-    SYNC_TIME_START();
-
-    /* gather size */
-    MPI_Allgather(&dcAr.super.nb_local_tiles, 1, MPI_INT, num, 1, MPI_INT, MPI_COMM_WORLD);
-    MPI_Allgather(&dcAr.nb_elem_r, 1, MPI_INT, nb_elem_r, 1, MPI_INT, MPI_COMM_WORLD);
-
-    for(int i = 0; i < nodes; i++)
-        for(int j = 0; j < i; j++)
-            disp[i] += num[j];
-          
-    /* Gather without order */
-    MPI_Allgatherv((int *)dcAr.mat, dcAr.super.nb_local_tiles, MPI_INT,
-                   Ar_copy, num, disp, MPI_INT, MPI_COMM_WORLD);
-
-    /* Timer end */
-    SYNC_TIME_PRINT(rank, ("rank_copy" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                           "send_full= %d band_size= %d\n\n",
-                           P, Q, NB, N, maxrank, send_full_tile, band_size));
-
     if( auto_band ) {
         /* Make sure band_size starts from 1 */
         assert( band_size == 1 );
@@ -595,7 +529,7 @@ int main(int argc, char ** argv)
         /* Find the best band_size */
         int band_size_opt = parsec_band_size_auto_tuning(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
                                                     (parsec_tiled_matrix_dc_t*)&dcFake,
-                                                    rank_array, NB, disp, nb_elem_r);
+                                                    rank_array, NB);
 
         /* Timer end */
         SYNC_TIME_PRINT(rank, ("OPT band_size" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
@@ -654,33 +588,6 @@ int main(int argc, char ** argv)
 	time_regenerate = sync_time_elapsed;
     }
 
-    /* Timer start */
-    SYNC_TIME_START();
-
-    double memory_per_node, memory_per_node_max;
-    long long int *size_allocate = (long long int *)calloc(1, sizeof(int));
-    long long int *size_allocate_max = (long long int *)calloc(1, sizeof(int));
-
-    /* Calculate memory needed before factorization
-     * memory_per_node: based on actual rank 
-     * memory_per_node_max: based on maxrank
-     */
-    *size_allocate = (long long int)(NT - band_size) * (NT - band_size + 1) * NB * iavgrk + (long long int)band_size * NT * NB * NB;
-    *size_allocate_max = (long long int)(NT - band_size) * (NT - band_size + 1) * NB * maxrank + (long long int)band_size * NT * NB * NB;
-
-    memory_per_node = *size_allocate / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.super.nodes;
-    memory_per_node_max = *size_allocate_max / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.super.nodes;
-
-    /* Timer end */
-    SYNC_TIME_PRINT(rank, ("Allocate Sum" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                           "band_size= %d send_full= %d memory_per_node= %lf GB memory_per_node_max= %lf GB\n\n",
-                           P, Q, NB, N, maxrank, band_size, send_full_tile, memory_per_node, memory_per_node_max));
-
-    if( memory_per_node > THRESHOLD_MEMORY_PER_NODE ) {
-            fprintf(stderr, "memory_for_matrix_allocation_per_node : %d < %lf Gbytes\n", THRESHOLD_MEMORY_PER_NODE, memory_per_node);
-            return 0;
-    }
-
     /* Re-order GEMM */
     /* dcRG data descriptor */
     sym_two_dim_block_cyclic_band_t dcRG;
@@ -720,6 +627,36 @@ int main(int argc, char ** argv)
 
     time_reorder = sync_time_elapsed;
 
+    /* Timer start */
+    SYNC_TIME_START();
+
+    double memory_per_node, memory_per_node_max;
+    long long int *size_allocate = (long long int *)calloc(1, sizeof(int));
+    long long int *size_allocate_max = (long long int *)calloc(1, sizeof(int));
+
+    /* Calculate memory needed before factorization
+     * memory_per_node: based on actual rank 
+     * memory_per_node_max: based on maxrank
+     */
+    *size_allocate = (long long int)(NT - band_size) * (NT - band_size + 1) * NB * iavgrk + (long long int)band_size * NT * NB * NB;
+    *size_allocate_max = (long long int)(NT - band_size) * (NT - band_size + 1) * NB * maxrank + (long long int)band_size * NT * NB * NB;
+
+    memory_per_node = *size_allocate / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.super.nodes;
+    memory_per_node_max = *size_allocate_max / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.super.nodes;
+
+    /* Free memory */
+    free(size_allocate);
+
+    /* Timer end */
+    SYNC_TIME_PRINT(rank, ("Allocate Sum" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+                           "band_size= %d send_full= %d memory_per_node= %lf GB memory_per_node_max= %lf GB\n\n",
+                           P, Q, NB, N, maxrank, band_size, send_full_tile, memory_per_node, memory_per_node_max));
+
+    if( memory_per_node > THRESHOLD_MEMORY_PER_NODE ) {
+            fprintf(stderr, "memory_for_matrix_allocation_per_node : %d < %lf Gbytes\n", THRESHOLD_MEMORY_PER_NODE, memory_per_node);
+            return 0;
+    }
+
     /* Gather rank info */
     /* dcRank data descriptor : init_rank, min_rank, max_rank, final_rank */
     sym_two_dim_block_cyclic_band_t dcRank;
@@ -743,13 +680,8 @@ int main(int argc, char ** argv)
     dcRank.super.super.super.data_of_key = sym_twoDBC_band_data_of_key;
     dcRank.super.super.super.rank_of_key = sym_twoDBC_band_rank_of_key;
 
-    /* Free memory */
-    free(Ar_copy);
-    free(num);
-    free(nb_elem_r);
-    free(disp);
-    free(size_allocate);
 
+    /* Used for checking results */
     sym_two_dim_block_cyclic_t dcAd;
     sym_two_dim_block_cyclic_t dcA0;
 

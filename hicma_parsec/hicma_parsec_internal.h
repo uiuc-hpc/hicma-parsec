@@ -108,14 +108,6 @@
  */
 #define RANK_MAP_TYPE 5
 
-/* Using MPI routines to gather rank
- * only to calculate the average, min, and max rank,
- * because the rank order for each tile is not correct.
- * Otherwise, use JDF to gather, but much slover
- * when matrix is large
- */
-#define USE_MPI_GATHER 0
-
 /* Print thread execution time */
 #define PRINT_THREAD_EXE_TIME 0
 

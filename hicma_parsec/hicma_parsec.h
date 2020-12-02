@@ -103,18 +103,14 @@ int parsec_band_regenerate( parsec_context_t *parsec,
  * @param [in] parsec:       parsec context
  * @param [in] dcAr:         the data, already distributed and allocated
  * @param [in] dcFake:       used for distribution
- * @param [in] Ar_copy:      Rank info
+ * @param [in] rank_array:   Rank info
  * @param [in] NB:           tile size
- * @param [in] disp:         displacement for each process in memory
- * @param [in] nb_elem_r:    number of elements in row
  */
 int parsec_band_size_auto_tuning(parsec_context_t *parsec,
                           parsec_tiled_matrix_dc_t *dcAr,
                           parsec_tiled_matrix_dc_t *dcFake,
-                          int *Ar_copy,
-                          int NB,
-                          int *disp,
-                          int *nb_elem_r);
+                          int *rank_array,
+                          int NB);
 
 /**
  * @brief Gather dcY to rank_array
