@@ -62,17 +62,17 @@ parsec_Av_memory_New(parsec_tiled_matrix_dc_t *dcA,
     parsec_Av_memory_taskpool_t* taskpool = NULL;
     taskpool = parsec_Av_memory_new(dcA, dcAv, dcAr, maxrank);
 
-    parsec_matrix_add2arena(taskpool->arenas[PARSEC_Av_memory_DEFAULT_ARENA],
+    parsec_matrix_add2arena(&taskpool->arenas_datatypes[PARSEC_Av_memory_DEFAULT_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, dcA->mb, maxrank, dcA->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-    parsec_matrix_add2arena(taskpool->arenas[PARSEC_Av_memory_UV_ARENA],
+    parsec_matrix_add2arena(&taskpool->arenas_datatypes[PARSEC_Av_memory_UV_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, dcA->mb, maxrank*2, dcA->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-    parsec_matrix_add2arena(taskpool->arenas[PARSEC_Av_memory_AR_ARENA],
+    parsec_matrix_add2arena(&taskpool->arenas_datatypes[PARSEC_Av_memory_AR_ARENA],
                             parsec_datatype_int_t, matrix_UpperLower,
                             1, 1, 1, 1,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -86,9 +86,9 @@ parsec_Av_memory_New(parsec_tiled_matrix_dc_t *dcA,
 void parsec_Av_memory_Destruct(parsec_taskpool_t *taskpool)
 {
     parsec_Av_memory_taskpool_t *tp = (parsec_Av_memory_taskpool_t *)taskpool;
-    parsec_matrix_del2arena( tp->arenas[PARSEC_Av_memory_DEFAULT_ARENA] );
-    parsec_matrix_del2arena( tp->arenas[PARSEC_Av_memory_UV_ARENA] );
-    parsec_matrix_del2arena( tp->arenas[PARSEC_Av_memory_AR_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_Av_memory_DEFAULT_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_Av_memory_UV_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_Av_memory_AR_ARENA] );
     parsec_taskpool_free(taskpool);
 }
 

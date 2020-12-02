@@ -18,7 +18,7 @@ static int *buff_g4 = NULL;
 
 descRank   [ type = "parsec_tiled_matrix_dc_t*" ]
 band_size  [ type = "int" ]
-num_col    [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descRank)->grid.cols * ((two_dim_block_cyclic_t *)descRank)->grid.kcols" ]
+num_col    [ type = "int" hidden=on default="((sym_two_dim_block_cyclic_band_t *)descRank)->off_band.grid.cols * ((sym_two_dim_block_cyclic_band_t *)descRank)->off_band.grid.kcols" ]
 NT         [ type = "int" hidden=on default="(descRank->lnt-1)/num_col" ]
 
 /**************************************************
@@ -81,7 +81,7 @@ parsec_rank_print_New(parsec_tiled_matrix_dc_t *Rank, int band_size)
 {
     parsec_rank_print_taskpool_t* taskpool = NULL;
     taskpool = parsec_rank_print_new(Rank, band_size);
-    parsec_matrix_add2arena(taskpool->arenas[PARSEC_rank_print_DEFAULT_ARENA],
+    parsec_matrix_add2arena(&taskpool->arenas_datatypes[PARSEC_rank_print_DEFAULT_ARENA],
                             parsec_datatype_int_t, matrix_UpperLower,
                             1, Rank->mb, Rank->nb, Rank->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -94,7 +94,7 @@ parsec_rank_print_New(parsec_tiled_matrix_dc_t *Rank, int band_size)
 void parsec_rank_print_Destruct(parsec_taskpool_t *taskpool)
 {
     parsec_rank_print_taskpool_t *rank_print_taskpool = (parsec_rank_print_taskpool_t *)taskpool;
-    parsec_matrix_del2arena(rank_print_taskpool->arenas[PARSEC_rank_print_DEFAULT_ARENA]);
+    parsec_matrix_del2arena(&rank_print_taskpool->arenas_datatypes[PARSEC_rank_print_DEFAULT_ARENA]);
     parsec_taskpool_free(taskpool);
 }
 

@@ -493,8 +493,8 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		/* dcAv contains V. */
 		sym_two_dim_block_cyclic_t dcAv;
 		sym_two_dim_block_cyclic_init(&dcAv, matrix_RealDouble,
-				nodes, rank, MB, maxrank, LDA, N_UV, 0, 0,
-				LDA, N_UV, P, uplo);
+				rank, MB, maxrank, LDA, N_UV, 0, 0,
+				LDA, N_UV, P, nodes/P, uplo);
 		parsec_data_collection_set_key((parsec_data_collection_t*)&dcAv, "dcAv");
 
 		/* Set address in Av to A+MB*maxrank*sizeof(double) */

@@ -176,17 +176,17 @@ STARSH_check_New(int uplo,
 
     tp = (parsec_taskpool_t*)starsh_check;
 
-    parsec_matrix_add2arena(starsh_check->arenas[PARSEC_STARSH_check_FULL_ARENA],
+    parsec_matrix_add2arena(&starsh_check->arenas_datatypes[PARSEC_STARSH_check_FULL_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, A->mb, A->mb, A->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-    parsec_matrix_add2arena(starsh_check->arenas[PARSEC_STARSH_check_UV_ARENA],
+    parsec_matrix_add2arena(&starsh_check->arenas_datatypes[PARSEC_STARSH_check_UV_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, A->mb, A->nb, A->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-    parsec_matrix_add2arena(starsh_check->arenas[PARSEC_STARSH_check_AR_ARENA],
+    parsec_matrix_add2arena(&starsh_check->arenas_datatypes[PARSEC_STARSH_check_AR_ARENA],
                             parsec_datatype_int_t, matrix_UpperLower,
                             1, 1, 1, 1,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -199,9 +199,9 @@ void STARSH_check_Destruct(parsec_taskpool_t *taskpool)
 {
     parsec_STARSH_check_taskpool_t *STARSH_check_taskpool = (parsec_STARSH_check_taskpool_t *)taskpool;
 
-    parsec_matrix_del2arena(STARSH_check_taskpool->arenas[PARSEC_STARSH_check_FULL_ARENA]);
-    parsec_matrix_del2arena(STARSH_check_taskpool->arenas[PARSEC_STARSH_check_UV_ARENA]);
-    parsec_matrix_del2arena(STARSH_check_taskpool->arenas[PARSEC_STARSH_check_AR_ARENA]);
+    parsec_matrix_del2arena(&STARSH_check_taskpool->arenas_datatypes[PARSEC_STARSH_check_FULL_ARENA]);
+    parsec_matrix_del2arena(&STARSH_check_taskpool->arenas_datatypes[PARSEC_STARSH_check_UV_ARENA]);
+    parsec_matrix_del2arena(&STARSH_check_taskpool->arenas_datatypes[PARSEC_STARSH_check_AR_ARENA]);
 
     parsec_taskpool_free(taskpool);
 }

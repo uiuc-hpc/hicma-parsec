@@ -134,9 +134,11 @@ int check_dpotrf2( parsec_context_t *parsec, int loud,
     int side;
 
     two_dim_block_cyclic_init(&LLt, matrix_RealDouble, matrix_Tile,
-                              A->super.nodes, twodA->grid.rank,
-                              A->mb, A->nb, N, N, 0, 0,
-                              N, N, twodA->grid.krows, twodA->grid.kcols, twodA->grid.rows);
+                              twodA->grid.rank,
+                              A->mb, A->nb, N, N, 0, 0, N, N,
+			      twodA->grid.rows, A->super.nodes/twodA->grid.rows,
+			      twodA->grid.krows, twodA->grid.kcols,
+			      twodA->grid.ip, twodA->grid.jq);
 
     LLt.mat = parsec_data_allocate((size_t)LLt.super.nb_local_tiles *
                                   (size_t)LLt.super.bsiz *
@@ -412,37 +414,33 @@ int main(int argc, char ** argv)
 
     /* dcA data descriptor */
     sym_two_dim_block_cyclic_band_t dcA;
-    sym_two_dim_block_cyclic_init(&dcA.super, matrix_RealDouble,
-                                  nodes, rank, NB, NB_UV, N, N_UV, 0, 0,
-                                  N, N_UV, P, uplo);
-    parsec_data_collection_set_key((parsec_data_collection_t*)&dcA, "dcA");
+    sym_two_dim_block_cyclic_init(&dcA.off_band, matrix_RealDouble,
+                                  rank, NB, NB_UV, N, N_UV, 0, 0,
+                                  N, N_UV, P, nodes/P, uplo);
+    parsec_data_collection_set_key((parsec_data_collection_t*)&dcA, "dcA_off_band");
 
     /* Init band */
     two_dim_block_cyclic_init(&dcA.band, matrix_RealDouble, matrix_Tile,
-                              nodes, rank, NB, NB_BAND, NB*band_size, N_BAND, 0, 0,
-                              NB*band_size, N_BAND, 1, 1, P_BAND);
+                              rank, NB, NB_BAND, NB*band_size, N_BAND, 0, 0,
+                              NB*band_size, N_BAND, P_BAND, nodes/P_BAND,
+			      1, 1, 0, 0);
 #if BAND_MEMORY_CONTIGUOUS
     /* Allocate memory on band */
     dcA.band.mat = parsec_data_allocate((size_t)dcA.band.super.nb_local_tiles *
                                    (size_t)dcA.band.super.bsiz *
                                    (size_t)parsec_datadist_getsizeoftype(dcA.band.super.mtype));
 #endif
-    parsec_data_collection_set_key(&dcA.band.super.super, "dcA band");
+    parsec_data_collection_set_key(&dcA.band.super.super, "dcA_band");
 
-    /* Set band size */
-    dcA.band_size = (unsigned int)band_size;
+    /* Init two_dim_block_cyclic_band_t structure */
+    sym_two_dim_block_cyclic_band_init( &dcA, nodes, rank, band_size );
 
-    /* Set new data_of and rank_of */
-    dcA.super.super.super.data_of = sym_twoDBC_band_data_of;
-    dcA.super.super.super.rank_of = sym_twoDBC_band_rank_of;
-    dcA.super.super.super.data_of_key = sym_twoDBC_band_data_of_key;
-    dcA.super.super.super.rank_of_key = sym_twoDBC_band_rank_of_key;
 
     /* dcAr contains rank of each tile. It is NT by NT matrix for now. */
     two_dim_block_cyclic_t dcAr;
     two_dim_block_cyclic_init(&dcAr, matrix_Integer, matrix_Tile,
-                              nodes, rank, 1, 1, NT, NT, 0, 0,
-                              NT, NT, 1, 1, P);
+                              rank, 1, 1, NT, NT, 0, 0,
+                              NT, NT, P, nodes/P, 1, 1, 0, 0);
     dcAr.mat = parsec_data_allocate((size_t)dcAr.super.nb_local_tiles *
                                    (size_t)dcAr.super.bsiz *
                                    (size_t)parsec_datadist_getsizeoftype(dcAr.super.mtype));
@@ -514,8 +512,8 @@ int main(int argc, char ** argv)
         /* dcFake to control process rank working on*/ 
         two_dim_block_cyclic_t dcFake;
         two_dim_block_cyclic_init(&dcFake, matrix_Integer, matrix_Tile,
-                                  nodes, rank, 1, 1, 1, nodes, 0, 0,
-                                  1, nodes, 1, 1, 1);
+                                  rank, 1, 1, 1, nodes, 0, 0,
+                                  1, nodes, 1, nodes, 1, 1, 0, 0);
         dcFake.mat = parsec_data_allocate((size_t)dcFake.super.nb_local_tiles *
                                           (size_t)dcFake.super.bsiz *
                                           (size_t)parsec_datadist_getsizeoftype(dcFake.super.mtype));
@@ -556,22 +554,18 @@ int main(int argc, char ** argv)
 
             /* Re-init band */
             two_dim_block_cyclic_init(&dcA.band, matrix_RealDouble, matrix_Tile,
-                                      nodes, rank, NB, NB_BAND, NB*band_size, N_BAND, 0, 0,
-                                      NB*band_size, N_BAND, 1, 1, P_BAND);
+                                      rank, NB, NB_BAND, NB*band_size, N_BAND, 0, 0,
+                                      NB*band_size, N_BAND, P_BAND, nodes/P_BAND,
+				      1, 1, 0, 0);
 #if BAND_MEMORY_CONTIGUOUS
             /* Re-allocate memory on band */
             dcA.band.mat = parsec_data_allocate((size_t)dcA.band.super.nb_local_tiles *
                                                 (size_t)dcA.band.super.bsiz *
                                                 (size_t)parsec_datadist_getsizeoftype(dcA.band.super.mtype));
 #endif
-            /* Set band size */
-            dcA.band_size = (unsigned int)band_size;
 
-            /* Set new data_of and rank_of */
-            dcA.super.super.super.data_of = sym_twoDBC_band_data_of;
-            dcA.super.super.super.rank_of = sym_twoDBC_band_rank_of;
-            dcA.super.super.super.data_of_key = sym_twoDBC_band_data_of_key;
-            dcA.super.super.super.rank_of_key = sym_twoDBC_band_rank_of_key;
+	    /* Set band size */
+            dcA.band_size = (unsigned int)band_size;
 
             /* band generation */
             parsec_band_regenerate(parsec, uplo, (parsec_tiled_matrix_dc_t *)&dcA,
@@ -589,25 +583,20 @@ int main(int argc, char ** argv)
     /* Re-order GEMM */
     /* dcRG data descriptor */
     sym_two_dim_block_cyclic_band_t dcRG;
-    sym_two_dim_block_cyclic_init(&dcRG.super, matrix_Integer,
-                                  nodes, rank, 1, NT, NT, NT*NT, 0, 0,
-                                  NT, NT*NT, P, uplo);
+    sym_two_dim_block_cyclic_init(&dcRG.off_band, matrix_Integer,
+                                  rank, 1, NT, NT, NT*NT, 0, 0,
+                                  NT, NT*NT, P, nodes/P, uplo);
     parsec_data_collection_set_key((parsec_data_collection_t*)&dcRG, "dcRG_super");
 
     /* Init band */
     two_dim_block_cyclic_init(&dcRG.band, matrix_Integer, matrix_Tile,
-                              nodes, rank, 1, NT, band_size, NT*NT, 0, 0,
-                              band_size, NT*NT, 1, 1, P_BAND);
+                              rank, 1, NT, band_size, NT*NT, 0, 0,
+                              band_size, NT*NT, P_BAND, nodes/P_BAND,
+			      1, 1, 0, 0);
     parsec_data_collection_set_key(&dcRG.band.super.super, "dcRG_band");
 
-    /* Set band size */
-    dcRG.band_size = (unsigned int)band_size;
-
-    /* Set new data_of and rank_of */
-    dcRG.super.super.super.data_of = sym_twoDBC_band_data_of;
-    dcRG.super.super.super.rank_of = sym_twoDBC_band_rank_of;
-    dcRG.super.super.super.data_of_key = sym_twoDBC_band_data_of_key;
-    dcRG.super.super.super.rank_of_key = sym_twoDBC_band_rank_of_key;
+    /* Init two_dim_block_cyclic_band_t structure */
+    sym_two_dim_block_cyclic_band_init( &dcRG, nodes, rank, band_size );
 
     /* Timer start */
     SYNC_TIME_START();
@@ -639,8 +628,8 @@ int main(int argc, char ** argv)
     *size_allocate = (long long int)(NT - band_size) * (NT - band_size + 1) * NB * iavgrk + (long long int)band_size * NT * NB * NB;
     *size_allocate_max = (long long int)(NT - band_size) * (NT - band_size + 1) * NB * maxrank + (long long int)band_size * NT * NB * NB;
 
-    memory_per_node = *size_allocate / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.super.nodes;
-    memory_per_node_max = *size_allocate_max / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.super.nodes;
+    memory_per_node = *size_allocate / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.nodes;
+    memory_per_node_max = *size_allocate_max / (double)1024 / 1024 / 1024 * 8 / dcA.super.super.nodes;
 
     /* Free memory */
     free(size_allocate);
@@ -658,25 +647,19 @@ int main(int argc, char ** argv)
     /* Gather rank info during Cholesky if PRINT_RANK*/
     /* dcRank data descriptor : init_rank, min_rank, max_rank, final_rank */
     sym_two_dim_block_cyclic_band_t dcRank;
-    sym_two_dim_block_cyclic_init(&dcRank.super, matrix_Integer,
-                                  nodes, rank, 1, RANK_MAP_BUFF, NT, RANK_MAP_BUFF*NT, 0, 0,
-                                  NT, RANK_MAP_BUFF*NT, P, uplo);
+    sym_two_dim_block_cyclic_init(&dcRank.off_band, matrix_Integer,
+                                  rank, 1, RANK_MAP_BUFF, NT, RANK_MAP_BUFF*NT, 0, 0,
+                                  NT, RANK_MAP_BUFF*NT, P, nodes/P, uplo);
     parsec_data_collection_set_key((parsec_data_collection_t*)&dcRank, "dcRank_super");
 
     /* Init band */
     two_dim_block_cyclic_init(&dcRank.band, matrix_Integer, matrix_Tile,
-                              nodes, rank, 1, RANK_MAP_BUFF, band_size, RANK_MAP_BUFF*NT, 0, 0,
-                              band_size, RANK_MAP_BUFF*NT, 1, 1, P_BAND);
+                              rank, 1, RANK_MAP_BUFF, band_size, RANK_MAP_BUFF*NT, 0, 0,
+                              band_size, RANK_MAP_BUFF*NT, P_BAND, nodes/P_BAND, 1, 1, 0, 0);
     parsec_data_collection_set_key(&dcRank.band.super.super, "dcRank_band");
 
-    /* Set band size */
-    dcRank.band_size = (unsigned int)band_size;
-
-    /* Set new data_of and rank_of */
-    dcRank.super.super.super.data_of = sym_twoDBC_band_data_of;
-    dcRank.super.super.super.rank_of = sym_twoDBC_band_rank_of;
-    dcRank.super.super.super.data_of_key = sym_twoDBC_band_data_of_key;
-    dcRank.super.super.super.rank_of_key = sym_twoDBC_band_rank_of_key;
+    /* Init two_dim_block_cyclic_band_t structure */
+    sym_two_dim_block_cyclic_band_init( &dcRank, nodes, rank, band_size );
 
 
     /* Used for checking results */
@@ -687,8 +670,8 @@ int main(int argc, char ** argv)
     {
         /* dcAd */
         sym_two_dim_block_cyclic_init(&dcAd, matrix_RealDouble,
-                                      nodes, rank, NB, NB, N, N, 0, 0,
-                                      N, N, P, uplo);
+                                      rank, NB, NB, N, N, 0, 0,
+                                      N, N, P, nodes/P, uplo);
         dcAd.mat = parsec_data_allocate((size_t)dcAd.super.nb_local_tiles *
                                         (size_t)dcAd.super.bsiz *
                                         (size_t)parsec_datadist_getsizeoftype(dcAd.super.mtype));
@@ -700,8 +683,8 @@ int main(int argc, char ** argv)
 
         /* dcA0 */
         sym_two_dim_block_cyclic_init(&dcA0, matrix_RealDouble,
-                                  nodes, rank, NB, NB, N, N, 0, 0,
-                                  N, N, P, uplo);
+                                  rank, NB, NB, N, N, 0, 0,
+                                  N, N, P, nodes/P, uplo);
         dcA0.mat = parsec_data_allocate((size_t)dcA0.super.nb_local_tiles *
                                         (size_t)dcA0.super.bsiz *
                                         (size_t)parsec_datadist_getsizeoftype(dcA0.super.mtype));
@@ -913,8 +896,8 @@ int main(int argc, char ** argv)
         /* Check the factorization obtained from HiCMA */
         sym_two_dim_block_cyclic_t dcA2;
         sym_two_dim_block_cyclic_init(&dcA2, matrix_RealDouble,
-                                      nodes, rank, NB, NB, N, N, 0, 0,
-                                      N, N, P, uplo);
+                                      rank, NB, NB, N, N, 0, 0,
+                                      N, N, P, nodes/P, uplo);
         dcA2.mat = parsec_data_allocate((size_t)dcA2.super.nb_local_tiles *
                                         (size_t)dcA2.super.bsiz *
                                         (size_t)parsec_datadist_getsizeoftype(dcA2.super.mtype));
@@ -1083,10 +1066,11 @@ int main(int argc, char ** argv)
     free(g_time);
     free(critical_path_time);
 
-    if( NULL == dcA.band.mat )
-        parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcA, band_size, indicator_band);
-    else
-        parsec_data_free(dcA.band.mat);
+#if BAND_MEMORY_CONTIGUOUS
+    parsec_data_free(dcA.band.mat);
+#else
+    parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcA, band_size, indicator_band);
+#endif
 
     parsec_data_free(dcAr.mat);
     parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcA, band_size, indicator_offband);

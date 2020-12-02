@@ -59,10 +59,10 @@ BODY
     int tempnn = tempmm;
 
     /* New data_copy and allocate memory on band if not allocated */
-    if( NULL == D ) {
-        this_task->data._f_D.data_out = parsec_data_copy_new(data_of_descA(m, n), 0);
-        this_task->data._f_D.data_out->device_private = calloc(descA->mb * descA->mb, sizeof(double));
-    }
+#if !BAND_MEMORY_CONTIGUOUS
+    this_task->data._f_D.data_out = parsec_data_copy_new(data_of_descA(m, n), 0);
+    this_task->data._f_D.data_out->device_private = calloc(descA->mb * descA->mb, sizeof(double));
+#endif
 
     problem_kernel(tempmm, tempnn, problem_index + m*descA->mb,
             problem_index + n*descA->mb, problem_data, problem_data,
@@ -291,17 +291,17 @@ STARSH_gen_New(int uplo,
             rsvd_liwork*sizeof(int));
 
     /* Arena */
-    parsec_matrix_add2arena(starsh_gen->arenas[PARSEC_STARSH_gen_FULL_ARENA],
+    parsec_matrix_add2arena(&starsh_gen->arenas_datatypes[PARSEC_STARSH_gen_FULL_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, A->mb, A->mb, A->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-    parsec_matrix_add2arena(starsh_gen->arenas[PARSEC_STARSH_gen_UV_ARENA],
+    parsec_matrix_add2arena(&starsh_gen->arenas_datatypes[PARSEC_STARSH_gen_UV_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, A->mb, maxrank*2, A->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-    parsec_matrix_add2arena(starsh_gen->arenas[PARSEC_STARSH_gen_AR_ARENA],
+    parsec_matrix_add2arena(&starsh_gen->arenas_datatypes[PARSEC_STARSH_gen_AR_ARENA],
                             parsec_datatype_int_t, matrix_UpperLower,
                             1, 1, 1, 1,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -314,9 +314,9 @@ void STARSH_gen_Destruct(parsec_taskpool_t *taskpool)
 {
     parsec_STARSH_gen_taskpool_t *STARSH_gen_taskpool = (parsec_STARSH_gen_taskpool_t *)taskpool;
 
-    parsec_matrix_del2arena(STARSH_gen_taskpool->arenas[PARSEC_STARSH_gen_FULL_ARENA]);
-    parsec_matrix_del2arena(STARSH_gen_taskpool->arenas[PARSEC_STARSH_gen_UV_ARENA]);
-    parsec_matrix_del2arena(STARSH_gen_taskpool->arenas[PARSEC_STARSH_gen_AR_ARENA]);
+    parsec_matrix_del2arena(&STARSH_gen_taskpool->arenas_datatypes[PARSEC_STARSH_gen_FULL_ARENA]);
+    parsec_matrix_del2arena(&STARSH_gen_taskpool->arenas_datatypes[PARSEC_STARSH_gen_UV_ARENA]);
+    parsec_matrix_del2arena(&STARSH_gen_taskpool->arenas_datatypes[PARSEC_STARSH_gen_AR_ARENA]);
 
     parsec_taskpool_free(taskpool);
 }

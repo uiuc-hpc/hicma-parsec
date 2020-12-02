@@ -245,7 +245,7 @@ BODY
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descAg->mb+iinfo; /* Should return here */
 
-    if(DEBUG_INFO) printf("HCORE_dpotrf( %d )\n\t( %s, %d, A(%d,%d)[%p], %d) return info = %d\n", k, plasma_const(uplo), tempkm, k, 0, T, descAg->mb, iinfo);
+    if(DEBUG_INFO) printf("HCORE_dpotrf( %d )\n\t( %s, %d, A(%d,%d)[%p], %d) return info = %d\n", k, dplasma_lapack_const(uplo), tempkm, k, 0, T, descAg->mb, iinfo);
 }
 END
 
@@ -282,7 +282,7 @@ BODY
 {
 #if PRINT_RANK
     /* Gather rank */
-    if( 0 == k && descRank->super.myrank == sym_twoDBC_band_rank_of(&descRank->super, m, k) ) {
+    if( 0 == k && descRank->super.myrank == descRank->super.rank_of(&descRank->super, m, k) ) {
         /* New data_copy and allocate memory for descRank(m, n) */
         parsec_data_copy_t *my_data_copy = parsec_data_copy_new(descRank->super.data_of(&descRank->super, m, k), 0);
         my_data_copy->device_private = calloc(RANK_MAP_BUFF, sizeof(int));
@@ -311,8 +311,8 @@ BODY
 
     if(DEBUG_INFO) printf("HCORE_dtrsm( %d, %d )\n\t( %s, %s, %s, %s, %d, %d, %f, A(%d,%d)[%p], %d,  A(%d,%d)[%p], %d)\n",
              m, k,
-             plasma_const( PlasmaRight ), plasma_const( PlasmaLower ),
-             plasma_const( PlasmaTrans ), plasma_const( PlasmaNonUnit ),
+             dplasma_lapack_const( PlasmaRight ), dplasma_lapack_const( PlasmaLower ),
+             dplasma_lapack_const( PlasmaTrans ), dplasma_lapack_const( PlasmaNonUnit ),
              tempmm, storage_maxrank,
              1.0, k, k, T, ldak,
                   m, k, Cv, ldam);
@@ -389,7 +389,7 @@ BODY
     if(DEBUG_INFO) printf(
              "HCORE_dsyrk( %d, %d )\n\t( %s, %s, %d, %d, %f, Av(%d,%d)[%p], %d, %f, Ag(%d,%d)[%p], %d)\n",
              k, m,
-             plasma_const( PlasmaLower ), plasma_const( PlasmaNoTrans ),
+             dplasma_lapack_const( PlasmaLower ), dplasma_lapack_const( PlasmaNoTrans ),
              tempmm, descAg->mb,
              -1.0, m, k, Av, ldam,
               1.0, m, 0, T, ldam);
@@ -459,7 +459,7 @@ BODY
 {
 #if PRINT_RANK
     /* Gather rank */
-    if( m-n >= band_size && descRank->super.myrank == sym_twoDBC_band_rank_of(&descRank->super, m, n) && 0 == k ) {
+    if( m-n >= band_size && descRank->super.myrank == descRank->super.rank_of(&descRank->super, m, n) && 0 == k ) {
         /* New data_copy and allocate memory for descRank(m, n) */
         parsec_data_copy_t *my_data_copy = parsec_data_copy_new(descRank->super.data_of(&descRank->super, m, n), 0);
         my_data_copy->device_private = calloc(RANK_MAP_BUFF, sizeof(int));
@@ -601,7 +601,7 @@ BODY
 
     if(DEBUG_INFO) printf("HCORE_dgemm( %d, %d, %d )\n\t( %s, %s, %d, %d, %d, %f, A(%d,%d)[%p], %d-%d, A(%d,%d)[%p], %d-%d, %f, A(%d,%d)[%p], %d-%d)\n",
              m, n, k,
-             plasma_const( PlasmaNoTrans ),  plasma_const( PlasmaTrans ),
+             dplasma_lapack_const( PlasmaNoTrans ),  dplasma_lapack_const( PlasmaTrans ),
              tempmmu, tempmmv, descAv->mb,
              -1.0, m, k, Au, ldamu, ldamv,
                    n, k, Bu, ldanu, ldanv,
@@ -639,7 +639,7 @@ BODY
 
 #if PRINT_RANK
     /* Gather rank */
-    if( m-n >= band_size && descRank->super.myrank == sym_twoDBC_band_rank_of(&descRank->super, m, n) ) {
+    if( m-n >= band_size && descRank->super.myrank == descRank->super.rank_of(&descRank->super, m, n) ) {
         if( ((int *)Cr)[0] < ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] )
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] = ((int *)Cr)[0];
 

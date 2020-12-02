@@ -25,15 +25,15 @@
 
 /* DPLASMA headers */
 #include "dplasma.h"
-#include "include/dplasmajdf.h"
-#include "include/dplasmaaux.h"
-#include "tests/flops.h"
+#include "src/dplasmajdf.h"
+#include "src/dplasmaaux.h"
+#include "src/flops.h"
+#include "src/cores/core_blas.h"
+#include "src/cores/core_dblas.h"
 
 /* BLAS and LAPACKE headers */
 #include <cblas.h>
 #include <lapacke.h>
-#include <core_blas.h>
-#include <core_dblas.h>
 
 /* Starsh headers */ 
 #include <starsh-randtlr.h>
