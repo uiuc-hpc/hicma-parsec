@@ -79,7 +79,7 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
     SYNC_TIME_START();
 
     /* Gather from dcAr to G (global) */
-    parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, rank_array);
+    parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, rank_array, band_size);
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("Gather rank" "\tband_size= %d  NT= %4d\n", band_size, NT));
@@ -90,7 +90,7 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
 
     if( rank  == root ){
 	    printf("-------------------------------------------");
-	    HICMA_get_stat('L', rank_array, dcAr.super.lm, dcAr.super.ln, dcAr.super.lm, &rankstat);
+	    HICMA_get_stat2(rank_array, dcAr.super.lm*dcAr.super.ln, maxrank, &rankstat);
 	    HICMA_print_stat(rankstat);
     }
 
@@ -101,10 +101,8 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
 	    int i, j;
 	    for(i = 0; i < dcAr.super.lm; i++){
 		    for(j = 0; j < dcAr.super.lm; j++){//ASSUMPTION MT==NT
-			    if( i < j )
-				    printf("%3d ", 0); //%-3d
-			    else if( i == j )
-				    printf("%3d ", 0);
+			    if( rank_array[j*dcAr.super.lm+i] < 0 )
+				    printf("%3d ", -1); //%-3d
 			    else
 				    printf("%3d ", rank_array[j*dcAr.super.lm+i]);
 		    }
@@ -501,7 +499,8 @@ int main(int argc, char ** argv)
     double iavgrk = -1.0;
 
     /* Used for gathering rank */
-    int *rank_array = (int *)calloc(dcAr.super.lmt * dcAr.super.lnt, sizeof(int));
+    int *rank_array = (int *)malloc(dcAr.super.lmt * dcAr.super.lnt * sizeof(int));
+    memset(rank_array, -1, dcAr.super.lmt * dcAr.super.lnt * sizeof(int));
 
     tlr_rank_stat("init_rank_tile", rank_array, band_size, parsec, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
 
@@ -657,7 +656,7 @@ int main(int argc, char ** argv)
             return 0;
     }
 
-    /* Gather rank info */
+    /* Gather rank info during Cholesky if PRINT_RANK*/
     /* dcRank data descriptor : init_rank, min_rank, max_rank, final_rank */
     sym_two_dim_block_cyclic_band_t dcRank;
     sym_two_dim_block_cyclic_init(&dcRank.super, matrix_Integer,

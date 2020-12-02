@@ -113,14 +113,16 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
                           int NB);
 
 /**
- * @brief Gather dcY to rank_array
+ * @brief Gather dcAr to rank_array
  *
  * @param [in] dcY: the data, already distributed and allocated
  * @param [in] rank_array: array of rank
+ * @param [in] band_size: band size
  */
 int parsec_rank_gather(parsec_context_t *parsec,
-                parsec_tiled_matrix_dc_t *dcY,
-                int *rank_array);
+                parsec_tiled_matrix_dc_t *dcAr,
+                int *rank_array,
+		int band_size);
 
 /**
  * Check rank correctness and set -1 to tiles on band
