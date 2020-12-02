@@ -90,7 +90,7 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
 
     if( rank  == root ){
 	    printf("-------------------------------------------");
-	    HICMA_get_stat2(rank_array, dcAr.super.lm*dcAr.super.ln, maxrank, &rankstat);
+	    HICMA_get_stat2(rank_array, dcAr.super.lm, band_size, &rankstat);
 	    HICMA_print_stat(rankstat);
     }
 
@@ -100,11 +100,11 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
 	    printf("%s %d %d\n", strid, NT, NT);
 	    int i, j;
 	    for(i = 0; i < dcAr.super.lm; i++){
-		    for(j = 0; j < dcAr.super.lm; j++){//ASSUMPTION MT==NT
-			    if( rank_array[j*dcAr.super.lm+i] < 0 )
-				    printf("%3d ", -1); //%-3d
-			    else
+		    for(j = 0; j < dcAr.super.ln; j++){//ASSUMPTION MT==NT
+			    if( i - j >= band_size ) 
 				    printf("%3d ", rank_array[j*dcAr.super.lm+i]);
+			    else
+				    printf("%3d ", -1); //%-3d
 		    }
 		    printf("\n");
 	    }
@@ -500,7 +500,6 @@ int main(int argc, char ** argv)
 
     /* Used for gathering rank */
     int *rank_array = (int *)malloc(dcAr.super.lmt * dcAr.super.lnt * sizeof(int));
-    memset(rank_array, -1, dcAr.super.lmt * dcAr.super.lnt * sizeof(int));
 
     tlr_rank_stat("init_rank_tile", rank_array, band_size, parsec, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
 

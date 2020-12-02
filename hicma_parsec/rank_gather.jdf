@@ -10,11 +10,9 @@ extern "C" %{
 
 /** Gather from dcAr to rank_array 
 */
-descAr         [ type = "parsec_tiled_matrix_dc_t *" ]
+descAr        [ type = "parsec_tiled_matrix_dc_t *" ]
 rank_array    [ type = "int *" ]
 band_size     [ type = "int" ]
-num_col       [ type = "int" hidden=on default="((two_dim_block_cyclic_t *)descAr)->grid.cols * ((two_dim_block_cyclic_t *)descAr)->grid.kcols" ]
-NT            [ type = "int" hidden=on default="(descAr->lnt-1)/num_col" ]
 
 /**************************************************
  *                   my_task                      *
@@ -94,7 +92,6 @@ int parsec_rank_gather(parsec_context_t *parsec,
    
     /* A tempory buff to gather rank info for each process, initializing to -1 */ 
     int *rank_array_tmp = (int *)calloc(dcAr->lm * dcAr->ln, sizeof(int) );
-    memset(rank_array_tmp, -1, dcAr->lmt * dcAr->lnt * sizeof(int));
     
     parsec_rank_gather = parsec_rank_gather_New( dcAr, rank_array_tmp, band_size );
 

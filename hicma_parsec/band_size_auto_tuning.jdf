@@ -41,13 +41,10 @@ procs_id = m % ( rows * cols )
 
 BODY
 {
-    int procs = descAr->super.rank_of(&descAr->super, m, k);
-    int local_m = m / rows; 
-    int local_k = k / cols; 
     int Arank = rank_array[k*descAr->lm+m];
     int info = 0;
 
-    if( -1 == Arank ) { 
+    if( Arank < 0 ) { 
         fprintf(stderr, "ERROR in trsm_ops (%d, %d): Arank %d\n", m, k, Arank);
         info = 1;
     }
@@ -84,7 +81,7 @@ BODY
     int myid = es->th_id;
     int info = 0;
 
-    if( -1 == Arank || -1 == Brank || -1 == Crank ) {
+    if( Arank < 0 || Brank < 0 || Crank < 0 ) {
         fprintf(stderr, "ERROR in gemm_ops (%d, %d, %d): Arank %d, Brank %d, Crank %d\n", m, n, k, Arank, Brank, Crank);
         info = 1;
     }

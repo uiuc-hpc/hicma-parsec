@@ -1924,21 +1924,21 @@ void HICMA_get_stat(char uplo, int *Ark, size_t m, size_t n, size_t ld,  HICMA_s
     stat->avg = final_avgrank;
 }
 
-/* Used for MPI_Ggatherv */
-void HICMA_get_stat2(int *G, size_t m, int maxrank, HICMA_stat_t *stat)
+/* Used for Gather rank of low-rank tiles */ 
+void HICMA_get_stat2(int *G, size_t lda, int band_size, HICMA_stat_t *stat)
 {
-    int min = maxrank, max = 0, sum = 0;
-    long int num = m;
+    int min = INT_MAX, max = 0;
+    long int num = 0;
+    long long int sum = 0;
 
-    for(int i = 0; i < m; i++){
-        if( G[i] <= maxrank && G[i] >= 0 ){
-            sum += G[i];
-            if( G[i] < min )
-                min = G[i];
-            if( G[i] > max )
-                max = G[i];
-        } else {
-            num -= 1;
+    for(int i = band_size; i < lda; i++){
+        for(int j = 0; j < i-band_size+1; j++){
+            sum += G[j*lda+i];
+	    num++;
+            if( G[j*lda+i] < min )
+                min = G[j*lda+i];
+            if( G[j*lda+i] > max )
+                max = G[j*lda+i];
         } 
     }
     printf("number of tiles:%lu\n", num);
