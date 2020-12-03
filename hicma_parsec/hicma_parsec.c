@@ -292,13 +292,11 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 	if(0 == iparam[IPARAM_N])
 	{
 		fprintf(stderr, "#XXXXX the matrix size (N) is not set!\n");
-		exit(2);
 	}
 
 	if(0 == iparam[IPARAM_NB])
 	{
 		fprintf(stderr, "#XXXXX the tile size (NB) is not set!\n");
-		exit(2);
 	}
 
 	if( iparam[IPARAM_MAX_RANK] <= 0 ) {
@@ -388,6 +386,10 @@ parsec_context_t* setup_parsec(int argc, char **argv, int *iparam, double *dpara
 	}
 	print_arguments(iparam);
 
+        /* Check N and NB setted */
+        if( 0 == iparam[IPARAM_N] || 0 == iparam[IPARAM_NB] )
+            exit(1);
+
 	if(verbose) TIME_PRINT(iparam[IPARAM_RANK], ("PaRSEC initialized\n"));
 	return ctx;
 }
@@ -458,15 +460,8 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	gather_time_tmp = (double *)calloc(nb_threads, sizeof(double));
 
         /* TIPS for performance */
-	if( 0 == A->super.myrank ) { 
-		if( 1 == band_size ) 
-			fprintf(stderr, "\nWARNING: band_size= %d, so PARSEC_DIST_COLLECTIVES = ON in DPLASMA for better performance !!!\n\n", band_size);
-		else if( band_size > 1 )
-			fprintf(stderr, "\nWARNING: band_size= %d, so PARSEC_DIST_COLLECTIVES = OFF in DPLASMA for better performance !!!\n\n", band_size);
-		else {
-			fprintf(stderr, "\nERROR: band_size should be not less that 1 : %d\n\n", band_size);
-			exit(1);
-		}
+	if( 0 == A->super.myrank && band_size > 1 ) { 
+		fprintf(stderr, "\nWARNING: band_size= %d (> 1), so add flag '-- -mca runtime_comm_coll_bcast 0' at the end of command for better performance !!!\n\n", band_size);
 	}
 
 	/* Call 3flow version
