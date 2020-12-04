@@ -7,6 +7,9 @@ extern "C" %{
 
 #include "hicma_parsec.h"
 
+/* Record the start time of potrf(0) */
+static double start_time_potrf;
+
 /* Used for operation count */
 extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 
@@ -260,8 +263,26 @@ BODY [type=RECURSIVE]
     op_band[es->th_id] += cnt;
     op_path[es->th_id] += cnt;
 
-    if( descA->mt/100 && 0 == k % (descA->mt/100) )
-        fprintf(stderr, "In potrf, k %d, %.2lf %% is finished\n", k, 100.0*k/descA->mt);
+    /* Print the progress */ 
+    int total_time_print = 100;
+    if( descA->nt/total_time_print ) {
+        struct timeval tstart;
+        if( 0 == k ) {
+	    gettimeofday(&tstart, NULL);
+            start_time_potrf = tstart.tv_sec + tstart.tv_usec / 1.0e6; 
+        }
+
+        if( k < descA->super.nodes )
+            MPI_Bcast( &start_time_potrf, 1, MPI_DOUBLE, descA->super.rank_of(&descA->super, 0, 0), MPI_COMM_WORLD );
+  
+        gettimeofday(&tstart, NULL);
+        double start_time = tstart.tv_sec + tstart.tv_usec / 1.0e6 - start_time_potrf;
+        double estimated_time = start_time * descA->nt / (k+1);
+
+        if( 0 == k % (descA->nt/total_time_print) )
+            fprintf(stderr, "In potrf, k %d, %.2lf %% is finished; time: %lf of estimated total %lf\n",
+			    k, 100.0*k/descA->nt, start_time, estimated_time); 
+    }
 
     if( tempkm > smallnb )
     {
@@ -1220,7 +1241,8 @@ BODY
         /* If new_UVrk > Crank_old, re-allocate */
         if( new_UVrk > Crank_old && !send_full_tile ) {
             if( DEBUG_INFO ) printf("Reallocate %d %d %d\n", m, n, k);
-            free( this_task->data._f_C.data_out->device_private ); 
+	    if( NULL != this_task->data._f_C.data_out->device_private )
+                free( this_task->data._f_C.data_out->device_private ); 
             this_task->data._f_C.data_out->device_private = calloc( descA->mb * new_UVrk * 2, sizeof(double) );
             this_task->data._f_C.data_out->original->nb_elts = descA->mb * new_UVrk * 2 * sizeof(double);
         }
@@ -1371,7 +1393,8 @@ BODY
 	/* If new_UVrk > Crank_old, re-allocate */
 	if( new_UVrk > Crank_old && !send_full_tile ) {
 		if( DEBUG_INFO ) printf("\nReallocate %d %d %d\n\n", m, n, k);
-		free( this_task->data._f_C.data_out->device_private ); 
+		if( NULL != this_task->data._f_C.data_out->device_private )
+		    free( this_task->data._f_C.data_out->device_private ); 
 		this_task->data._f_C.data_out->device_private = calloc( descA->mb * new_UVrk * 2, sizeof(double) );
 		this_task->data._f_C.data_out->original->nb_elts = descA->mb * new_UVrk * 2 * sizeof(double);
 	}

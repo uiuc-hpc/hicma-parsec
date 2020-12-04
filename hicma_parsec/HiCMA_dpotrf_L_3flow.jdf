@@ -10,6 +10,9 @@ extern "C" %{
 /* Used for operation count */
 extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 
+/* Record the start time of potrf(0) */
+static double start_time_potrf;
+
 /*
  * Priorities used in this jdf:
  *      - potrf_dpotrf(k)    : (MT-k)**3
@@ -207,8 +210,26 @@ BODY [type=RECURSIVE]
     op_band[es->th_id] += cnt;
     op_path[es->th_id] += cnt;
 
-    if( descAg->mt/1000 && 0 == (k+1) % (descAg->mt/1000) )
-        fprintf(stderr, "In potrf, k %d, %.2lf %% is finished\n", k, 100.0*(k+1)/descAg->mt);
+    /* Print the progress */
+    int total_time_print = 100;
+    if( descAg->nt/total_time_print ) {
+        struct timeval tstart;
+        if( 0 == k ) {
+            gettimeofday(&tstart, NULL);
+            start_time_potrf = tstart.tv_sec + tstart.tv_usec / 1.0e6;
+        }
+
+        if( k < descAg->super.nodes )
+            MPI_Bcast( &start_time_potrf, 1, MPI_DOUBLE, descAg->super.rank_of(&descAg->super, 0, 0), MPI_COMM_WORLD );
+  
+        gettimeofday(&tstart, NULL);
+        double start_time = tstart.tv_sec + tstart.tv_usec / 1.0e6 - start_time_potrf;
+        double estimated_time = start_time * descAg->nt / (k+1);
+
+        if( 0 == k % (descAg->nt/total_time_print) )
+            fprintf(stderr, "In potrf, k %d, %.2lf %% is finished; time: %lf of estimated total %lf\n",
+                            k, 100.0*k/descAg->nt, start_time, estimated_time);
+    }
 
     if (tempkm > smallnb)
     {
@@ -549,7 +570,8 @@ BODY
     /* If new_UVrk > Crank_old, re-allocate */
     if( new_UVrk > Crank_old && !send_full_tile ) {
 	    if( DEBUG_INFO ) printf("Reallocate %d %d %d\n", m, n, k);
-	    free( this_task->data._f_Cu.data_out->device_private );
+	    if( NULL != this_task->data._f_Cu.data_out->device_private )
+	        free( this_task->data._f_Cu.data_out->device_private );
 	    this_task->data._f_Cu.data_out->device_private = calloc( descAg->mb * new_UVrk * 2, sizeof(double) );
 	    this_task->data._f_Cu.data_out->original->nb_elts = descAg->mb * new_UVrk * 2 * sizeof(double);
     }
@@ -559,7 +581,7 @@ BODY
     _CV_save = this_task->data._f_Cu.data_out->device_private + descAg->mb * new_UVrk * sizeof(double);
 
     /* Update address Cv and data_of_Av(m, n) */
-    this_task->data._f_Cv.data_out = parsec_data_copy_new(data_of_descAv(m, n), 0);
+    //this_task->data._f_Cv.data_out = parsec_data_copy_new(data_of_descAv(m, n), 0);
     this_task->data._f_Cv.data_out->device_private = _CV_save; 
 
     HiCMA_HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
