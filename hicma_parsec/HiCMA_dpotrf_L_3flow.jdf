@@ -226,7 +226,7 @@ BODY [type=RECURSIVE]
         double start_time = tstart.tv_sec + tstart.tv_usec / 1.0e6 - start_time_potrf;
         double estimated_time = start_time * descAg->nt / (k+1);
 
-        if( 0 == k % (descAg->nt/total_time_print) )
+        if( 0 == k % (descAg->nt/total_time_print) || descAg->mt-1 == k )
             fprintf(stderr, "In potrf, k %d, %.2lf %% is finished; time: %lf of estimated total %lf\n",
                             k, 100.0*k/descAg->nt, start_time, estimated_time);
     }
