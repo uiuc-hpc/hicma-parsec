@@ -16,14 +16,44 @@ make -j 8
 
 cd hicma_parsec
 
+Running examples:
+
+statistics-2d-sqexp:
+
+mpirun -np 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v
+
+statistics-3d-exp:
+
+mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200 -D 4 -P 2 -v -- -mca runtime_comm_coll_bcast 0
+
+-N: matrix size; required 
+
+-t: tile size; required
+
+-e: accuracy threshold; default: 1.0e-8
+
+-u: maxrank threshold for compressed tiles; default: tile_size/2
+
+-P: row process grid; default: number_of_nodes
+
+-D: kind of problem: default: 2
+
+-v: print more info
+
+More information:
+
 ./testing_dpotrf_tlr --help
 
 Additional PaRSEC flags: ./testing_dpotrf_tlr -- --help
 
-Running examples:
 
-mpirun -np 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -j 2700 -v -c 19 -G 130 -U 130 -D 2 -z 30 -Z 1 -Y 1 -E 0 -P 2 -x
 
-mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200 -j 108000 -v -P 2 -c 19 -G 1200 -U 1200 -D 4 -z 300 -Z 1 -Y 1 -- -mca runtime_comm_coll_bcast 0
+Note: 
 
-Note: if the problem is a little dense, i.e., band_size > 1 after auto-tuning, "-- -mca runtime_comm_coll_bcast 0" is needed for better performance. 
+(1) if the problem is a little dense, i.e., band_size > 1 after auto-tuning (e.g., in statistics-3d-sqexp application with accuracy threshold -e 1.0e-8), "-- -mca runtime_comm_coll_bcast 0" is needed for better performance;
+
+(2) recommend to set -c to number_of_cores - 1;
+
+(3) process grid as square as possible with P < Q;
+
+(4) in most cases, for -D 2 (statistics-2d-sqexp), maxrank= 150; -D 3 (statistics-3d-sqexp), maxrank= 500; -D 4 (statistics-3d-exp), maxrank= tile_size / 2. 

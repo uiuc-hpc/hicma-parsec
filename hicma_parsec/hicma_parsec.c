@@ -167,21 +167,27 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 	char *value;
 
 	/* Default */
-	//iparam[IPARAM_NNODES] = 1;
-	iparam[IPARAM_NGPUS]  = 0;
-	iparam[IPARAM_BAND] = 1;
-	iparam[IPARAM_LOOKAHEAD] = -1;
-	iparam[IPARAM_KIND_OF_PROBLEM] = 1; //default electrodynamics
-	iparam[IPARAM_SEND_FULL_TILE]  = 0; //default do not send full tile
-	iparam[IPARAM_HNB] = 300;
-	iparam[IPARAM_AUTO_BAND] = 1;
-	iparam[IPARAM_REORDER_GEMM] = 0;
-	iparam[IPARAM_TWO_FLOW] = 0;
-	iparam[IPARAM_P] = 0;
-	iparam[IPARAM_N] = 0;
-	iparam[IPARAM_NB] = 0;
-	iparam[IPARAM_MAX_RANK] = 0;
-	iparam[IPARAM_VERBOSE] = 5;
+        iparam[IPARAM_NCORES] = -1;         // number_of_cores_per_node - 1
+	iparam[IPARAM_NGPUS]  = 0;          // no GPU
+	iparam[IPARAM_BAND] = 1;            // band_size 1
+	iparam[IPARAM_LOOKAHEAD] = -1;      // lookahead set to auto-tuned band_size
+	iparam[IPARAM_KIND_OF_PROBLEM] = 2; // statistics-2d-sqexp 
+	iparam[IPARAM_SEND_FULL_TILE]  = 0; // do not send full tile
+	iparam[IPARAM_HNB] = 300;           // subtile size in recursive
+	iparam[IPARAM_AUTO_BAND] = 1;       // enable auto-tuning band_size
+	iparam[IPARAM_REORDER_GEMM] = 0;    // no reordering GEMM 
+	iparam[IPARAM_TWO_FLOW] = 0;        // not force to run 2flow version
+	iparam[IPARAM_P] = 0;               // row process grid, with set to numberi_of_nodes if not set
+	iparam[IPARAM_N] = 0;               // matrix size, need to set and will check later 
+	iparam[IPARAM_NB] = 0;              // tile size, need to set and will check later 
+	iparam[IPARAM_VERBOSE] = 5;         // verbose
+        dparam[DPARAM_ADD_DIAG] = 0.0;      // set to matrix size
+        dparam[DPARAM_WAVEK] = 50;          // wave_k in synthetic 2D application (-D 1)
+        dparam[DPARAM_FIXED_ACC] = 1.0e-8;  // default yield 1.0e-9
+	iparam[IPARAM_MAX_RANK] = 0;        // maxrank, set to tile_size/2 by default
+        iparam[IPARAM_GEN_MAX_RANK] = 0;    // default IPARAM_MAX_RANK
+        iparam[IPARAM_COMP_MAX_RANK] = 0;   // default IPARAM_MAX_RANK
+      
 
 	do {
 #if defined(PARSEC_HAVE_GETOPT_LONG)
@@ -287,23 +293,32 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 		fprintf(stderr, "#!!!!! the process grid PxQ (%dx%d) is smaller than the number of nodes (%d). Some nodes are idling!\n", iparam[IPARAM_P], iparam[IPARAM_Q], iparam[IPARAM_NNODES]);
 	}
 
-	/* Set matrices dimensions to default values if not provided */
-	/* Search for N as a bare number if not provided by -N */
-	if(0 == iparam[IPARAM_N])
-	{
+	/* Matrix size is reqired !! */ 
+	if( iparam[IPARAM_N] <= 0 )
 		fprintf(stderr, "#XXXXX the matrix size (N) is not set!\n");
-	}
-
-	if(0 == iparam[IPARAM_NB])
-	{
+                
+	/* Tile size is reqired !! */ 
+	if( iparam[IPARAM_NB] <= 0 )
 		fprintf(stderr, "#XXXXX the tile size (NB) is not set!\n");
-	}
 
+        /* Set add_diag to matrix_size */
+        if( dparam[DPARAM_ADD_DIAG] <= 0.0 )
+            dparam[DPARAM_ADD_DIAG] = (double)iparam[IPARAM_N];
+
+        /* If maxrank not set */
 	if( iparam[IPARAM_MAX_RANK] <= 0 ) {
-		iparam[IPARAM_MAX_RANK] = iparam[IPARAM_NB];
+		iparam[IPARAM_MAX_RANK] = iparam[IPARAM_NB] / 2;
 		fprintf(stderr, "Max rank has not been specified. Forced to the size of a tile %d\n",
 				iparam[IPARAM_MAX_RANK]);
 	}
+
+        /* Set generated maxrank to maxrank by default */
+        if( iparam[IPARAM_GEN_MAX_RANK] <= 0 )
+		iparam[IPARAM_GEN_MAX_RANK] = iparam[IPARAM_MAX_RANK];
+
+        /* Set computed maxrank to maxrank by default */
+        if( iparam[IPARAM_COMP_MAX_RANK] <= 0 )
+		iparam[IPARAM_COMP_MAX_RANK] = iparam[IPARAM_MAX_RANK];
 
 	(void)rc;
 }
