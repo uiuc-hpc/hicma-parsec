@@ -56,7 +56,7 @@ static void print_usage(void)
 			" -w --wavek            : Wave number for electrodynamics problem\n"
 			" -j --adddiag          : Add this number to diagonal elements to make the matrix positive definite in electrodynamics problem\n"
 			" -Z --band             : if 0, normal two_dim_block_cyclic, but not contiguous memory allocation for whole matrix; if > 0, with band distribution \n"
-			" -Y --lookahead        : set lookahead, from 0 to NT-1 \n"
+			" -Y --lookahead        : set lookahead, from -1 to NT-1; default -1, will set to auto_tuned band_size \n"
 			" -E --auto-band        : set auto select the most suitable band size \n"
 			" -I --reorder-gemm     : set reorder-gemm \n"
 			" -D --kind_of_problem  : 0: randtlr\n"
@@ -170,7 +170,7 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 	//iparam[IPARAM_NNODES] = 1;
 	iparam[IPARAM_NGPUS]  = 0;
 	iparam[IPARAM_BAND] = 1;
-	iparam[IPARAM_LOOKAHEAD] = 1;
+	iparam[IPARAM_LOOKAHEAD] = -1;
 	iparam[IPARAM_KIND_OF_PROBLEM] = 1; //default electrodynamics
 	iparam[IPARAM_SEND_FULL_TILE]  = 0; //default do not send full tile
 	iparam[IPARAM_HNB] = 300;
@@ -454,6 +454,14 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	/* Only for 1 vp */
 	assert( parsec->nb_vp == 1 );
 	int nb_threads = parsec->virtual_processes[0]->nb_cores;
+
+        /* Set lookahead to auto-tuned band_size if lookahead = -1 */
+        assert( lookahead >= -1 );
+        if( -1 == lookahead ) {
+            lookahead = band_size;
+	    if( 0 == A->super.myrank )
+                fprintf(stderr, "Set lookahead equal to band_size %d\n", lookahead);
+        }
 
 	/* Allocate memory to store execution time of each process */
 	gather_time = (double *)calloc(nb_threads, sizeof(double));

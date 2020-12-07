@@ -323,6 +323,7 @@ HiCMA_dpotrf_L_2flow_New( parsec_context_t *parsec,
                 is not meaningful");
         return NULL /*-1*/;
     }
+
     if(storagemaxrank > (A->mb/2)) {
         dplasma_error("HiCMA_dpotrf_L_2flow_New", "maxrank should not be larger than half of block size");
         return NULL /*-1*/;
