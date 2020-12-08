@@ -467,17 +467,6 @@ int main(int argc, char ** argv)
 
     double time_starsh = sync_time_elapsed;
 
-    /* Timer start */
-    SYNC_TIME_START();
-
-    /* Check correctness of rank */ 
-    parsec_rank_check(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, band_size); 
-
-    /* Timer end */
-    SYNC_TIME_PRINT(rank, ("Before HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                           "band_size= %d send_full= %d\n\n",
-                           P, Q, NB, N, maxrank, band_size, send_full_tile));
-
     if(rank == 0) if(loud > 3) { printf("%d: STARSH generated TLR matrix\n", __LINE__);fflush(stdout);}
     if(info != 0) {
         printf("Error in low rank matrix generation, info:%d\n", info);
@@ -491,6 +480,17 @@ int main(int argc, char ** argv)
         exit(-1);
     }
     if(rank == 0) if(loud > 3) printf("STARSH Matrix generation is done\n");
+
+    /* Timer start */
+    SYNC_TIME_START();
+
+    /* Check correctness of rank */
+    parsec_rank_check(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, band_size);
+
+    /* Timer end */
+    SYNC_TIME_PRINT(rank, ("Before HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+                           "band_size= %d send_full= %d\n\n",
+                           P, Q, NB, N, maxrank, band_size, send_full_tile));
 
     /* Gathering rank info */
     int imaxrk = -1, iminrk=-1;
