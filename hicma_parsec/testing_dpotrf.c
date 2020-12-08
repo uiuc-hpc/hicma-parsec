@@ -383,15 +383,15 @@ int main(int argc, char ** argv)
 
     /* If auto select band_size, band_size set to 1 at the beginning */
     if( auto_band ) {
-        if( rank == 0 ) { 
-            printf("\n%d: AUTO SELECT band_size, set band_size = 1 at the beginning\n", __LINE__);
+        if( rank == 0 && verbose) { 
+            printf("\n%d: Auto-tuning band_size, set band_size = 1 at the beginning\n", __LINE__);
             fflush(stdout);
         }
         band_size = 1;
     }
 
     if( reorder_gemm ) {
-        if( rank == 0 ) {
+        if( rank == 0 && verbose ) {
             printf("%d: Re-order gemm, set band_size = 1 at the beginning\n", __LINE__);
             fflush(stdout);
         }
