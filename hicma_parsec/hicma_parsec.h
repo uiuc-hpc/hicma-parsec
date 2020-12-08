@@ -42,15 +42,16 @@ int HiCMA_dpotrf_L( parsec_context_t* parsec,
               double acc,
 	      int fixed_rank,
               int maxrank,
-	      int lookahead,
+	      int *lookahead,
               int band_size,
               int hmb,
 	      int compmaxrank,
               int send_full_tile,
-              int two_flow, 
+              int *two_flow, 
               unsigned long* tileopcounters,
               unsigned long* opcounters,
-              double *critical_path_time
+              double *critical_path_time,
+	      int verbose
               );
 
 /**

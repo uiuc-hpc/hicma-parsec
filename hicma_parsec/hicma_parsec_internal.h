@@ -85,6 +85,12 @@
 /* Fluctuation, used in auto-band tuning */
 #define FLUCTUATION 0.66666667
 
+/* Gather rank info
+ * If disabled, band_size auto-tuning will be disabled,
+ * and use the band_size provided
+ */
+#define GATHER_RANK 1
+
 /* Show rank statistics
  * Gathering Rank info durint Cholesky
  * The rank is stored in dcRank with 4 (RANK_MAP_BUFF) integers
@@ -126,7 +132,7 @@
 #define BAND_MEMORY_CONTIGUOUS 0
 
 /* Memory threshold */
-#define THRESHOLD_MEMORY_PER_NODE 70
+#define THRESHOLD_MEMORY_PER_NODE INT_MAX 
 
 /* Print more info for debugging */
 #define DEBUG_INFO 0
@@ -187,19 +193,19 @@ enum dparam_t {
   DPARAM_SIZEOF
 };
 
-#define PASTE_CODE_IPARAM_LOCALS(iparam)                                \
-    int rank  = iparam[IPARAM_RANK];                                    \
-    int nodes = iparam[IPARAM_NNODES];                                  \
-    int cores = iparam[IPARAM_NCORES];                                  \
-    int gpus  = iparam[IPARAM_NGPUS];                                   \
-    int P     = iparam[IPARAM_P];                                       \
-    int Q     = iparam[IPARAM_Q];                                       \
-    int N     = iparam[IPARAM_N];                                       \
-    int NB    = iparam[IPARAM_NB];                                      \
-    int HNB   = iparam[IPARAM_HNB];                                     \
-    int NT    = (N%NB==0) ? (N/NB) : (N/NB+1);                          \
-    int check = iparam[IPARAM_CHECK];                                   \
-    int loud  = iparam[IPARAM_VERBOSE];                                 \
+#define PASTE_CODE_IPARAM_LOCALS(iparam)                               \
+    int rank  = iparam[IPARAM_RANK];                                   \
+    int nodes = iparam[IPARAM_NNODES];                                 \
+    int cores = iparam[IPARAM_NCORES];                                 \
+    int gpus  = iparam[IPARAM_NGPUS];                                  \
+    int P     = iparam[IPARAM_P];                                      \
+    int Q     = iparam[IPARAM_Q];                                      \
+    int N     = iparam[IPARAM_N];                                      \
+    int NB    = iparam[IPARAM_NB];                                     \
+    int HNB   = iparam[IPARAM_HNB];                                    \
+    int NT    = (N%NB==0) ? (N/NB) : (N/NB+1);                         \
+    int check = iparam[IPARAM_CHECK];                                  \
+    int verbose  = iparam[IPARAM_VERBOSE];                             \
     double wave_k = dparam[DPARAM_WAVEK];                              \
     int maxrank = iparam[IPARAM_MAX_RANK];                             \
     int genmaxrank = iparam[IPARAM_GEN_MAX_RANK];                      \
@@ -212,10 +218,10 @@ enum dparam_t {
     int reorder_gemm = iparam[IPARAM_REORDER_GEMM];                    \
     int two_flow = iparam[IPARAM_TWO_FLOW];                            \
     int auto_band = iparam[IPARAM_AUTO_BAND];                          \
-    double radius = dparam[DPARAM_RAD];                                   \
-    double density = dparam[DPARAM_DENST];                                   \
-    int numobj  = iparam[IPARAM_NUMOBJ];                                \
-    int rbf_kernel  = iparam[IPARAM_RBFKERNEL];                          \
+    double radius = dparam[DPARAM_RAD];                                \
+    double density = dparam[DPARAM_DENST];                             \
+    int numobj  = iparam[IPARAM_NUMOBJ];                               \
+    int rbf_kernel  = iparam[IPARAM_RBFKERNEL];                        \
     int order  = iparam[IPARAM_ORDER]; 
 
 #define PASTE_CODE_DPARAM_LOCALS(dparam) \

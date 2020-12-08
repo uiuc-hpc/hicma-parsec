@@ -74,25 +74,23 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
     int rank = dcAr.super.super.myrank;
     int root = dcAr.super.super.rank_of(&dcAr.super.super, 0, 0);
 
-    if(0 == rank) printf("Ranks will be gathered\n");
     /* Timer start */
     SYNC_TIME_START();
 
     /* Gather from dcAr to G (global) */
     parsec_rank_gather(parsec, (parsec_tiled_matrix_dc_t*)&dcAr, rank_array, band_size);
 
-    /* Timer end */
-    SYNC_TIME_PRINT(rank, ("Gather rank" "\tband_size= %d  NT= %4d\n", band_size, NT));
-
-    if(0 == rank) {printf("Ranks were gathered\n");fflush(stdout);}
-
+    /* Calculate min/avg/max */
     HICMA_stat_t rankstat;
+    HICMA_get_stat2(rank_array, dcAr.super.lm, band_size, &rankstat);
 
-    if( rank  == root ){
-	    printf("-------------------------------------------");
-	    HICMA_get_stat2(rank_array, dcAr.super.lm, band_size, &rankstat);
-	    HICMA_print_stat(rankstat);
-    }
+    *pminrk = rankstat.min;
+    *pmaxrk = rankstat.max;
+    *pavgrk = rankstat.avg;
+
+    /* Timer end */
+    SYNC_TIME_PRINT(rank, ("Gather rank" "\tband_size= %d  NT= %4d avg= %lf min= %d max= %d\n",
+			    band_size, NT, *pavgrk, *pminrk, *pmaxrk));
 
 #if PRINT_RANK 
     SYNC_TIME_START();
@@ -111,14 +109,10 @@ void tlr_rank_stat(char* strid, int *rank_array, int band_size,  parsec_context_
     }
     SYNC_TIME_PRINT(rank, ("Print ranks of tiles\n"));
 #endif
-
-    *pminrk = rankstat.min; 
-    *pmaxrk = rankstat.max; 
-    *pavgrk = rankstat.avg; 
 }
 
 /* Check difference of ||L*L'-A|| */
-int check_dpotrf2( parsec_context_t *parsec, int loud,
+int check_dpotrf2( parsec_context_t *parsec, int verbose,
 		int uplo,
 		parsec_tiled_matrix_dc_t *A,
 		parsec_tiled_matrix_dc_t *A0, double threshold )
@@ -163,13 +157,10 @@ int check_dpotrf2( parsec_context_t *parsec, int loud,
     //result = Rnorm / ( Anorm * N * eps ) ;
     result = Rnorm / ( Anorm ) ;
 
-    if ( loud > 2 ) {
+    if ( verbose ) {
         printf("============\n");
         printf("Checking the Cholesky factorization. Threshold is %.2e \n", threshold);
-
-        if ( loud > 3 )
-            printf( "-- ||A||_oo = %e, ||L'L-A||_oo = %e\n", Anorm, Rnorm );
-
+        printf( "-- ||A||_oo = %e, ||L'L-A||_oo = %e\n", Anorm, Rnorm );
         printf("-- ||L'L-A||_oo/(||A||_oo) = %e \n", result);
     }
 
@@ -178,12 +169,12 @@ int check_dpotrf2( parsec_context_t *parsec, int loud,
          //(result > 60.0) )
          (result > threshold) )
     {
-        if( loud ) printf("-- Factorization is suspicious ! \n");
+        if( verbose ) printf("-- Factorization is suspicious ! \n");
         info_factorization = 1;
     }
     else
     {
-        if( loud ) printf("-- Factorization is CORRECT ! \n");
+        if( verbose ) printf("-- Factorization is CORRECT ! \n");
         info_factorization = 0;
     }
 
@@ -194,7 +185,7 @@ int check_dpotrf2( parsec_context_t *parsec, int loud,
 }
 
 /* Check solution L difference from the dense counterpart */ 
-int check_diff( parsec_context_t *parsec, int loud,
+int check_diff( parsec_context_t *parsec, int verbose,
                   int uplo,
                   parsec_tiled_matrix_dc_t *A,
                   parsec_tiled_matrix_dc_t *A0, double threshold )
@@ -219,12 +210,10 @@ int check_diff( parsec_context_t *parsec, int loud,
 
     Rnorm = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo, A);
 
-    if ( loud > 2 ) {
+    if ( verbose ) {
         printf("============\n");
         printf("Checking the equality of lower/upper triangular parts of two matrices. Threshold is %.2e\n", threshold);
-
-        if ( loud > 3 )
-            printf( "-- dpotrf: ||L0||_oo = %e, HiCMA: ||L||_oo = %e, ||L-L0||_oo = %e, ||L-L0||_oo/||L||_oo = %e \n", A0norm, Anorm, Rnorm, Rnorm/Anorm );
+        printf( "-- dpotrf: ||L0||_oo = %e, HiCMA: ||L||_oo = %e, ||L-L0||_oo = %e, ||L-L0||_oo/||L||_oo = %e \n", A0norm, Anorm, Rnorm, Rnorm/Anorm );
     }
 
     if ( isnan(Rnorm)  || isinf(Rnorm)  ||
@@ -233,12 +222,12 @@ int check_diff( parsec_context_t *parsec, int loud,
          (Rnorm/Anorm > threshold)
          )
     {
-        if( loud ) printf("-- DIFFERENT matrices ! \n");
+        if( verbose ) printf("-- DIFFERENT matrices ! \n");
         info_factorization = 1;
     }
     else
     {
-        if( loud ) printf("-- SAME matrices ! \n");
+        if( verbose ) printf("-- SAME matrices ! \n");
         info_factorization = 0;
     }
 
@@ -261,8 +250,8 @@ int main(int argc, char ** argv)
     PASTE_CODE_DPARAM_LOCALS(dparam);
     PASTE_CODE_FLOPS(FLOPS_DPOTRF, ((double)N));
 
-    if(rank == 0) if(loud > 3) { printf("%s is starting\n", argv[0]);fflush(stdout);}
-    if(rank == 0) if(loud > 3) {
+    if( 0 == rank && verbose ) { printf("%s is starting\n", argv[0]); fflush(stdout); }
+    if( 0 == rank && verbose ) {
         printf("M:%d N:%d NB:%d NB:%d HNB:%d HNB:%d\n", N, N, NB, NB, HNB, HNB);
         printf("nodes:%d P:%d Q:%d cores:%d\n", nodes, P, Q, cores);
         printf("kind_of_problem:%d %s\n", kind_of_problem, str_problem[kind_of_problem]);
@@ -296,7 +285,6 @@ int main(int argc, char ** argv)
     enum STARSH_PARTICLES_PLACEMENT place = STARSH_PARTICLES_UNIFORM;
         
     srand(0); // FIXME
-    if(rank == 0) if(loud > 3) { printf("%d: STARSH will generate problem\n", __LINE__);fflush(stdout);}
 
     /* Synthetic matrix with equal ranks */
     if(kind_of_problem == 0)
@@ -378,8 +366,6 @@ int main(int argc, char ** argv)
         return info;
     }
 
-    if(rank == 0) if(loud > 3) { printf("%d: STARSH generated problem\n", __LINE__);fflush(stdout);}
-
     STARSH_int *index = malloc(N*sizeof(STARSH_int));
     STARSH_int i; 
     for(i = 0; i < N; ++i)
@@ -387,7 +373,7 @@ int main(int argc, char ** argv)
     starsh_params_t params = {data, kernel, index};
 
     /* Make sure lookahead > 0 */
-    assert(lookahead >= 0);
+    assert(lookahead >= -1);
 
     /* Make sure band >= 0 */
     assert(band_size >= 1);
@@ -398,7 +384,7 @@ int main(int argc, char ** argv)
     /* If auto select band_size, band_size set to 1 at the beginning */
     if( auto_band ) {
         if( rank == 0 ) { 
-            printf("\n%d: AUTO SELECT band_size, set band_size = 1 at the beginning\n\n", __LINE__);
+            printf("\n%d: AUTO SELECT band_size, set band_size = 1 at the beginning\n", __LINE__);
             fflush(stdout);
         }
         band_size = 1;
@@ -406,7 +392,7 @@ int main(int argc, char ** argv)
 
     if( reorder_gemm ) {
         if( rank == 0 ) {
-            printf("\n%d: Re-order gemm, set band_size = 1 at the beginning\n\n", __LINE__);
+            printf("%d: Re-order gemm, set band_size = 1 at the beginning\n", __LINE__);
             fflush(stdout);
         }
         band_size = 1;
@@ -450,7 +436,8 @@ int main(int argc, char ** argv)
     for(int i = 0; i < dcAr.super.nb_local_tiles; i++) 
         ((int *)dcAr.mat)[i] = -1; 
 
-    if(rank == 0) if(loud > 3) { printf("%d: Dense diagonal, U, V, rank Matrices are allocated\n", __LINE__);fflush(stdout);}
+    if( 0 == rank && verbose ) { printf("%d: Dense diagonal, U, V, rank Matrices are allocated\n", __LINE__);fflush(stdout);}
+    if( 0 == rank && verbose ) { printf("%d: STARSH will generate problem\n", __LINE__);fflush(stdout);}
 
     /* Timer start */
     SYNC_TIME_START();
@@ -467,20 +454,14 @@ int main(int argc, char ** argv)
 
     double time_starsh = sync_time_elapsed;
 
-    if(rank == 0) if(loud > 3) { printf("%d: STARSH generated TLR matrix\n", __LINE__);fflush(stdout);}
     if(info != 0) {
         printf("Error in low rank matrix generation, info:%d\n", info);
         fflush(stdout);
         cleanup_parsec(parsec, iparam);
         return -1;
     }
-    if(info != 0) {
-        printf("Error occured in STARSH, tried to stop execution, info:%d. exit() will be called!\n", info);
-        fflush(stdout);
-        exit(-1);
-    }
-    if(rank == 0) if(loud > 3) printf("STARSH Matrix generation is done\n");
 
+#if DEBUG_INFO
     /* Timer start */
     SYNC_TIME_START();
 
@@ -491,6 +472,7 @@ int main(int argc, char ** argv)
     SYNC_TIME_PRINT(rank, ("Before HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
                            "band_size= %d send_full= %d\n\n",
                            P, Q, NB, N, maxrank, band_size, send_full_tile));
+#endif
 
     /* Gathering rank info */
     int imaxrk = -1, iminrk=-1;
@@ -499,7 +481,12 @@ int main(int argc, char ** argv)
     /* Used for gathering rank */
     int *rank_array = (int *)malloc(dcAr.super.lmt * dcAr.super.lnt * sizeof(int));
 
+#if GATHER_RANK
     tlr_rank_stat("init_rank_tile", rank_array, band_size, parsec, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
+#else
+    /* Disable band_size auto-tuning, becasue the rank info is not gathered */
+    auto_band = 0;
+#endif
 
     int imaxrk_before = imaxrk;
     int iminrk_before = iminrk;
@@ -528,7 +515,7 @@ int main(int argc, char ** argv)
                                                     rank_array, NB);
 
         /* Timer end */
-        SYNC_TIME_PRINT(rank, ("OPT band_size" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+        SYNC_TIME_PRINT(rank, ("band_size_auto_tuning" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
                                "send_full= %d band_size_opt= %d\n\n",
                                P, Q, NB, N, maxrank, send_full_tile, band_size_opt));
 
@@ -573,7 +560,7 @@ int main(int argc, char ** argv)
         }
 
         /* Timer end */
-        SYNC_TIME_PRINT(rank, ("band generation" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+        SYNC_TIME_PRINT(rank, ("band_regeneration" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
                                "send_full= %d band_size= %d\n\n",
                                P, Q, NB, N, maxrank, send_full_tile, band_size));
 
@@ -598,19 +585,20 @@ int main(int argc, char ** argv)
     /* Init two_dim_block_cyclic_band_t structure */
     sym_two_dim_block_cyclic_band_init( &dcRG, nodes, rank, band_size );
 
+#if 0
     /* Timer start */
     SYNC_TIME_START();
 
-    //parsec_reorder_gemm(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
-    //                            (parsec_tiled_matrix_dc_t*)&dcRG,
-    //                            Ar_copy, disp, nb_elem_r, band_size,
-    //                            reorder_gemm);
+    parsec_reorder_gemm(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
+                                (parsec_tiled_matrix_dc_t*)&dcRG,
+                                Ar_copy, disp, nb_elem_r, band_size,
+                                reorder_gemm);
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("reorder_gemm" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
                            "send_full= %d band_size= %d reorder_gemm= %d\n\n",
                            P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
-
+#endif
 
     time_reorder = sync_time_elapsed;
 
@@ -635,8 +623,8 @@ int main(int argc, char ** argv)
     free(size_allocate);
 
     /* Timer end */
-    SYNC_TIME_PRINT(rank, ("Allocate Sum" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                           "band_size= %d send_full= %d memory_per_node= %lf GB memory_per_node_max= %lf GB\n\n",
+    SYNC_TIME_PRINT(rank, ("Memory_count" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+                           "band_size= %d send_full= %d memory_per_node= %lf GB memory_per_node_max= %lf GB\n",
                            P, Q, NB, N, maxrank, band_size, send_full_tile, memory_per_node, memory_per_node_max));
 
     if( memory_per_node > THRESHOLD_MEMORY_PER_NODE ) {
@@ -747,6 +735,7 @@ int main(int argc, char ** argv)
     op_path = (unsigned long *)calloc(cores, sizeof(unsigned long));
     op_offpath = (unsigned long *)calloc(cores, sizeof(unsigned long));
 
+#if DEBUG_INFO
     /* Timer start */
     SYNC_TIME_START();
 
@@ -757,14 +746,21 @@ int main(int argc, char ** argv)
     SYNC_TIME_PRINT(rank, ("Before HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
                            "band_size= %d send_full= %d\n\n",
                            P, Q, NB, N, maxrank, band_size, send_full_tile));
+#endif
 
-    imaxrk = -1, iminrk=-1;
-    iavgrk = -1.0;
-    tlr_rank_stat("init_rank_tile", rank_array, band_size, parsec, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
+#if GATHER_RANK
+    /* If band_size changed, gather rank before Cholesky */
+    if( auto_band && band_size > 1 ) {
+        imaxrk = -1;
+        iminrk=-1;
+        iavgrk = -1.0;
+        tlr_rank_stat("init_rank_tile", rank_array, band_size, parsec, &dcAr, &iminrk, &imaxrk, &iavgrk, maxrank);
+    }
+#endif
 
     double time_hicma = 0.0;
     info = 0;
-    if(check) {
+    if( check ) {
 	    /* Timer start */
 	    SYNC_TIME_START();
 
@@ -789,8 +785,9 @@ int main(int argc, char ** argv)
 				    P, Q, NB, N, gflops=(flops/1e9)/sync_time_elapsed));
     }
 
-    if(rank == 0) if(loud > 3) { printf("%d: HiCMA dpotrf is starting\n", __LINE__);fflush(stdout);}
+    if( 0 == rank && verbose ) { printf("%d: HiCMA dpotrf is starting\n", __LINE__);fflush(stdout);}
 
+    /* Gather time info during Cholesky */
     double *g_time = calloc(6, sizeof(double));
     double *critical_path_time = calloc(6, sizeof(double));
 
@@ -802,9 +799,9 @@ int main(int argc, char ** argv)
 		    (parsec_tiled_matrix_dc_t*)&dcAr,
 		    (parsec_tiled_matrix_dc_t*)&dcRG,
 		    (parsec_tiled_matrix_dc_t*)&dcRank,
-		    tol, fixedrk, maxrank, lookahead, band_size,
-		    HNB, compmaxrank, send_full_tile, two_flow,
-		    tileopcounters, opcounters, critical_path_time
+		    tol, fixedrk, maxrank, &lookahead, band_size,
+		    HNB, compmaxrank, send_full_tile, &two_flow,
+		    tileopcounters, opcounters, critical_path_time, verbose
 		    );
 
     /* Timer end */
@@ -816,29 +813,24 @@ int main(int argc, char ** argv)
     /* Record time */
     time_hicma = sync_time_elapsed;
 
-    if(rank == 0) if(loud > 3) {
-	    printf("%d: HiCMA dpotrf ended in %g seconds\n", __LINE__,
-			    time_hicma
-		  );
-	    fflush(stdout);
+    if( 0 == rank && info != 0 ) {
+            printf("-- Factorization is suspicious (info = %d) ! \n", info);
+            ret |= 1;
     }
 
-    if (info != 0) {
-	    printf("HiCMA_dpotrf failed with error code %d\n", info);
-    }
+#if PRINT_RANK
+    /* Timer start */
+    SYNC_TIME_START();
 
-    if( PRINT_RANK ) {
-	    /* Timer start */
-	    SYNC_TIME_START();
+    parsec_rank_print(parsec, (parsec_tiled_matrix_dc_t*)&dcRank, band_size);
 
-	    parsec_rank_print(parsec, (parsec_tiled_matrix_dc_t*)&dcRank, band_size);
+    /* Timer end */
+    SYNC_TIME_PRINT(rank, ("rank_print" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
+			    "send_full= %d band_size= %d reorder_gemm= %d\n\n",
+			    P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
+#endif
 
-	    /* Timer end */
-	    SYNC_TIME_PRINT(rank, ("rank_print" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-				    "send_full= %d band_size= %d reorder_gemm= %d\n\n",
-				    P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
-    }
-
+#if DEBUG_INFO
     /* Timer start */
     SYNC_TIME_START();
 
@@ -849,17 +841,7 @@ int main(int argc, char ** argv)
     SYNC_TIME_PRINT(rank, ("After HiCMA Check Rank" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
 			    "band_size= %d send_full= %d\n\n",
 			    P, Q, NB, N, maxrank, band_size, send_full_tile));
-
-    if(rank == 0) if(loud > 3) {
-	    printf("time_starsh: %g\t", time_starsh);
-	    printf("time_hicma: %g\t", time_hicma);
-	    printf("\n");
-    }
-
-    if( 0 == rank && info != 0 ) {
-	    printf("-- Factorization is suspicious (info = %d) ! \n", info);
-	    ret |= 1;
-    }
+#endif
 
     if( check ) {
 	    if(rank == 0) printf("\nCHECK RESULT:\n\n");
@@ -882,7 +864,7 @@ int main(int argc, char ** argv)
             printf("difference between these two matrices must be less than fixed accuracy threshold %.1e if fixed rank %d is zero.\n", tol, fixedrk);
         }
 
-        ret |= check_diff( parsec, (rank == 0) ? loud : 0, uplo,
+        ret |= check_diff( parsec, (rank == 0) ? verbose : 0, uplo,
                              (parsec_tiled_matrix_dc_t *)&dcAd,
                              (parsec_tiled_matrix_dc_t *)&dcA0, tol);
     }
@@ -922,7 +904,7 @@ int main(int argc, char ** argv)
 			     band_size, &info);
 
         /* ~/parsec/build/dplasma/lib/dplasma_dcheck.c */
-        ret |= check_dpotrf2( parsec, (rank == 0) ? loud : 0, uplo,
+        ret |= check_dpotrf2( parsec, (rank == 0) ? verbose : 0, uplo,
                              (parsec_tiled_matrix_dc_t *)&dcAd, //hicma_potrf(A approximate)
                              (parsec_tiled_matrix_dc_t *)&dcA2, tol);
 
@@ -938,8 +920,11 @@ int main(int argc, char ** argv)
 
     int fmaxrk = -1, fminrk=-1;
     double favgrk = -1.0;
+#if GATHER_RANK
     tlr_rank_stat("rank_tile", rank_array, band_size, parsec, &dcAr, &fminrk, &fmaxrk, &favgrk, maxrank);
+#endif
 
+    /* Count operations */
     SYNC_TIME_START();
     unsigned long* alltileopcounters = calloc(nelm_tileopcounters, sizeof(unsigned long));
     MPI_Reduce(tileopcounters, alltileopcounters, nelm_tileopcounters, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);  
@@ -1019,7 +1004,7 @@ int main(int argc, char ** argv)
     /* Time for critical path */
     SYNC_TIME_START();
     MPI_Reduce(critical_path_time, g_time, 6, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    SYNC_TIME_PRINT(rank, ("Total_critical_path_time %lf, potrf %lf, trsm %lf, syrk %lf\n", g_time[0] + g_time[1] + g_time[2], g_time[0], g_time[1], g_time[2]));
+    SYNC_TIME_PRINT(rank, ("Total_critical_path_time %lf, potrf %lf, trsm %lf, syrk %lf\n\n", g_time[0] + g_time[1] + g_time[2], g_time[0], g_time[1], g_time[2]));
 
     /* Print info during computation */
     if(rank == 0) {

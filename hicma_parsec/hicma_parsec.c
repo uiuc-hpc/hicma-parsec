@@ -180,7 +180,7 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 	iparam[IPARAM_P] = 0;               // row process grid, with set to numberi_of_nodes if not set
 	iparam[IPARAM_N] = 0;               // matrix size, need to set and will check later 
 	iparam[IPARAM_NB] = 0;              // tile size, need to set and will check later 
-	iparam[IPARAM_VERBOSE] = 5;         // verbose
+	iparam[IPARAM_VERBOSE] = 0;         // verbose
         dparam[DPARAM_ADD_DIAG] = 0.0;      // set to matrix size
         dparam[DPARAM_WAVEK] = 50;          // wave_k in synthetic 2D application (-D 1)
         dparam[DPARAM_FIXED_ACC] = 1.0e-8;  // default yield 1.0e-9
@@ -219,12 +219,12 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 			case 'Q': iparam[IPARAM_Q] = atoi(optarg); break;
 			case 'N': iparam[IPARAM_N] = atoi(optarg); break;
 			case 't': iparam[IPARAM_NB] = atoi(optarg); break;
-			case 'x': iparam[IPARAM_CHECK] = 1; iparam[IPARAM_VERBOSE] = my_own_max(2, iparam[IPARAM_VERBOSE]); break;
+			case 'x': iparam[IPARAM_CHECK] = 1; iparam[IPARAM_VERBOSE] = 1; break;
 			case 'z': iparam[IPARAM_HNB] = atoi(optarg); break;
 
 			case 'v':
 				  if(optarg)  iparam[IPARAM_VERBOSE] = atoi(optarg);
-				  else        iparam[IPARAM_VERBOSE] = 5;
+				  else        iparam[IPARAM_VERBOSE] = 1;
 				  break;
 
 			case 'f': iparam[IPARAM_FIXED_RANK]  = atoi(optarg); break;
@@ -263,10 +263,8 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 
 	if(iparam[IPARAM_NGPUS] < 0) iparam[IPARAM_NGPUS] = 0;
 	if(iparam[IPARAM_NGPUS] > 0) {
-		if (iparam[IPARAM_VERBOSE] > 3) {
+		if( iparam[IPARAM_VERBOSE] ) {
 			parsec_setenv_mca_param( "device_show_capabilities", "1", &environ );
-		}
-		if (iparam[IPARAM_VERBOSE] > 2) {
 			parsec_setenv_mca_param( "device_show_statistics", "1", &environ );
 		}
 	}
@@ -327,7 +325,7 @@ static void print_arguments(int* iparam)
 {
 	int verbose = iparam[IPARAM_RANK] ? 0 : iparam[IPARAM_VERBOSE];
 
-	if(verbose) {
+	if( verbose ) {
 		fprintf(stderr, "#+++++ cores detected       : %d\n", iparam[IPARAM_NCORES]);
 
 		fprintf(stderr, "#+++++ nodes x cores + gpu  : %d x %d + %d (%d+%d)\n"
@@ -405,7 +403,7 @@ parsec_context_t* setup_parsec(int argc, char **argv, int *iparam, double *dpara
         if( 0 == iparam[IPARAM_N] || 0 == iparam[IPARAM_NB] )
             exit(1);
 
-	if(verbose) TIME_PRINT(iparam[IPARAM_RANK], ("PaRSEC initialized\n"));
+	if( verbose ) TIME_PRINT(iparam[IPARAM_RANK], ("PaRSEC initialized\n"));
 	return ctx;
 }
 
@@ -452,15 +450,16 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		parsec_tiled_matrix_dc_t *Rank,
 		double acc, int rk,
 		int maxrank,
-		int lookahead,
+		int *lookahead,
 		int band_size,
 		int hmb,
 		int compmaxrank,
 		int send_full_tile,
-		int two_flow, 
+		int *two_flow, 
 		unsigned long* tileopcounters,
 		unsigned long* opcounters,
-		double *critical_path_time
+		double *critical_path_time,
+		int verbose
 		)
 {
 	parsec_taskpool_t *hicma_zpotrf = NULL;
@@ -471,11 +470,11 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	int nb_threads = parsec->virtual_processes[0]->nb_cores;
 
         /* Set lookahead to auto-tuned band_size if lookahead = -1 */
-        assert( lookahead >= -1 );
-        if( -1 == lookahead ) {
-            lookahead = band_size;
-	    if( 0 == A->super.myrank )
-                fprintf(stderr, "Set lookahead equal to band_size %d\n", lookahead);
+        assert( *lookahead >= -1 );
+        if( -1 == *lookahead ) {
+            *lookahead = band_size;
+	    if( 0 == A->super.myrank && verbose )
+                printf("Lookahead is not provided, set lookahead = band_size = %d\n", *lookahead);
         }
 
 	/* Allocate memory to store execution time of each process */
@@ -497,7 +496,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	 *
 	 * WARNING : to get best performance, the PARSEC_DIST_COLLECTIVES in DPLASMA should be ON !!!
 	 */ 
-	if( 1 == band_size && !two_flow ) {
+	if( 1 == band_size && !(*two_flow) ) {
 		int nodes = A->super.nodes;
 		int rank = A->super.myrank;
 		int MB = A->mb;
@@ -505,8 +504,8 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		int N_UV = maxrank * A->lnt;
 		int P = ((two_dim_block_cyclic_t *)Ar)->grid.rows;
 
-		if( 0 == A->super.myrank )
-			fprintf(stderr, "3flow version start\n\n");
+		if( 0 == A->super.myrank && verbose )
+			printf("3flow version start\n");
 
 		/* dcAv contains V. */
 		sym_two_dim_block_cyclic_t dcAv;
@@ -523,7 +522,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 				A, A, Av, Ar, RG, Rank,
 				acc, rk,
 				maxrank,
-				lookahead,
+				*lookahead,
 				band_size,
 				hmb,
 				compmaxrank,
@@ -553,13 +552,14 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		 *          it needs PARSEC_DIST_COLLECTIVES = OFF in DPLASMA for better performance
 		 */
                 if( 0 == A->super.myrank )
-                        fprintf(stderr, "2flow version start\n\n");
+                        printf("2flow version start\n");
+		*two_flow = 1;
 
 		hicma_zpotrf = HiCMA_dpotrf_L_2flow_New( parsec, uplo,
 				A, Ar, RG, Rank,
 				acc, rk,
 				maxrank,
-				lookahead,
+				*lookahead,
 				band_size,
 				hmb,
 				compmaxrank,
