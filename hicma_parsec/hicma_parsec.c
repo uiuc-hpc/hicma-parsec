@@ -26,6 +26,10 @@ double sync_time_elapsed = 0.0;
 double *gather_time;
 double *gather_time_tmp;
 
+/* Parsec routines for collective pattern */
+extern int remote_dep_bcast_star_child(int me, int him);
+extern int (*remote_dep_bcast_child)(int me, int him);
+
 /**********************************
  * Command line arguments
  **********************************/
@@ -481,11 +485,6 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	gather_time = (double *)calloc(nb_threads, sizeof(double));
 	gather_time_tmp = (double *)calloc(nb_threads, sizeof(double));
 
-        /* TIPS for performance */
-	if( 0 == A->super.myrank && band_size > 1 ) { 
-		fprintf(stderr, "\nWARNING: band_size= %d (> 1), so add flag '-- -mca runtime_comm_coll_bcast 0' at the end of command for better performance !!!\n\n", band_size);
-	}
-
 	/* Call 3flow version
 	 *
 	 * This version is used in papers of ProTools at SC2019 and PASC2020, 
@@ -494,7 +493,6 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	 * ProTools at SC2019: Performance analysis of tile low-rank cholesky factorization using parsec instrumentation tools
 	 * PASC2020: Extreme-scale task-based cholesky factorization toward climate and weather prediction applications
 	 *
-	 * WARNING : to get best performance, the PARSEC_DIST_COLLECTIVES in DPLASMA should be ON !!!
 	 */ 
 	if( 1 == band_size && !(*two_flow) ) {
 		int nodes = A->super.nodes;
@@ -547,13 +545,16 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		 *
 		 * Used in paper: Leveraging parsec runtime support to tackle challenging 3d data-sparse matrix problems
 		 *
-		 * WARNING: it could be also used for band_size = 1 with PARSEC_DIST_COLLECTIVES = ON for better performance
-		 *          When band_size > 1, which means there is a band of dense tiles near diagonal,
-		 *          it needs PARSEC_DIST_COLLECTIVES = OFF in DPLASMA for better performance
 		 */
-                if( 0 == A->super.myrank )
+                if( 0 == A->super.myrank && verbose )
                         printf("2flow version start\n");
 		*two_flow = 1;
+
+		/* Set the right collective pattern
+		 * need to be one taskpoll at a time */
+		if( band_size > 1 ) {
+			remote_dep_bcast_child = remote_dep_bcast_star_child;
+		}
 
 		hicma_zpotrf = HiCMA_dpotrf_L_2flow_New( parsec, uplo,
 				A, Ar, RG, Rank,

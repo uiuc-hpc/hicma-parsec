@@ -24,7 +24,7 @@ mpirun -np 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2
 
 statistics-3d-exp:
 
-mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200 -D 4 -P 2 -v -- -mca runtime_comm_coll_bcast 0
+mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200 -D 4 -P 2 -v
 
 -N: matrix size; required 
 
@@ -48,12 +48,10 @@ Additional PaRSEC flags: ./testing_dpotrf_tlr -- --help
 
 
 
-Note: 
+Tips: 
 
-(1) if the problem is a little dense, i.e., band_size > 1 after auto-tuning (e.g., in statistics-3d-sqexp application with accuracy threshold -e 1.0e-8), "-- -mca runtime_comm_coll_bcast 0" is needed for better performance;
+(1) set -c to number_of_cores - 1;
 
-(2) recommend to set -c to number_of_cores - 1;
+(2) process grid as square as possible with P < Q;
 
-(3) process grid as square as possible with P < Q;
-
-(4) in most cases, for -D 2 (statistics-2d-sqexp), maxrank= 150; -D 3 (statistics-3d-sqexp), maxrank= 500; -D 4 (statistics-3d-exp), maxrank= tile_size / 2. 
+(3) in most cases, for -D 2 (statistics-2d-sqexp), maxrank= 150; -D 3 (statistics-3d-sqexp), maxrank= 500; -D 4 (statistics-3d-exp), maxrank= tile_size / 2. 
