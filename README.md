@@ -50,8 +50,11 @@ Additional PaRSEC flags: ./testing_dpotrf_tlr -- --help
 
 Tips: 
 
-(1) set -c to number_of_cores - 1;
+(1) Set argument -c to number_of_cores - 1;
 
-(2) process grid as square as possible with P < Q;
+(2) Choose the process grid to be as square as possible with P < Q;
 
-(3) in most cases, for -D 2 (statistics-2d-sqexp), maxrank= 150; -D 3 (statistics-3d-sqexp), maxrank= 500; -D 4 (statistics-3d-exp), maxrank= tile_size / 2. 
+(3) in most cases,
+    for -D 2 (statistics-2d-sqexp), set maxrank= 150;
+    for -D 3 (statistics-3d-sqexp), set maxrank= 500;
+    for -D 4 (statistics-3d-exp), set maxrank= tile_size / 2. 
