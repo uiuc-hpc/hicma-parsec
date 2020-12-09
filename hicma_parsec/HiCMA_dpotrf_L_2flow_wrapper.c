@@ -323,6 +323,7 @@ HiCMA_dpotrf_L_2flow_New( parsec_context_t *parsec,
                 is not meaningful");
         return NULL /*-1*/;
     }
+
     if(storagemaxrank > (A->mb/2)) {
         dplasma_error("HiCMA_dpotrf_L_2flow_New", "maxrank should not be larger than half of block size");
         return NULL /*-1*/;
@@ -588,22 +589,22 @@ HiCMA_dpotrf_L_2flow_New( parsec_context_t *parsec,
         parsec_private_memory_init( hicma_dpotrf->_g_p_work_mbr, A->mb * compmaxrank * sizeof(double) ); 
 
         /* Arena */
-        parsec_matrix_add2arena(hicma_dpotrf->arenas[PARSEC_HiCMA_dpotrf_L_2flow_FULL_ARENA],
+        parsec_matrix_add2arena(&hicma_dpotrf->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_FULL_ARENA],
                                 parsec_datatype_double_t, matrix_UpperLower,
                                 1, A->mb, A->mb, A->mb,
                                 PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-        parsec_matrix_add2arena(hicma_dpotrf->arenas[PARSEC_HiCMA_dpotrf_L_2flow_DEFAULT_ARENA],
+        parsec_matrix_add2arena(&hicma_dpotrf->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_DEFAULT_ARENA],
                                 parsec_datatype_double_t, matrix_UpperLower,
                                 1, 1, 1, 1,
                                 PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-        parsec_matrix_add2arena(hicma_dpotrf->arenas[PARSEC_HiCMA_dpotrf_L_2flow_UV_ARENA],
+        parsec_matrix_add2arena(&hicma_dpotrf->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_UV_ARENA],
                                 parsec_datatype_double_t, matrix_UpperLower,
                                 1, A->mb, storagemaxrank*2, A->mb,
                                 PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
-        parsec_matrix_add2arena(hicma_dpotrf->arenas[PARSEC_HiCMA_dpotrf_L_2flow_AR_ARENA],
+        parsec_matrix_add2arena(&hicma_dpotrf->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_AR_ARENA],
                                 parsec_datatype_int_t, matrix_UpperLower,
                                 1, 1, 1, 1,
                                 PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -628,10 +629,10 @@ void HiCMA_dpotrf_L_2flow_Destruct(parsec_taskpool_t* _tp)
     }
 #endif
 
-    parsec_matrix_del2arena( tp->arenas[PARSEC_HiCMA_dpotrf_L_2flow_DEFAULT_ARENA] );
-    parsec_matrix_del2arena( tp->arenas[PARSEC_HiCMA_dpotrf_L_2flow_FULL_ARENA] );
-    parsec_matrix_del2arena( tp->arenas[PARSEC_HiCMA_dpotrf_L_2flow_UV_ARENA] );
-    parsec_matrix_del2arena( tp->arenas[PARSEC_HiCMA_dpotrf_L_2flow_AR_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_DEFAULT_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_FULL_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_UV_ARENA] );
+    parsec_matrix_del2arena( &tp->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_2flow_AR_ARENA] );
     parsec_private_memory_fini( tp->_g_p_work );
     parsec_private_memory_fini( tp->_g_p_work_mbr );
     parsec_private_memory_fini( tp->_g_p_work_rr );

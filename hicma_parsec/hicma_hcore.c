@@ -1941,8 +1941,6 @@ void HICMA_get_stat2(int *G, size_t lda, int band_size, HICMA_stat_t *stat)
                 max = G[j*lda+i];
         } 
     }
-    printf("number of tiles:%lu\n", num);
-    fflush(stdout);
 
     stat->min = min;
     stat->max = max;

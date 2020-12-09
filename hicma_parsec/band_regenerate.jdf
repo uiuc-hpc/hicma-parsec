@@ -39,10 +39,10 @@ BODY
     int tempnn = tempmm;
 
     /* New data_copy and allocate memory on band if not allocated */
-    if( NULL == D ) {
-        this_task->data._f_D.data_out = parsec_data_copy_new(data_of_descA(m, n), 0);
-        this_task->data._f_D.data_out->device_private = calloc(descA->mb * descA->mb, sizeof(double));
-    }
+#if !BAND_MEMORY_CONTIGUOUS
+    this_task->data._f_D.data_out = parsec_data_copy_new(data_of_descA(m, n), 0);
+    this_task->data._f_D.data_out->device_private = calloc(descA->mb * descA->mb, sizeof(double));
+#endif
 
     /* Generate tiles */
     problem_kernel(tempmm, tempnn, problem_index + m*descA->mb,
@@ -92,7 +92,7 @@ band_regenerate_New(int uplo,
     parsec_band_regenerate_taskpool_t *band_regenerate =
         parsec_band_regenerate_new(uplo, A, data, kernel, index, band_size);
 
-    parsec_matrix_add2arena(band_regenerate->arenas[PARSEC_band_regenerate_DEFAULT_ARENA],
+    parsec_matrix_add2arena(&band_regenerate->arenas_datatypes[PARSEC_band_regenerate_DEFAULT_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
                             1, A->mb, A->nb, A->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -103,7 +103,7 @@ band_regenerate_New(int uplo,
 void band_regenerate_Destruct(parsec_taskpool_t *taskpool)
 {
     parsec_band_regenerate_taskpool_t *band_regenerate_taskpool = (parsec_band_regenerate_taskpool_t *)taskpool;
-    parsec_matrix_del2arena(band_regenerate_taskpool->arenas[PARSEC_band_regenerate_DEFAULT_ARENA]);
+    parsec_matrix_del2arena(&band_regenerate_taskpool->arenas_datatypes[PARSEC_band_regenerate_DEFAULT_ARENA]);
     parsec_taskpool_free(taskpool);
 }
 

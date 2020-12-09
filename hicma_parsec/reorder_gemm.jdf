@@ -16,7 +16,7 @@ extern "C" %{
 
 descAr          [ type = "parsec_tiled_matrix_dc_t *" ]
 descRG          [ type = "parsec_tiled_matrix_dc_t *" ]
-Ar_copy         [ type = "int *" ]
+rank_array      [ type = "int *" ]
 disp            [ type = "int *" ]
 nb_elem_r       [ type = "int *" ]
 band_size       [ type = "int" ]
@@ -64,33 +64,14 @@ CTL ctl2 -> ctl reorder(m, n)
 BODY
 {
     if( m-n >= band_size ) {
-        int Aprocs = descAr->super.rank_of(&descAr->super, m, k);
-        int Bprocs = descAr->super.rank_of(&descAr->super, n, k);
-        int Cprocs = descAr->super.rank_of(&descAr->super, m, n);
-        int local_m = m / rows;
-        int local_n_B = n / rows;
-        int local_n_C = n / cols;
-        int local_k = k / cols;
-        int Arank = Ar_copy[disp[Aprocs] + local_k * nb_elem_r[Aprocs] + local_m];
-        int Brank = Ar_copy[disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B];
-        int Crank = Ar_copy[disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m];
+        int Arank = rank_array[k*descAr->lm+m];
+        int Brank = rank_array[k*descAr->lm+n];
+        int Crank = rank_array[n*descAr->lm+m];
 
-        if( -1 == Arank || -1 == Brank || -1 == Crank ) {
+        if( Arank < 0 || Brank < 0 || Crank < 0 ) {
             if( !(-1 == Brank && n-k < band_size) )
-            fprintf(stderr, "ERROR in gemm_ops (%d, %d, %d): Arank %d, Brank %d, Crank %d\n", m, n, k, Arank, Brank, Crank);
+            fprintf(stderr, "ERROR in reorder_gemm (%d, %d, %d): Arank %d, Brank %d, Crank %d\n", m, n, k, Arank, Brank, Crank);
         }
-
-#if DEBUG_INFO
-	printf("gather_rank_of_reorder %d %d %d: Arank %d posA %d, Brank %d posB %d, Crank %d posC %d; "
-			"Anb_elem_r %d, Adisp %d, Bnb_elem_r %d, Bdisp %d, Cnb_elem_r %d, Cdisp %d; "
-			"Aprocs %d, Cprocs %d, Bprocs %d, local_m %d, local_n_B %d, local_n_C %d, local_k %d\n",
-			m, n, k, Arank, disp[Aprocs] + local_k * nb_elem_r[Aprocs] + local_m,
-			Brank, disp[Bprocs] + local_k * nb_elem_r[Bprocs] + local_n_B,
-			Crank, disp[Cprocs] + local_n_C * nb_elem_r[Cprocs] + local_m,
-			nb_elem_r[Aprocs], disp[Aprocs], nb_elem_r[Bprocs], disp[Bprocs],
-			nb_elem_r[Cprocs], disp[Cprocs], Aprocs, Bprocs, Cprocs,
-			local_m, local_n_B, local_n_C, local_k);
-#endif
 
         /* Policy to do re-order; be aware: B is dense if n < band_size */
         //((int *)A)[k] = Arank;
@@ -176,21 +157,21 @@ extern "C" %{
 parsec_taskpool_t*
 parsec_reorder_gemm_New(parsec_tiled_matrix_dc_t *dcAr,
                         parsec_tiled_matrix_dc_t *dcRG,
-                        int *Ar_copy, int *disp,
+                        int *rank_array, int *disp,
                         int *nb_elem_r, int band_size,
                         int reorder_gemm)
 {
     parsec_taskpool_t* reorder_gemm_taskpool;
     parsec_reorder_gemm_taskpool_t* taskpool = NULL;
 
-    taskpool = parsec_reorder_gemm_new(dcAr, dcRG, Ar_copy, disp, nb_elem_r,
+    taskpool = parsec_reorder_gemm_new(dcAr, dcRG, rank_array, disp, nb_elem_r,
                                        band_size, reorder_gemm);
     reorder_gemm_taskpool = (parsec_taskpool_t*)taskpool;
 
     taskpool->_g_work_tmp = (parsec_memory_pool_t*)malloc(sizeof(parsec_memory_pool_t));
     parsec_private_memory_init( taskpool->_g_work_tmp, dcAr->lnt * sizeof(int) );
 
-    parsec_matrix_add2arena(taskpool->arenas[PARSEC_reorder_gemm_DEFAULT_ARENA],
+    parsec_matrix_add2arena(&taskpool->arenas_datatypes[PARSEC_reorder_gemm_DEFAULT_ARENA],
                             parsec_datatype_int_t, matrix_UpperLower,
                             1, dcRG->mb, dcRG->nb, dcRG->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
@@ -205,19 +186,20 @@ void parsec_reorder_gemm_Destruct(parsec_taskpool_t *taskpool)
 {
     parsec_reorder_gemm_taskpool_t *reorder_gemm_taskpool = (parsec_reorder_gemm_taskpool_t *)taskpool;
     parsec_private_memory_fini( reorder_gemm_taskpool->_g_work_tmp );
+    parsec_matrix_del2arena(&reorder_gemm_taskpool->arenas_datatypes[PARSEC_reorder_gemm_DEFAULT_ARENA]);
     parsec_taskpool_free(taskpool);
 }
 
 int parsec_reorder_gemm(parsec_context_t *parsec,
                         parsec_tiled_matrix_dc_t *dcAr,
                         parsec_tiled_matrix_dc_t *dcRG,
-                        int *Ar_copy, int *disp,
+                        int *rank_array, int *disp,
                         int *nb_elem_r, int band_size,
                         int reorder_gemm)
 {
     parsec_taskpool_t *parsec_reorder_gemm = NULL;
     
-    parsec_reorder_gemm = parsec_reorder_gemm_New(dcAr, dcRG, Ar_copy, disp, nb_elem_r,
+    parsec_reorder_gemm = parsec_reorder_gemm_New(dcAr, dcRG, rank_array, disp, nb_elem_r,
                                                   band_size, reorder_gemm);
 
     if( parsec_reorder_gemm != NULL ){
