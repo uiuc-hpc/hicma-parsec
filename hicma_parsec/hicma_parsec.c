@@ -483,10 +483,12 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
                 printf("Lookahead is not provided, set lookahead = band_size = %d\n", *lookahead);
         }
 
+#if !DYNAMIC_COLLECTIVE_PATTERN
         /* TIPS for performance */
  	if( 0 == A->super.myrank && band_size > 1 ) { 
  		fprintf(stderr, "\nWARNING: band_size= %d (> 1), so add flag '-- -mca runtime_comm_coll_bcast 0' at the end of command for better performance !!!\n\n", band_size);
  	}
+#endif
 
 	/* Allocate memory to store execution time of each process */
 	gather_time = (double *)calloc(nb_threads, sizeof(double));
