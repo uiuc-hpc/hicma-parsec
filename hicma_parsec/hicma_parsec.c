@@ -26,9 +26,11 @@ double sync_time_elapsed = 0.0;
 double *gather_time;
 double *gather_time_tmp;
 
+#if DYNAMIC_COLLECTIVE_PATTERN
 /* Parsec routines for collective pattern */
 extern int remote_dep_bcast_star_child(int me, int him);
 extern int (*remote_dep_bcast_child)(int me, int him);
+#endif
 
 /**********************************
  * Command line arguments
@@ -481,6 +483,11 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
                 printf("Lookahead is not provided, set lookahead = band_size = %d\n", *lookahead);
         }
 
+        /* TIPS for performance */
+ 	if( 0 == A->super.myrank && band_size > 1 ) { 
+ 		fprintf(stderr, "\nWARNING: band_size= %d (> 1), so add flag '-- -mca runtime_comm_coll_bcast 0' at the end of command for better performance !!!\n\n", band_size);
+ 	}
+
 	/* Allocate memory to store execution time of each process */
 	gather_time = (double *)calloc(nb_threads, sizeof(double));
 	gather_time_tmp = (double *)calloc(nb_threads, sizeof(double));
@@ -543,7 +550,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		 * Combine U and V flow in the two flow version
 		 * Hybrid dense and TLR tiles
 		 *
-		 * Used in paper: Leveraging parsec runtime support to tackle challenging 3d data-sparse matrix problems
+		 * IPDPS2021: Leveraging parsec runtime support to tackle challenging 3d data-sparse matrix problems
 		 *
 		 */
                 if( 0 == A->super.myrank && verbose )
@@ -552,9 +559,11 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 
 		/* Set the right collective pattern
 		 * need to be one taskpoll at a time */
+#if DYNAMIC_COLLECTIVE_PATTERN
 		if( band_size > 1 ) {
 			remote_dep_bcast_child = remote_dep_bcast_star_child;
 		}
+#endif
 
 		hicma_zpotrf = HiCMA_dpotrf_L_2flow_New( parsec, uplo,
 				A, Ar, RG, Rank,

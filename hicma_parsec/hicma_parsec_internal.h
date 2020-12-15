@@ -82,6 +82,17 @@
 /* string print */ 
 #define xstr(a) #a 
 
+/* Dynamically select collective after band_size auto-tuning
+ *
+ * band_size == 1: the default collective mode, pipeline chain,
+ * band_size > 1: remote_dep_bcast_star_child, which could be manually set
+ * by adding "-- -mca runtime_comm_coll_bcast 0" to the end of command
+ *
+ * Warnning: it's not safe if multiple taskpools exist at the same time
+ * if DYNAMIC_COLLECTIVE_PATTERN true 
+ */ 
+#define DYNAMIC_COLLECTIVE_PATTERN 0
+
 /* Fluctuation, used in auto-band tuning */
 #define FLUCTUATION 0.66666667
 
