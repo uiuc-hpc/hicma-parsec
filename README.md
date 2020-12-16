@@ -5,15 +5,20 @@
 The following modules can be used on ECRC systems:
 
 ```
-mkl/2018-update-1  gcc/5.5.0 cmake/3.17.3
+mkl/2018-update-1   gcc/5.5.0    cmake/3.17.3   openmpi/3.0.0-gcc-5.5.0
 ```
 
-DPLASMA and STARS-H are required.
+DPLASMA and STARS-H are required. 
+Both libraries are provided as submodules of this repository 
+so use these submodules for installation.
+`git submodule update --init --recursive` can be used to get the submodules.
 
 
 ### STARS-H
 
-First, install star-sh, following https://github.com/ecrc/stars-h. Make sure to export PKG_CONFIG_PATH.
+STARS-H can be installed following the instructions at https://github.com/ecrc/stars-h. Make sure to export `PKG_CONFIG_PATH`.
+
+A sample installation of STARS-H:
 
 ```
 cd stars-h && mkdir build
