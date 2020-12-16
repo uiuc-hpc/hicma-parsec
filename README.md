@@ -1,14 +1,47 @@
-It depends on dplasma ans star-sh
+# HICMA with PaRSEC
+
+## External Dependencies
+
+The following modules can be used on ECRC systems:
+
+```
+mkl/2018-update-1  gcc/5.5.0 cmake/3.17.3
+```
+
+DPLASMA and STARS-H are required.
+
+
+### STARS-H
 
 First, install star-sh, following https://github.com/ecrc/stars-h. Make sure to export PKG_CONFIG_PATH.
 
-git clone https://github.com/ecrc/hicma-x-dev.git
+```
+cd stars-h && mkdir build
+cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/installdir -DMPI=OFF -DSTARPU=OFF -DCUDA=OFF -DOPENMP=OFF -DGSL=OFF
+make -j install
+```
+
+Set `$PKG_CONFIG_FILE`:
+
+```
+export PKG_CONFIG_PATH=$HOME/hicma-x-dev/stars-h/build/installdir/lib/pkgconfig:$PKG_CONFIG_PATH
+```
+
+--
+
+## Installation
+
+Submodules must be updated via `git submodule update --init --recursive`.
+
+```
+git clone --recursive https://github.com/ecrc/hicma-x-dev.git
 
 cd hicma-x-dev && mkdir -p build
 
 git checkout band_tlr_pasc 
 
 cd build && cmake .. 
+```
 
 In addtion, if intel compiler, add -DCMAKE_Fortran_FLAGS="-nofor-main". For instance, configuration on Shaheen II: cmake .. -DCMAKE_Fortran_FLAGS="-nofor-main" -DDPLASMA_PRECISIONS="d" -DBUILD_SHARED_LIBS=ON -DPARSEC_WITH_HEADER_FILES=ON -DPARSEC_WITH_DEVEL_HEADERS=ON -DCMAKE_CXX_COMPILER=CC -DCMAKE_C_COMPILER=cc -DCMAKE_Fortran_COMPILER=ftn -DPARSEC_ATOMIC_USE_GCC_32_BUILTINS_EXITCODE=0 -DPARSEC_ATOMIC_USE_GCC_64_BUILTINS_EXITCODE=0 -DPARSEC_ATOMIC_USE_GCC_128_BUILTINS_EXITCODE=0 -DPARSEC_GPU_WITH_CUDA=OFF -DPARSEC_HAVE_CUDA=off -DCMAKE_BUILD_TYPE=Release -DBLA_VENDOR=Intel10_64lp_seq -DPARSEC_DIST_EAGER_LIMIT=0 -DPARSEC_DIST_SHORT_LIMIT=0
 
