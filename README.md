@@ -110,7 +110,10 @@ More information:
 ./testing_dpotrf_tlr --help
 ```
 
-Additional PaRSEC flags: ./testing_dpotrf_tlr -- --help
+Additional PaRSEC flags:
+```
+./testing_dpotrf_tlr -- --help
+```
 
 
 
