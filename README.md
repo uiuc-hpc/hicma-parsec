@@ -11,7 +11,12 @@ mkl/2018-update-1   gcc/5.5.0    cmake/3.17.3   openmpi/3.0.0-gcc-5.5.0
 DPLASMA and STARS-H are required. 
 Both libraries are provided as submodules of this repository 
 so use these submodules for installation.
+
 `git submodule update --init --recursive` can be used to get the submodules.
+
+STARS-H is manually installedi as mentioned in the following subsection.
+But DPLASMA and HiCMA are installed together using a single command
+as will be mentoned in the next section.
 
 
 ### STARS-H
@@ -61,17 +66,29 @@ Run make for compilation. If following command fails, try removing `-j 8`
 make -j 8
 ```
 
+## Quick Example Runs
+
+Go to HiCMA folder:
+
+```
 cd hicma_parsec
+```
 
 Running examples:
 
 statistics-2d-sqexp:
 
+```
 mpirun -np 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v
+```
 
 statistics-3d-exp:
 
+```
 mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200 -D 4 -P 2 -v -- -mca runtime_comm_coll_bcast 0
+```
+
+## Program Parameters
 
 -N: matrix size; required 
 
@@ -89,13 +106,15 @@ mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200
 
 More information:
 
+```
 ./testing_dpotrf_tlr --help
+```
 
 Additional PaRSEC flags: ./testing_dpotrf_tlr -- --help
 
 
 
-Tips: 
+## Tips 
 
 (1) if the problem is a little dense, i.e., band_size > 1 after auto-tuning (e.g., in statistics-3d-sqexp application with accuracy threshold -e 1.0e-8), "-- -mca runtime_comm_coll_bcast 0" is needed for better performance;
 
@@ -104,6 +123,9 @@ Tips:
 (3) Choose the process grid to be as square as possible with P < Q;
 
 (4) in most cases,
+
     for -D 2 (statistics-2d-sqexp), set maxrank= 150;
+
     for -D 3 (statistics-3d-sqexp), set maxrank= 500;
+    
     for -D 4 (statistics-3d-exp), set maxrank= tile_size / 2. 
