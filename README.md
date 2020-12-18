@@ -8,16 +8,31 @@ The following modules can be used on ECRC systems:
 mkl/2018-update-1   gcc/5.5.0    cmake/3.17.3   openmpi/3.0.0-gcc-5.5.0
 ```
 
-DPLASMA and STARS-H are required. 
-Both libraries are provided as submodules of this repository 
+DPLASMA, HCORE and STARS-H are required. 
+These libraries are provided as submodules of this repository 
 so use these submodules for installation.
 
 `git submodule update --init --recursive` can be used to get the submodules.
 
-STARS-H is manually installedi as mentioned in the following subsection.
+HCORE and STARS-H are manually installed as mentioned in the following subsections.
 But DPLASMA and HiCMA are installed together using a single command
 as will be mentoned in the next section.
 
+### HCORE
+
+A sample installation of HCORE:
+
+```
+cd hcore && mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/installdir 
+make -j install
+```
+
+Set `$PKG_CONFIG_FILE`:
+
+```
+export PKG_CONFIG_PATH=$HOME/hicma-x-dev/hcore/build/installdir/lib/pkgconfig:$PKG_CONFIG_PATH
+```
 
 ### STARS-H
 
@@ -26,7 +41,7 @@ STARS-H can be installed following the instructions at https://github.com/ecrc/s
 A sample installation of STARS-H:
 
 ```
-cd stars-h && mkdir build
+cd stars-h && mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/installdir -DMPI=OFF -DSTARPU=OFF -DCUDA=OFF -DOPENMP=OFF -DGSL=OFF
 make -j install
 ```
@@ -50,7 +65,9 @@ cd hicma-x-dev && mkdir -p build
 
 git checkout band_tlr_pasc 
 
-cd build && cmake .. 
+mkdir build && cd build 
+
+cmake .. 
 ```
 
 In addtion, if Intel compiler is used, add `-DCMAKE_Fortran_FLAGS="-nofor-main"`. 

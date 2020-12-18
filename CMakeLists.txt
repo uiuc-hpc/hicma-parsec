@@ -120,4 +120,18 @@ if( STARSH_FOUND )
     endif()
 endif()
 
+# HICMA depends on HCORE
+# -------------------------------
+find_package( HCORE REQUIRED )
+if( HCORE_FOUND )
+    include_directories(${HCORE_INCLUDE_DIRS_DEP})
+    if(HCORE_LINKER_FLAGS)
+        list(APPEND CMAKE_EXE_LINKER_FLAGS "${HCORE_LINKER_FLAGS}")
+    endif()
+    if(HCORE_LIBRARY_DIRS)
+        # the RPATH to be used when installing
+        list(APPEND CMAKE_INSTALL_RPATH "${HCORE_LIBRARY_DIRS}")
+    endif()
+endif()
+
 add_subdirectory(hicma_parsec)
