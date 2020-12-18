@@ -82,6 +82,12 @@ statistics-2d-sqexp:
 mpirun -np 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v
 ```
 
+Run on single node and numerical correctness checking enabled:
+
+```
+mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v --check
+```
+
 statistics-3d-exp:
 
 ```

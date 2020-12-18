@@ -80,7 +80,8 @@
 #endif
 
 /* string print */ 
-#define xstr(a) #a 
+#define xstr(a) str(a) 
+#define str(a) #a 
 
 /* Dynamically select collective after band_size auto-tuning
  *

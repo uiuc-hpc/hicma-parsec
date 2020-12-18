@@ -39,10 +39,8 @@ set( JDF
      STARSH_gen.jdf
    )
 
-set( CMAKE_C_FLAGS 
-  ${CMAKE_C_FLAGS}
-  -D_GNU_SOURCE
-   )
+#git rev-parse --short HEAD
+set( CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -DGITHASH=8cdc2d9 -D_GNU_SOURCE ")
 
 add_executable(testing_dpotrf_tlr ${SRC} testing_dpotrf.c)
 if( LINK_WITH_MKL ) 

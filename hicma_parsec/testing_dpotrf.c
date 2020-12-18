@@ -1028,7 +1028,7 @@ int main(int argc, char ** argv)
         printf("%g %g ", radius, density);
         }
 #ifdef GITHASH
-        printf("%s    ", xstr(GITHASH));
+        printf("%s ", xstr(GITHASH));
 #else
         printf("GITHASH:N/A    ");
 #endif
