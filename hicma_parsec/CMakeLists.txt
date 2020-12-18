@@ -1,8 +1,6 @@
 cmake_policy(SET CMP0074 NEW)
 include(FindPkgConfig)
 
-OPTION(LINK_WITH_MKL "Link with MKL" ON)
-
 include(ParsecCompilePTG)
 include_directories("${PROJECT_SOURCE_DIR}/dplasma/parsec")
 include_directories("${PROJECT_SOURCE_DIR}/dplasma")
@@ -42,11 +40,24 @@ set( JDF
 #git rev-parse --short HEAD
 set( CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -DGITHASH=8cdc2d9 -D_GNU_SOURCE ")
 
+set( LD_LIB_HICMA_PARSEC
+     parsec
+     dplasma
+     ${HICMA_DEP}
+   )
+
+# If MKL, make sure the sequential lib is used
+string(FIND "${CBLAS_DIR_FOUND}" "mkl" _match_mkl)
+if( _match_mkl )
+    set( LD_LIB_HICMA_PARSEC
+         mkl_intel_lp64
+         mkl_sequential
+         ${LD_LIB_HICMA_PARSEC} 
+       )
+    message(STATUS "Linked with MKL Library: ${LD_LIB_HICMA_PARSEC}")
+endif( )
+
 add_executable(testing_dpotrf_tlr ${SRC} testing_dpotrf.c)
-if( LINK_WITH_MKL ) 
-    target_link_libraries(testing_dpotrf_tlr mkl_intel_lp64 mkl_sequential parsec dplasma ${HICMA_DEP})
-else( LINK_WITH_MKL )
-    target_link_libraries(testing_dpotrf_tlr parsec dplasma lapacke ${HICMA_DEP})
-endif( LINK_WITH_MKL )
+target_link_libraries(testing_dpotrf_tlr ${LD_LIB_HICMA_PARSEC})
 
 target_ptg_sources(testing_dpotrf_tlr PRIVATE ${JDF} )
