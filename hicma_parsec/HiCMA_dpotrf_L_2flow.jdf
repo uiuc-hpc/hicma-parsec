@@ -315,7 +315,7 @@ BODY
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descA, k );
 
-    iinfo = HiCMA_HCORE_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
+    iinfo = tile_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
 
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descA->mb+iinfo; /* Should return here */
@@ -530,7 +530,7 @@ BODY
         int ldam = BLKLDD( descA, m );
         void *Cv = (void *)C + descA->mb * ((int *)Cr)[0] * sizeof(double);
 
-        HiCMA_HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+        tile_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
                    tempmm, descA->mb, (double)1.0, T, ldak,
                    Cv, ldam, Cr, k, 0, m, k);
 
@@ -764,6 +764,8 @@ BODY
         void *Av = (void *)A + descA->mb * rank * sizeof(double);
         int call_hcore_dsyrk = 1;
 
+#define call_hcore_dsyrk 1
+
 #if call_hcore_dsyrk
         void *p_elem_work = parsec_private_memory_pop( p_work );
         HiCMA_HCORE_dsyrk(PlasmaLower, PlasmaNoTrans,
@@ -774,7 +776,7 @@ BODY
                    (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work);
         parsec_private_memory_push( p_work, p_elem_work );
 
-/* If want to call 3 gemms instead of HiCMA_HCORE_dsyrk */
+/* If want to call 3 gemms instead */
 #else
         void *p_elem_work_mbr = parsec_private_memory_pop( p_work_mbr );
         void *p_elem_work_rr = parsec_private_memory_pop( p_work_rr );

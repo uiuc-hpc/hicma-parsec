@@ -159,9 +159,9 @@ int check_dpotrf2( parsec_context_t *parsec, int verbose,
 
     if ( verbose ) {
         printf("============\n");
-        printf("Checking the Cholesky factorization. Threshold is %.2e \n", threshold);
+        printf("Checking the Cholesky factorization. Threshold is " BLU "%.2e" RESET " \n", threshold);
         printf( "-- ||A||_oo = %e, ||L'L-A||_oo = %e\n", Anorm, Rnorm );
-        printf("-- ||L'L-A||_oo/(||A||_oo) = %e \n", result);
+        printf("-- ||L'L-A||_oo/(||A||_oo) = " RED "%e" RESET "\n", result);
     }
 
     if ( isnan(Rnorm)  || isinf(Rnorm)  ||
@@ -169,12 +169,12 @@ int check_dpotrf2( parsec_context_t *parsec, int verbose,
          //(result > 60.0) )
          (result > threshold) )
     {
-        if( verbose ) printf("-- Factorization is suspicious ! \n");
+        if( verbose ) printf(RED "-- Factorization is suspicious ! \n" RESET);
         info_factorization = 1;
     }
     else
     {
-        if( verbose ) printf("-- Factorization is CORRECT ! \n");
+        if( verbose ) printf(GRN "-- Factorization is CORRECT ! \n" RESET);
         info_factorization = 0;
     }
 

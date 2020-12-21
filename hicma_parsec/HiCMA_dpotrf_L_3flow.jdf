@@ -261,7 +261,7 @@ BODY
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descAg, k );
 
-    iinfo = HiCMA_HCORE_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
+    iinfo = tile_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
 
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descAg->mb+iinfo; /* Should return here */
@@ -326,7 +326,7 @@ BODY
     int ldak = BLKLDD( descAg, k );
     int ldam = BLKLDD( descAv, m );
 
-    HiCMA_HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+    tile_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
                tempmm, storage_maxrank, (double)1.0, T, ldak,
                Cv, ldam, Cr, k, 0, m, k);
 

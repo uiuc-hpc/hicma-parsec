@@ -45,6 +45,8 @@
 #include "auxdescutil.h" // _printmat
 #include "ka_counts.h"
 #include "hicma_hcore.h"
+#include "hcore.h" //FIXME
+#include "hcore_d.h" //FIXME
 
 /* System headers */
 #include <time.h>
@@ -80,8 +82,20 @@
 #endif
 
 /* string print */ 
+/* two macro expansions are required to print VALUE of a macro */
 #define xstr(a) str(a) 
 #define str(a) #a 
+
+/* Color codes for printing */
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
+
 
 /* Dynamically select collective after band_size auto-tuning
  *

@@ -10,7 +10,7 @@ mpicc `pkg-config --cflags plasma` `pkg-config --libs plasma` -c hicma_hcore.c  
  */
 int trsm_print_index_end = 0;
 int
-HiCMA_HCORE_dpotrf( int /*int*/ uplo,
+tile_dpotrf( int /*int*/ uplo,
                    int m, 
                    double* A, int lda, int Am, int An) {
     /*printf("===========%s %s %d==========\n", __FILE__, __func__, __LINE__);*/
@@ -49,7 +49,7 @@ HiCMA_HCORE_dpotrf( int /*int*/ uplo,
     return iinfo;
 }
 int
-HiCMA_HCORE_dtrsm( int /*int*/ side,
+tile_dtrsm( int /*int*/ side,
                    int /*int*/ uplo,
                    int /*int*/ transA,
                    int /*int*/ diag,

@@ -486,7 +486,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 #if !DYNAMIC_COLLECTIVE_PATTERN
         /* TIPS for performance */
  	if( 0 == A->super.myrank && band_size > 1 ) { 
- 		fprintf(stderr, "\nWARNING: band_size= %d (> 1), so add flag '-- -mca runtime_comm_coll_bcast 0' at the end of command for better performance !!!\n\n", band_size);
+ 		fprintf(stderr, YEL "\nWARNING: band_size= %d (> 1), so add flag '-- -mca runtime_comm_coll_bcast 0' at the end of command for better performance !!!\n\n" RESET, band_size);
  	}
 #endif
 
@@ -512,7 +512,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		int P = ((two_dim_block_cyclic_t *)Ar)->grid.rows;
 
 		if( 0 == A->super.myrank && verbose )
-			printf("3flow version start\n");
+			printf(MAG "3flow version start\n" RESET);
 
 		/* dcAv contains V. */
 		sym_two_dim_block_cyclic_t dcAv;
@@ -556,7 +556,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		 *
 		 */
                 if( 0 == A->super.myrank && verbose )
-                        printf("2flow version start\n");
+                        printf(BLU "2flow version start\n" RESET);
 		*two_flow = 1;
 
 		/* Set the right collective pattern
