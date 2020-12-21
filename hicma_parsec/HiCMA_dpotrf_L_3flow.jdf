@@ -399,12 +399,13 @@ BODY
     void *p_elem_work = NULL;
     p_elem_work = parsec_private_memory_pop( p_work );
 
-    HiCMA_HCORE_dsyrk(PlasmaLower, PlasmaNoTrans,
+    flop_counter flops;
+    HCORE_dsyrk(PlasmaLower, PlasmaNoTrans,
                tempmm, rank,
                (double)-1.0, 
                Au /*A(m, k)*/, ldau,
                Av /*A(m, k)*/, ldav,
-               (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work);
+               (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work, &flops);
     parsec_private_memory_push( p_work, p_elem_work );
 
     if(DEBUG_INFO) printf(

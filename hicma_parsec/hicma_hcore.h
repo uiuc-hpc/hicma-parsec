@@ -45,15 +45,6 @@ tile_dtrsm( int /*int*/ side,
                    double* B, int ldb,
                    int* Brk, int Am, int An, int Bm, int Bn
                    );
-void HiCMA_HCORE_dsyrk(int uplo, int trans,
-                int M, int K,
-                double alpha,
-                const double *AU, int LDAU,
-                const double *AV, int LDAV,
-                double beta, 
-                double *CD, int LDCD,
-                double* work
-                );
 void HiCMA_HCORE_dgemm(int transA, int transB,
         int M, int N,
         double alpha,

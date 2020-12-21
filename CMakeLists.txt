@@ -132,6 +132,10 @@ if( HCORE_FOUND )
         # the RPATH to be used when installing
         list(APPEND CMAKE_INSTALL_RPATH "${HCORE_LIBRARY_DIRS}")
     endif()
+    if (HCORE_LIBRARIES)
+        find_library( _HCORE_LIB NAME hcore PATHS ${HCORE_LIBRARY_DIRS} )
+        list(APPEND HICMA_DEP ${HCORE_LIBRARIES})
+    endif()
 endif()
 
 add_subdirectory(hicma_parsec)

@@ -13,6 +13,7 @@ include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/../dplasma")
 include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/../dplasma")
 link_directories(${STARSH_LIBRARY_DIRS})
+link_directories(${HCORE_LIBRARY_DIRS})
 
 set( SRC
      descprint.c
