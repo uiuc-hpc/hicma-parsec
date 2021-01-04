@@ -1,5 +1,14 @@
 # HICMA with PaRSEC
 
+## Source codes
+
+Suppose you will put the source codes under $HOME directory.
+
+```
+cd $HOME
+git clone --recursive https://github.com/ecrc/hicma-x-dev.git
+```
+
 ## External Dependencies
 
 The following modules can be used on ECRC systems:
@@ -23,6 +32,7 @@ as will be mentoned in the next section.
 A sample installation of HCORE:
 
 ```
+cd $HOME/hicma-x-dev
 cd hcore && mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/installdir 
 make -j install
@@ -41,6 +51,7 @@ STARS-H can be installed following the instructions at https://github.com/ecrc/s
 A sample installation of STARS-H:
 
 ```
+cd $HOME/hicma-x-dev
 cd stars-h && mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/installdir -DMPI=OFF -DSTARPU=OFF -DCUDA=OFF -DOPENMP=OFF -DGSL=OFF
 make -j install
@@ -59,14 +70,9 @@ export PKG_CONFIG_PATH=$HOME/hicma-x-dev/stars-h/build/installdir/lib/pkgconfig:
 Submodules must be updated via `git submodule update --init --recursive`.
 
 ```
-git clone --recursive https://github.com/ecrc/hicma-x-dev.git
-
-cd hicma-x-dev && mkdir -p build
-
+cd $HOME/hicma-x-dev
 git checkout band_tlr_pasc 
-
-mkdir build && cd build 
-
+mkdir -p build && cd build 
 cmake .. 
 ```
 
@@ -99,10 +105,10 @@ statistics-2d-sqexp:
 mpirun -np 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v
 ```
 
-Run on single node and numerical correctness checking enabled:
+numerical correctness checking enabled:
 
 ```
-mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v --check
+mpirun -n 4 -npernode 1 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v --check
 ```
 
 statistics-3d-exp:
@@ -113,19 +119,15 @@ mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200
 
 ## Program Parameters
 
+```
 -N: matrix size; required 
-
 -t: tile size; required
-
 -e: accuracy threshold; default: 1.0e-8
-
 -u: maxrank threshold for compressed tiles; default: tile_size/2
-
 -P: row process grid; default: number_of_nodes
-
 -D: kind of problem: default: 2
-
 -v: print more info
+```
 
 More information:
 
@@ -150,8 +152,8 @@ Additional PaRSEC flags:
 
 (4) in most cases,
 
+```
     for -D 2 (statistics-2d-sqexp), set maxrank= 150;
-
     for -D 3 (statistics-3d-sqexp), set maxrank= 500;
-    
     for -D 4 (statistics-3d-exp), set maxrank= tile_size / 2. 
+```
