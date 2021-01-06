@@ -552,6 +552,8 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		 * Combine U and V flow in the two flow version
 		 * Hybrid dense and TLR tiles
 		 *
+		 * Could also be used when band_size = 1, and difference between 3flow version is the way deal with U and V 
+		 *
 		 * IPDPS2021: Leveraging parsec runtime support to tackle challenging 3d data-sparse matrix problems
 		 *
 		 */
