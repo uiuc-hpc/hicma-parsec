@@ -76,7 +76,7 @@ mkdir -p build && cd build
 cmake .. 
 ```
 
-In addtion, if Intel compiler is used, add `-DCMAKE_Fortran_FLAGS="-nofor-main"`. 
+In addition, if Intel compiler is used, add `-DCMAKE_Fortran_FLAGS="-nofor-main"`. 
 
 A sample configuration for Shaheen II: 
 ```
@@ -115,6 +115,12 @@ statistics-3d-exp:
 
 ```
 mpirun -np 4 --npernode 1 ./testing_dpotrf_tlr -N 108000 -t 2700 -e 1e-8 -u 1200 -D 4 -P 2 -v -- -mca runtime_comm_coll_bcast 0
+```
+
+3-flow version:
+
+```
+mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v -E 0 -Z 1 --check
 ```
 
 ## Program Parameters

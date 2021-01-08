@@ -139,7 +139,7 @@ int main(int argc, char ** argv)
         LAPACKE_dge_trans(LAPACK_COL_MAJOR, tlr_rk, m, _tV, m, Cv, m);
 
 	    /* warm up run */
-	    HiCMA_HCORE_dgemm( PlasmaNoTrans, PlasmaTrans,
+	    HCORE_dgemm( PlasmaNoTrans, PlasmaTrans, // TODO this call is not ready yet
 			    m, /* mb */ 
 			    m, /* nb */
 			    (double)-1.0, 
@@ -154,7 +154,7 @@ int main(int argc, char ** argv)
 		    *Ar = tlr_rk;
 		    *Br = tlr_rk;
 		    *Cr = tlr_rk;
-		    HiCMA_HCORE_dgemm( PlasmaNoTrans, PlasmaTrans,
+		    HCORE_dgemm( PlasmaNoTrans, PlasmaTrans, // TODO this call is not ready yet
 				    m, /* mb */ 
 				    m, /* nb */
 				    (double)-1.0, 
