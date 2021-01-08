@@ -1210,7 +1210,8 @@ BODY
         double* CVclone;
         int ld_CVclone;
         double* _CV_save;
-        HiCMA_HCORE_dgemm_qr_svd_b_dense( PlasmaNoTrans, PlasmaTrans,
+        flop_counter flops;
+        HCORE_dgemm_qr_svd_b_dense( PlasmaNoTrans, PlasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
                 (double)-1.0,
@@ -1219,7 +1220,8 @@ BODY
                 (double)1.0,
                 Cu, Cv, &new_Crank, ldamu,
                 rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
-                /** parameters that will be passed to HiCMA_HCORE_dgemm_ormqr */
+                &flops,
+                /** parameters that will be passed to HCORE_dgemm_ormqr */
                 &work_new,
                 &_CU,
                 &_CV,
@@ -1254,7 +1256,7 @@ BODY
         _CU_save = this_task->data._f_C.data_out->device_private;
         _CV_save = this_task->data._f_C.data_out->device_private + descA->mb * new_UVrk * sizeof(double);
 
-        HiCMA_HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+        HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
                 (double)-1.0,
@@ -1262,7 +1264,8 @@ BODY
                 (double)1.0,
                 Cu, Cv, &new_Crank, ldamu,
                 rk, 2*storage_maxrank, computation_maxrank, acc, work_new,
-                /** parameters coming from HiCMA_HCORE_dgemm_qr_svd */
+                &flops,
+                /** parameters coming from HCORE_dgemm_qr_svd */
                 _CU,
                 _CV,
                 CU_ncols,
@@ -1362,7 +1365,8 @@ BODY
 	double* CVclone;
 	int ld_CVclone;
 	double* _CV_save;
-	HiCMA_HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
+    flop_counter flops;
+	HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
 			tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
 			tempmmv,
 			(double)-1.0,
@@ -1371,7 +1375,8 @@ BODY
 			(double)1.0,
 			Cu, Cv, Cr, ldamu,
 			rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
-			/** parameters that will be passed to HiCMA_HCORE_dgemm_ormqr */
+            &flops,
+			/** parameters that will be passed to HCORE_dgemm_ormqr */
 			&work_new,
 			&_CU,
 			&_CV,
@@ -1406,7 +1411,7 @@ BODY
 	_CU_save = this_task->data._f_C.data_out->device_private;
 	_CV_save = this_task->data._f_C.data_out->device_private + descA->mb * new_UVrk * sizeof(double);
 
-	HiCMA_HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+	HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
 			tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
 			tempmmv,
 			(double)-1.0,
@@ -1414,7 +1419,8 @@ BODY
 			(double)1.0,
 			Cu, Cv, Cr, ldamu,
 			rk, storage_maxrank, computation_maxrank, acc, work_new,
-			/** parameters coming from HiCMA_HCORE_dgemm_qr_svd */
+            &flops,
+			/** parameters coming from HCORE_dgemm_qr_svd */
 			_CU,
 			_CV,
 			CU_ncols,
