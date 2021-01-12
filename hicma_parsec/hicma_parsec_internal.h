@@ -44,9 +44,9 @@
 /* Local headers */
 #include "auxdescutil.h" // _printmat
 #include "ka_counts.h"
-#include "hicma_hcore.h"
-#include "hcore.h" //FIXME
-#include "hcore_d.h" //FIXME
+#include "hicma_internal.h"
+#include "hcore.h" 
+#include "hcore_d.h"
 
 /* System headers */
 #include <time.h>

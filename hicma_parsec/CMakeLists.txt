@@ -19,7 +19,7 @@ set( SRC
      descprint.c
      HiCMA_dpotrf_L_2flow_wrapper.c
      HiCMA_dpotrf_L_3flow_wrapper.c
-     hicma_hcore.c
+     hicma_internal.c
      hicma_init.c
      hicma_parsec.c
    )
@@ -62,3 +62,8 @@ add_executable(testing_dpotrf_tlr ${SRC} testing_dpotrf.c)
 target_link_libraries(testing_dpotrf_tlr ${LD_LIB_HICMA_PARSEC})
 
 target_ptg_sources(testing_dpotrf_tlr PRIVATE ${JDF} )
+
+add_test(NAME "dpotrf-3flow"
+    COMMAND make -j && mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v -E 0 -Z 1 --check)
+add_test(NAME "dpotrf-2flow"
+    COMMAND make -j && mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v --check)

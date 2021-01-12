@@ -3,7 +3,7 @@
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
  **/
-#include "hicma_hcore.h"
+#include "hicma_internal.h"
 int use_scratch = 1;
 /*
 mpicc `pkg-config --cflags plasma` `pkg-config --libs plasma` -c hicma_hcore.c  && ar rc libhicmahcore.a hicma_hcore.o
@@ -113,30 +113,6 @@ tile_dtrsm( int /*int*/ side,
     return 0;
 }
 
-double
-HiCMA_check_norm(int _n_, int _ld_, double* _A_, double* _B_, double* p_elem_work){
-    /* Copy _B_ into p_work */
-    cblas_dcopy(_n_*_n_, _B_, 1, p_elem_work, 1);
-
-    /*((double*)p_elem_work)[0] = 4.0;*/
-    /*printf("%g\n", ((double*)p_elem_work)[0]);*/
-
-    /* Check _A_ and _B_ are equal */
-    /* ~/parsec/build/dplasma/cores/core_dgeadd.c */
-    /* void cblas_daxpy (const MKL_IN_A_ n, const double a, const double *x, const MKL_IN_A_ incx, double *y, const MKL_IN_A_ incy); */
-    /* y := a*x + y */
-    /* _B_ = -1 * _A_ + _B_ */
-    cblas_daxpy(_n_*_n_, (double)-1., _A_, 1, p_elem_work, 1);
-    double norm = 0.0;
-    /*CORE_dlansy(PlasmaInfNorm, uplo, _n_, p_elem_work, _ld_, p_elem_norm, &norm); */
-    //norm = LAPACKE_dlansy_work(LAPACK_COL_MAJOR, 'I', 'L', _n_, p_elem_work, _ld_, p_elem_norm);
-    norm = LAPACKE_dlansy(LAPACK_COL_MAJOR, 'I', 'L', _n_, p_elem_work, _ld_); // FIXME CORE_d... function must be used 
-    if(norm > HiCMA_HCORE_ERROR_THRESHOLD_DENSE) {
-        printf("norm %g is larger than HiCMA_HCORE_ERROR_THRESHOLD_DENSE %g. Exiting...\n", norm, HiCMA_HCORE_ERROR_THRESHOLD_DENSE);
-    //    exit(-1);
-    }
-    return norm;
-} 
 
 void HICMA_get_stat(char uplo, int *Ark, size_t m, size_t n, size_t ld,  HICMA_stat_t *stat)
 {
