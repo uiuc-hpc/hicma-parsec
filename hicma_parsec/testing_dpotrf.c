@@ -606,8 +606,8 @@ int main(int argc, char ** argv)
     SYNC_TIME_START();
 
     double memory_per_node, memory_per_node_max;
-    long long int *size_allocate = (long long int *)calloc(1, sizeof(int));
-    long long int *size_allocate_max = (long long int *)calloc(1, sizeof(int));
+    long long int *size_allocate = (long long int *)calloc(1, sizeof(long long int));
+    long long int *size_allocate_max = (long long int *)calloc(1, sizeof(long long int));
 
     /* Calculate memory needed before factorization
      * memory_per_node: based on actual rank 
@@ -621,6 +621,7 @@ int main(int argc, char ** argv)
 
     /* Free memory */
     free(size_allocate);
+    free(size_allocate_max);
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("Memory_count" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
