@@ -103,6 +103,9 @@ int parsec_rank_gather(parsec_context_t *parsec,
     /* Call MPI_Allreduce to reduce rank_array */
     MPI_Allreduce( rank_array_tmp, rank_array, dcAr->lm * dcAr->ln, MPI_INT, MPI_SUM, MPI_COMM_WORLD ); 
 
+    /* Free memory */
+    free( rank_array_tmp );
+
     return 0;
 }
 
