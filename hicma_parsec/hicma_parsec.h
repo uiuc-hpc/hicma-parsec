@@ -13,7 +13,6 @@
  * @param [in] parsec:             parsec context 
  * @param [inout] A:               the data, already distributed and allocated
  * @param [inout] Ar:              the rank info, already distributed and allocated
- * @param [in] RG:                 used for reordering GEMM 
  * @param [in] Rank:               used for gathering time info during factorization 
  * @param [in] acc:                accuracy threshold 
  * @param [in] fixed_rank:         fixed rank threshold used in recompression stage of HCORE_GEMM 
@@ -37,7 +36,6 @@ int HiCMA_dpotrf_L( parsec_context_t* parsec,
               int uplo,
               parsec_tiled_matrix_dc_t *A,
               parsec_tiled_matrix_dc_t *Ar,
-              parsec_tiled_matrix_dc_t *RG,
               parsec_tiled_matrix_dc_t *Rank,
               double acc,
 	      int fixed_rank,
@@ -200,22 +198,4 @@ parsec_context_t *setup_parsec(int argc, char* argv[], int *iparam, double *dpar
 /* Clean parsec */
 void cleanup_parsec(parsec_context_t* parsec, int *iparam);
 
-#if defined(PARSEC_HAVE_CUDA)
-typedef struct parsec_potrf_stream_workspace_s {
-    cusolverDnHandle_t handle;
-    void *gpu_buffer;
-    int buffer_size;
-}parsec_potrf_stream_workspace_t;
-
-typedef struct parsec_potrf_gpu_workspace_s {
-    parsec_potrf_stream_workspace_t *stream_workspace; 
-    parsec_device_cuda_module_t *gpu_device; 
-}parsec_potrf_gpu_workspace_t;
-
-typedef struct parsec_potrf_workspace_s {
-    parsec_potrf_gpu_workspace_t *gpu_workspace;
-    int info; 
-}parsec_potrf_workspace_t;
-#endif
-
-#endif
+#endif /* #ifndef _HICMA_PARSEC_H_ */

@@ -84,7 +84,7 @@ static void print_usage(void)
 	parsec_usage();
 }
 
-#define GETOPT_STRING "c:g:P:Q:N:t:h::f:e:u:G:U::w:j:Z:D:F:Y:E:I:W:M:K:B:R:O:S"
+#define GETOPT_STRING "c:P:Q:N:t:h::f:e:u:G:U::w:j:Z:D:F:Y:E:I:W:M:K:B:R:O:S"
 
 #if defined(PARSEC_HAVE_GETOPT_LONG)
 static struct option long_options[] =
@@ -92,8 +92,6 @@ static struct option long_options[] =
 	/* PaRSEC specific options */
 	{"cores",       required_argument,  0, 'c'},
 	{"c",           required_argument,  0, 'c'},
-	{"gpus",        required_argument,  0, 'g'},
-	{"g",           required_argument,  0, 'g'},
 
 	/* Generic Options */
 	{"grid-rows",   required_argument,  0, 'P'},
@@ -145,55 +143,55 @@ static struct option long_options[] =
 	{"reorder-gemm",required_argument,  0, 'I'},
 	{"I",           required_argument,  0, 'I'},
 	{"two-flow",    required_argument,  0, 'W'},
-	{"W",           required_argument,  0, 'W'},
-        {"mesh_file",    required_argument, 0, 'M'},
-        {"M",            required_argument,  0, 'M'},
-        {"numobj",       required_argument, 0, 'K'},
-        {"K",           required_argument,  0, 'K'},
-        {"rbf_kernel",  required_argument, 0, 'B'},
-        {"B",           required_argument,  0, 'B'},
-        {"radius",     required_argument, 0, 'R'},
-        {"R",           required_argument,  0, 'R'},
-        {"order",    required_argument, 0, 'O'},
-        {"O",           required_argument,  0, 'O'},
-        {"density",    required_argument, 0, 'S'},
-        {"S",           required_argument,  0, 'S'},
-	{0, 0, 0, 0}
+    {"W",           required_argument,  0, 'W'},
+    {"mesh_file",    required_argument, 0, 'M'},
+    {"M",            required_argument,  0, 'M'},
+    {"numobj",       required_argument, 0, 'K'},
+    {"K",           required_argument,  0, 'K'},
+    {"rbf_kernel",  required_argument, 0, 'B'},
+    {"B",           required_argument,  0, 'B'},
+    {"radius",     required_argument, 0, 'R'},
+    {"R",           required_argument,  0, 'R'},
+    {"order",    required_argument, 0, 'O'},
+    {"O",           required_argument,  0, 'O'},
+    {"density",    required_argument, 0, 'S'},
+    {"S",           required_argument,  0, 'S'},
+    {0, 0, 0, 0}
 };
 #endif  /* defined(PARSEC_HAVE_GETOPT_LONG) */
 
 static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dparam)
 {
-	extern char **environ;
-	int opt = 0;
-	int rc, c;
+    extern char **environ;
+    int opt = 0;
+    int rc, c;
 	int argc = *_argc;
 	char **argv = *_argv;
 	char *add_dot = NULL;
 	char *value;
 
-	/* Default */
-        iparam[IPARAM_NCORES] = -1;         // number_of_cores_per_node - 1
-	iparam[IPARAM_NGPUS]  = 0;          // no GPU
-	iparam[IPARAM_BAND] = 1;            // band_size 1
-	iparam[IPARAM_LOOKAHEAD] = -1;      // lookahead set to auto-tuned band_size
-	iparam[IPARAM_KIND_OF_PROBLEM] = 2; // statistics-2d-sqexp 
-	iparam[IPARAM_SEND_FULL_TILE]  = 0; // do not send full tile
-	iparam[IPARAM_HNB] = 300;           // subtile size in recursive
-	iparam[IPARAM_AUTO_BAND] = 1;       // enable auto-tuning band_size
-	iparam[IPARAM_REORDER_GEMM] = 0;    // no reordering GEMM 
-	iparam[IPARAM_TWO_FLOW] = 0;        // not force to run 2flow version
-	iparam[IPARAM_P] = 0;               // row process grid, with set to numberi_of_nodes if not set
-	iparam[IPARAM_N] = 0;               // matrix size, need to set and will check later 
-	iparam[IPARAM_NB] = 0;              // tile size, need to set and will check later 
-	iparam[IPARAM_VERBOSE] = 0;         // verbose
-        dparam[DPARAM_ADD_DIAG] = 0.0;      // set to matrix size
-        dparam[DPARAM_WAVEK] = 50;          // wave_k in synthetic 2D application (-D 1)
-        dparam[DPARAM_FIXED_ACC] = 1.0e-8;  // default yield 1.0e-9
-	iparam[IPARAM_MAX_RANK] = 0;        // maxrank, set to tile_size/2 by default
-        iparam[IPARAM_GEN_MAX_RANK] = 0;    // default IPARAM_MAX_RANK
-        iparam[IPARAM_COMP_MAX_RANK] = 0;   // default IPARAM_MAX_RANK
-      
+    /* Default */
+    iparam[IPARAM_NCORES] = -1;         // number_of_cores_per_node - 1
+    iparam[IPARAM_NGPUS]  = 0;          // no GPU
+    iparam[IPARAM_BAND] = 1;            // band_size 1
+    iparam[IPARAM_LOOKAHEAD] = -1;      // lookahead set to auto-tuned band_size
+    iparam[IPARAM_KIND_OF_PROBLEM] = 2; // statistics-2d-sqexp 
+    iparam[IPARAM_SEND_FULL_TILE]  = 0; // do not send full tile
+    iparam[IPARAM_HNB] = 300;           // subtile size in recursive
+    iparam[IPARAM_AUTO_BAND] = 1;       // enable auto-tuning band_size
+    iparam[IPARAM_REORDER_GEMM] = 0;    // no reordering GEMM 
+    iparam[IPARAM_TWO_FLOW] = 0;        // not force to run 2flow version
+    iparam[IPARAM_P] = 0;               // row process grid, with set to numberi_of_nodes if not set
+    iparam[IPARAM_N] = 0;               // matrix size, need to set and will check later 
+    iparam[IPARAM_NB] = 0;              // tile size, need to set and will check later 
+    iparam[IPARAM_VERBOSE] = 0;         // verbose
+    dparam[DPARAM_ADD_DIAG] = 0.0;      // set to matrix size
+    dparam[DPARAM_WAVEK] = 50;          // wave_k in synthetic 2D application (-D 1)
+    dparam[DPARAM_FIXED_ACC] = 1.0e-8;  // default yield 1.0e-9
+    iparam[IPARAM_MAX_RANK] = 0;        // maxrank, set to tile_size/2 by default
+    iparam[IPARAM_GEN_MAX_RANK] = 0;    // default IPARAM_MAX_RANK
+    iparam[IPARAM_COMP_MAX_RANK] = 0;   // default IPARAM_MAX_RANK
+
 
 	do {
 #if defined(PARSEC_HAVE_GETOPT_LONG)
@@ -208,64 +206,49 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 		switch(c)
 		{
 			case 'c': iparam[IPARAM_NCORES] = atoi(optarg); break;
-			case 'g':
-				  if(iparam[IPARAM_NGPUS] == -1) {
-					  fprintf(stderr, "#!!!!! This test does not have GPU support. GPU disabled.\n");
-					  break;
-				  }
-				  if(optarg)  iparam[IPARAM_NGPUS] = atoi(optarg);
-				  else        iparam[IPARAM_NGPUS] = INT_MAX;
-
-				  rc = asprintf(&value, "%d", iparam[IPARAM_NGPUS]);
-				  parsec_setenv_mca_param( "device_cuda_enabled", value, &environ );
-				  free(value);
-				  break;
-
 			case 'P': iparam[IPARAM_P] = atoi(optarg); break;
 			case 'Q': iparam[IPARAM_Q] = atoi(optarg); break;
 			case 'N': iparam[IPARAM_N] = atoi(optarg); break;
 			case 't': iparam[IPARAM_NB] = atoi(optarg); break;
 			case 'x': iparam[IPARAM_CHECK] = 1; iparam[IPARAM_VERBOSE] = 1; break;
 			case 'z': iparam[IPARAM_HNB] = atoi(optarg); break;
-
-			case 'v':
-				  if(optarg)  iparam[IPARAM_VERBOSE] = atoi(optarg);
-				  else        iparam[IPARAM_VERBOSE] = 1;
-				  break;
-
-			case 'f': iparam[IPARAM_FIXED_RANK]  = atoi(optarg); break;
-			case 'u': iparam[IPARAM_MAX_RANK]  = atoi(optarg); break;
-			case 'G': iparam[IPARAM_GEN_MAX_RANK]  = atoi(optarg); break;
-			case 'U': iparam[IPARAM_COMP_MAX_RANK]  = atoi(optarg); break;
-			case 'w': dparam[DPARAM_WAVEK]  = atof(optarg); break;
-			case 'e': dparam[DPARAM_FIXED_ACC]  = atof(optarg); break;
+            case 'f': iparam[IPARAM_FIXED_RANK]  = atoi(optarg); break;
+            case 'u': iparam[IPARAM_MAX_RANK]  = atoi(optarg); break;
+            case 'G': iparam[IPARAM_GEN_MAX_RANK]  = atoi(optarg); break;
+            case 'U': iparam[IPARAM_COMP_MAX_RANK]  = atoi(optarg); break;
+            case 'w': dparam[DPARAM_WAVEK]  = atof(optarg); break;
+            case 'e': dparam[DPARAM_FIXED_ACC]  = atof(optarg); break;
 			case 'j': dparam[DPARAM_ADD_DIAG]  = atof(optarg); break;
 			case 'Z': iparam[IPARAM_BAND]  = atoi(optarg); break;
 			case 'Y': iparam[IPARAM_LOOKAHEAD]  = atoi(optarg); break;
 			case 'D': iparam[IPARAM_KIND_OF_PROBLEM]  = atoi(optarg); break;
 			case 'F': iparam[IPARAM_SEND_FULL_TILE]  = atoi(optarg); break;
 			case 'E': iparam[IPARAM_AUTO_BAND]  = atoi(optarg); break;
-			case 'I': iparam[IPARAM_REORDER_GEMM]  = atoi(optarg); break;
-			case 'W': iparam[IPARAM_TWO_FLOW]  = atoi(optarg); break;
-                        case 'M' : mesh_file = optarg; break;
-                        case 'K': iparam[IPARAM_NUMOBJ]  = atoi(optarg); break;
-                        case 'B': iparam[IPARAM_RBFKERNEL]  = atoi(optarg); break;
-                        case 'O': iparam[IPARAM_ORDER]  = atoi(optarg); break;
-                        case 'R': dparam[DPARAM_RAD]    = atof(optarg); break;
-                        case 'S': dparam[DPARAM_DENST]  = atof(optarg); break;
-			case 'h': print_usage(); exit(0);
-				  break;
+            case 'I': iparam[IPARAM_REORDER_GEMM]  = atoi(optarg); break;
+            case 'W': iparam[IPARAM_TWO_FLOW]  = atoi(optarg); break;
+            case 'M' : mesh_file = optarg; break;
+            case 'K': iparam[IPARAM_NUMOBJ]  = atoi(optarg); break;
+            case 'B': iparam[IPARAM_RBFKERNEL]  = atoi(optarg); break;
+            case 'O': iparam[IPARAM_ORDER]  = atoi(optarg); break;
+            case 'R': dparam[DPARAM_RAD]    = atof(optarg); break;
+            case 'S': dparam[DPARAM_DENST]  = atof(optarg); break;
+            case 'h': print_usage(); exit(0); break;
 
-			case '?': /* getopt_long already printed an error message. */
-				  exit(1);
-				  break;  /* because some compilers are just too annoying */
+            case 'v':
+                      if(optarg)  iparam[IPARAM_VERBOSE] = atoi(optarg);
+                      else        iparam[IPARAM_VERBOSE] = 1;
+                      break;
 
-			default:
-				  break; /* Assume anything else is parsec/mpi stuff */
-		}
-	} while(-1 != c);
+            case '?': /* getopt_long already printed an error message. */
+                      exit(1);
+                      break;  /* because some compilers are just too annoying */
 
-	int verbose = iparam[IPARAM_RANK] ? 0 : iparam[IPARAM_VERBOSE];
+            default:
+                      break; /* Assume anything else is parsec/mpi stuff */
+        }
+    } while(-1 != c);
+
+    int verbose = iparam[IPARAM_RANK] ? 0 : iparam[IPARAM_VERBOSE];
 
 	if(iparam[IPARAM_NGPUS] < 0) iparam[IPARAM_NGPUS] = 0;
 	if(iparam[IPARAM_NGPUS] > 0) {
@@ -428,7 +411,6 @@ void cleanup_parsec(parsec_context_t* parsec, int *iparam)
  * @param [in] parsec:             parsec context 
  * @param [inout] A:               the data, already distributed and allocated
  * @param [inout] Ar:              the rank info, already distributed and allocated
- * @param [in] RG:                 used for reordering GEMM 
  * @param [in] Rank:               used for gathering time info during factorization 
  * @param [in] acc:                accuracy threshold 
  * @param [in] fixed_rank:         fixed rank threshold used in recompression stage of HCORE_GEMM 
@@ -452,7 +434,6 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		int uplo,
 		parsec_tiled_matrix_dc_t *A,
 		parsec_tiled_matrix_dc_t *Ar,
-		parsec_tiled_matrix_dc_t *RG,
 		parsec_tiled_matrix_dc_t *Rank,
 		double acc, int rk,
 		int maxrank,
@@ -526,7 +507,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 		parsec_Av_memory( parsec, A, Av, Ar, maxrank );
 
 		hicma_zpotrf = HiCMA_dpotrf_L_3flow_New( parsec, uplo,
-				A, A, Av, Ar, RG, Rank,
+				A, A, Av, Ar, Rank,
 				acc, rk,
 				maxrank,
 				*lookahead,
@@ -570,7 +551,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 #endif
 
 		hicma_zpotrf = HiCMA_dpotrf_L_2flow_New( parsec, uplo,
-				A, Ar, RG, Rank,
+				A, Ar, Rank,
 				acc, rk,
 				maxrank,
 				*lookahead,

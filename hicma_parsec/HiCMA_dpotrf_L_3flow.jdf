@@ -98,15 +98,6 @@ wrap_trsm_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
 wrap_syrk_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
 wrap_gemm_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
 
-/* GPU workspace */
-ws_handle            [ type = "void *" hidden = on default = NULL ]
-ws_mbr               [ type = "void *" hidden = on default = NULL ]
-ws_rr                [ type = "void *" hidden = on default = NULL ]
-
-/* GPU number and index */
-nb_cuda_devices      [ type = "int"   hidden = on default = 0 ]
-cuda_device_index    [ type = "int *" hidden = on default = "NULL"]
-
 
 /**************************************************
  **************************************************/
@@ -266,7 +257,6 @@ BODY
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descAg->mb+iinfo; /* Should return here */
 
-    if(DEBUG_INFO) printf("HCORE_dpotrf( %d )\n\t( %s, %d, A(%d,%d)[%p], %d) return info = %d\n", k, dplasma_lapack_const(uplo), tempkm, k, 0, T, descAg->mb, iinfo);
 }
 END
 
@@ -329,14 +319,6 @@ BODY
     tile_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
                tempmm, storage_maxrank, (double)1.0, T, ldak,
                Cv, ldam, Cr, k, 0, m, k);
-
-    if(DEBUG_INFO) printf("HCORE_dtrsm( %d, %d )\n\t( %s, %s, %s, %s, %d, %d, %f, A(%d,%d)[%p], %d,  A(%d,%d)[%p], %d)\n",
-             m, k,
-             dplasma_lapack_const( PlasmaRight ), dplasma_lapack_const( PlasmaLower ),
-             dplasma_lapack_const( PlasmaTrans ), dplasma_lapack_const( PlasmaNonUnit ),
-             tempmm, storage_maxrank,
-             1.0, k, k, T, ldak,
-                  m, k, Cv, ldam);
 
     /* Pass Cr value to size */
     if(send_full_tile == 1){
@@ -407,14 +389,6 @@ BODY
                Av /*A(m, k)*/, ldav,
                (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work, &flops);
     parsec_private_memory_push( p_work, p_elem_work );
-
-    if(DEBUG_INFO) printf(
-             "HCORE_dsyrk( %d, %d )\n\t( %s, %s, %d, %d, %f, Av(%d,%d)[%p], %d, %f, Ag(%d,%d)[%p], %d)\n",
-             k, m,
-             dplasma_lapack_const( PlasmaLower ), dplasma_lapack_const( PlasmaNoTrans ),
-             tempmm, descAg->mb,
-             -1.0, m, k, Av, ldam,
-              1.0, m, 0, T, ldam);
 
     /* Operation count */
     /// C = C + alpha * A * A'
@@ -624,14 +598,6 @@ BODY
     parsec_private_memory_push( p_work, p_elem_work );
     int Crank_new = ((int*)Cr)[0];
     if(DEBUG_INFO) printf("Cr value in DGEMM (%d, %d, %d): %d\n", m, n, k, ((int *)Cr)[0]);
-
-    if(DEBUG_INFO) printf("HCORE_dgemm( %d, %d, %d )\n\t( %s, %s, %d, %d, %d, %f, A(%d,%d)[%p], %d-%d, A(%d,%d)[%p], %d-%d, %f, A(%d,%d)[%p], %d-%d)\n",
-             m, n, k,
-             dplasma_lapack_const( PlasmaNoTrans ),  dplasma_lapack_const( PlasmaTrans ),
-             tempmmu, tempmmv, descAv->mb,
-             -1.0, m, k, Au, ldamu, ldamv,
-                   n, k, Bu, ldanu, ldanv,
-              1.0, m, n, Cu, ldamu, ldamv);
 
     /* Pass Cr value to size */
     if(send_full_tile == 1){

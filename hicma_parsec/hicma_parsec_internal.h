@@ -71,16 +71,6 @@
 #include "parsec/recursive.h"
 #endif
 
-#if defined(PARSEC_HAVE_CUDA)
-#include "parsec/include/parsec/execution_stream.h"
-#include "parsec/mca/device/cuda/device_cuda_internal.h"
-#include "parsec/mca/device/cuda/device_cuda.h"
-#include <cublas.h>
-#define CUBLAS_V2_H_
-#include <cusolverDn.h>
-#include "parsec/utils/zone_malloc.h"
-#endif
-
 /* string print */ 
 /* two macro expansions are required to print VALUE of a macro */
 #define xstr(a) str(a) 
@@ -280,7 +270,6 @@ typedef struct starsh_params_s
  * @param [in] parsec:             parsec context 
  * @param [inout] A:               the data, already distributed and allocated
  * @param [inout] Ar:              the rank info, already distributed and allocated
- * @param [in] RG:                 used for reordering GEMM 
  * @param [in] Rank:               used for gathering time info during factorization 
  * @param [in] acc:                accuracy threshold 
  * @param [in] fixed_rank:         fixed rank threshold used in recompression stage of HCORE_GEMM 
@@ -305,15 +294,14 @@ HiCMA_dpotrf_L_2flow_New( parsec_context_t *parsec,
                   int uplo,
                   parsec_tiled_matrix_dc_t *A,
                   parsec_tiled_matrix_dc_t *Ar,
-                  parsec_tiled_matrix_dc_t *RG,
                   parsec_tiled_matrix_dc_t *Rank,
                   double acc,
-		  int fixed_rank,
+                  int fixed_rank,
                   int maxrank,
-		  int lookahead,
+                  int lookahead,
                   int band_size,
                   int hmb,
-		  int compmaxrank,
+                  int compmaxrank,
                   int send_full_tile,
                   unsigned long* tileopcounters,
                   unsigned long* opcounters,
@@ -330,7 +318,6 @@ void HiCMA_dpotrf_L_2flow_Destruct(parsec_taskpool_t* _tp);
  * @param [inout] Au:              the data, already distributed and allocated
  * @param [inout] Av:              the data, already distributed and allocated
  * @param [inout] Ar:              the rank info, already distributed and allocated
- * @param [in] RG:                 used for reordering GEMM 
  * @param [in] Rank:               used for gathering time info during factorization 
  * @param [in] acc:                accuracy threshold 
  * @param [in] fixed_rank:         fixed rank threshold used in recompression stage of HCORE_GEMM 
@@ -357,7 +344,6 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
                   parsec_tiled_matrix_dc_t *Au,
                   parsec_tiled_matrix_dc_t *Av,
                   parsec_tiled_matrix_dc_t *Ar,
-                  parsec_tiled_matrix_dc_t *RG,
                   parsec_tiled_matrix_dc_t *Rank,
                   double acc,
 		  int fixed_rank,

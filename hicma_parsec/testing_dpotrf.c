@@ -242,7 +242,7 @@ int main(int argc, char ** argv)
     int uplo = PlasmaLower;
     int info = 0;
     int ret = 0;
-    double time_opt_band = 0.0, time_regenerate = 0.0, time_reorder = 0.0;
+    double time_opt_band = 0.0, time_regenerate = 0.0;
 
     /* Initialize PaRSEC */
     parsec = setup_parsec(argc, argv, iparam, dparam);
@@ -385,14 +385,6 @@ int main(int argc, char ** argv)
     if( auto_band ) {
         if( rank == 0 && verbose) { 
             printf("\n%d: Auto-tuning band_size, set band_size = 1 at the beginning\n", __LINE__);
-            fflush(stdout);
-        }
-        band_size = 1;
-    }
-
-    if( reorder_gemm ) {
-        if( rank == 0 && verbose ) {
-            printf("%d: Re-order gemm, set band_size = 1 at the beginning\n", __LINE__);
             fflush(stdout);
         }
         band_size = 1;
@@ -567,41 +559,8 @@ int main(int argc, char ** argv)
 	time_regenerate = sync_time_elapsed;
     }
 
-    /* Re-order GEMM */
-    /* dcRG data descriptor */
-    sym_two_dim_block_cyclic_band_t dcRG;
-    sym_two_dim_block_cyclic_init(&dcRG.off_band, matrix_Integer,
-                                  rank, 1, NT, NT, NT*NT, 0, 0,
-                                  NT, NT*NT, P, nodes/P, uplo);
-    parsec_data_collection_set_key((parsec_data_collection_t*)&dcRG, "dcRG_super");
 
-    /* Init band */
-    two_dim_block_cyclic_init(&dcRG.band, matrix_Integer, matrix_Tile,
-                              rank, 1, NT, band_size, NT*NT, 0, 0,
-                              band_size, NT*NT, P_BAND, nodes/P_BAND,
-			      1, 1, 0, 0);
-    parsec_data_collection_set_key(&dcRG.band.super.super, "dcRG_band");
-
-    /* Init two_dim_block_cyclic_band_t structure */
-    sym_two_dim_block_cyclic_band_init( &dcRG, nodes, rank, band_size );
-
-#if 0
-    /* Timer start */
-    SYNC_TIME_START();
-
-    parsec_reorder_gemm(parsec, (parsec_tiled_matrix_dc_t*)&dcAr,
-                                (parsec_tiled_matrix_dc_t*)&dcRG,
-                                Ar_copy, disp, nb_elem_r, band_size,
-                                reorder_gemm);
-
-    /* Timer end */
-    SYNC_TIME_PRINT(rank, ("reorder_gemm" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-                           "send_full= %d band_size= %d reorder_gemm= %d\n\n",
-                           P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
-#endif
-
-    time_reorder = sync_time_elapsed;
-
+    /* Calculate memory needed for matrix allocation */
     /* Timer start */
     SYNC_TIME_START();
 
@@ -798,7 +757,6 @@ int main(int argc, char ** argv)
     /* HiCMA Cholesky */
     info = HiCMA_dpotrf_L(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA,
 		    (parsec_tiled_matrix_dc_t*)&dcAr,
-		    (parsec_tiled_matrix_dc_t*)&dcRG,
 		    (parsec_tiled_matrix_dc_t*)&dcRank,
 		    tol, fixedrk, maxrank, &lookahead, band_size,
 		    HNB, compmaxrank, send_full_tile, &two_flow,
@@ -1021,7 +979,7 @@ int main(int argc, char ** argv)
         printf("%g %d %d   ", favgrk, fminrk, fmaxrk);
         printf("%lf %lf   ", memory_per_node, memory_per_node_max);
         printf("%lf %lf %lf %lf    ", g_time[0] + g_time[1] + g_time[2], g_time[0], g_time[1], g_time[2]);
-        printf("%lf %lf %lf %lf %lf    ", time_starsh, time_hicma, time_opt_band, time_regenerate, time_reorder);
+        printf("%lf %lf %lf %lf %lf    ", time_starsh, time_hicma, time_opt_band, time_regenerate, 0.0);
         printf("%le %le %le %le %le ", (double)total_numop, (double)total_band, (double)total_offband, (double)total_path, (double)total_offpath);
         printf("%lf %lf %d  ", (double)total_band/total_offband, (double)total_path/total_offpath, two_flow);
        if (kind_of_problem== 6 || kind_of_problem==7){
@@ -1060,13 +1018,9 @@ int main(int argc, char ** argv)
 
     parsec_data_free(dcAr.mat);
     parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcA, band_size, indicator_offband);
-    parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcRG, band_size, indicator_band);
-    parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcRG, band_size, indicator_offband);
     parsec_band_free(parsec, (parsec_tiled_matrix_dc_t *)&dcRank, band_size, indicator_offband);
     parsec_tiled_matrix_dc_destroy( (parsec_tiled_matrix_dc_t*)&dcA );
     parsec_tiled_matrix_dc_destroy( &dcA.band.super );
-    parsec_tiled_matrix_dc_destroy( (parsec_tiled_matrix_dc_t*)&dcRG );
-    parsec_tiled_matrix_dc_destroy( &dcRG.band.super );
     parsec_tiled_matrix_dc_destroy( (parsec_tiled_matrix_dc_t*)&dcRank );
     parsec_tiled_matrix_dc_destroy( &dcRank.band.super );
     parsec_tiled_matrix_dc_destroy( (parsec_tiled_matrix_dc_t*)&dcAr );

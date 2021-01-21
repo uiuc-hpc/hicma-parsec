@@ -38,58 +38,6 @@ extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
         tileopcounters[i*descA->nt+j] += cnt; \
     }while(0);
 
-static inline int define_k_pre(parsec_tiled_matrix_dc_t *descRG, int m, int n, int k) { 
-    if( descRG->super.myrank == descRG->super.rank_of(&descRG->super, m, n) ) {
-	return ((int *)((descRG->super.data_of(&descRG->super, m, n))->device_copies[0]->device_private))[k];
-
-    } else
-        return -1;
-}
-
-static inline int define_k_next(parsec_tiled_matrix_dc_t *descRG, int m, int n, int k) {
-    if( descRG->super.myrank == descRG->super.rank_of(&descRG->super, m, n) ) {
-        return ((int *)((descRG->super.data_of(&descRG->super, m, n))->device_copies[0]->device_private))[n+k];
-
-    } else
-        return -1;
-}
-
-#if defined(PARSEC_HAVE_CUDA)
-/* Lookup GPU workspace */
-static parsec_potrf_stream_workspace_t lookup_gpu_workspace( parsec_device_cuda_module_t *gpu_device,
-                                                           parsec_gpu_exec_stream_t *gpu_stream,
-                                                           parsec_potrf_workspace_t *ws ) {
-    int i, j;
-
-    /* Look for device */
-    for(i = 0; i < (int)parsec_nb_devices; i++) {
-        parsec_device_module_t *device = parsec_mca_device_get(i);
-        if( NULL == device ) continue;
-        if( device->type != PARSEC_DEV_CUDA ) continue;
-        parsec_device_cuda_module_t *gpu_device_compare = (parsec_device_cuda_module_t*)device;
-
-        if(gpu_device->cuda_index == gpu_device_compare->cuda_index)
-            break;
-    }
-
-    /* Look for stream; 0, h2d; 1 d2h*/
-    for(j = 2; j < gpu_device->max_exec_streams; j++) {
-        char *name_compare;
-        asprintf(&name_compare, "cuda(%d)", j);
-
-        if( !strcmp(name_compare, gpu_stream->name) )
-            break;
-    }
-
-    assert( i < (int)parsec_nb_devices );
-    assert( j > 1 );
-    assert( j < gpu_device->max_exec_streams );
-
-    return ws->gpu_workspace[i].stream_workspace[j];
-}
-#endif
-
-
 %}
 
 /* Globals
@@ -97,7 +45,6 @@ static parsec_potrf_stream_workspace_t lookup_gpu_workspace( parsec_device_cuda_
 uplo         [ type = int ]
 descA        [ type = "parsec_tiled_matrix_dc_t*" ]
 descAr       [ type = "parsec_tiled_matrix_dc_t*" ]
-descRG       [ type = "parsec_tiled_matrix_dc_t*" aligned = descA ]
 descRank     [ type = "parsec_tiled_matrix_dc_t*" aligned = descA ]
 INFO         [ type = "int*" ]
 acc          [ type = "double" ]
@@ -150,15 +97,6 @@ wrap_trsm_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
 wrap_syrk_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
 wrap_gemm_complete   [ type = "parsec_hook_t*" hidden = on default = NULL ]
 
-/* GPU workspace */
-ws_handle            [ type = "void *" hidden = on default = NULL ]
-ws_mbr               [ type = "void *" hidden = on default = NULL ]
-ws_rr                [ type = "void *" hidden = on default = NULL ]
-
-/* GPU number and index */
-nb_cuda_devices      [ type = "int"   hidden = on default = 0 ]
-cuda_device_index    [ type = "int *" hidden = on default = "NULL"]
-
 
 /**************************************************
  **************************************************/
@@ -207,53 +145,20 @@ potrf_dpotrf(k) [high_priority = on]
 // Execution space
 k = 0 .. descA->mt-1
 
-// End index
-my_end_index = %{ return parsec_imin(descA->lmt-1, k+band_size-1); %}
-
 // Parallel partitioning
 :descA(k, k)
 
 // Parameters
 RW T <- (k == 0) ? descA(k, k) : T potrf_dsyrk(k-1, k)   [ type = FULL ]
-     -> T potrf_dtrsm(k+1..my_end_index, k)              [ type = FULL ]
-     -> T potrf_dpotrf_copy(k)                           [ type = FULL ]
+     -> T potrf_dtrsm(k+1..descA->lmt-1, k)              [ type = FULL ]
      -> descA(k, k)                                      [ type = FULL ]
 
 ; (k >= (descA->mt - PRI_CHANGE)) ? (descA->mt - k) * (descA->mt - k) * (descA->mt - k) : PRI_MAX
 
-BODY [type=CUDA weight=k+1]
-{
-#if defined(PARSEC_HAVE_CUDA)
-    if( DEBUG_INFO ) printf("GPU_potrf %d\n", k);
-    int tempkn = k == descA->nt-1 ? descA->n - k*descA->nb : descA->nb;
-    int ldak = BLKLDD( descA, k );
-    cusolverStatus_t status;
-
-    /* Lookup workspace */
-    parsec_potrf_stream_workspace_t stream_handle = lookup_gpu_workspace(gpu_device, gpu_stream, ws_handle);
-
-    /* Info used on GPU kernel */
-    cusolverDnHandle_t handle = stream_handle.handle;
-    int *dev_info = (int *)(stream_handle.gpu_buffer + stream_handle.buffer_size * sizeof(double));
-    double *gpu_buffer = (double *)stream_handle.gpu_buffer;
-    int buffer_size = stream_handle.buffer_size;
-    assert(NULL != gpu_buffer);
-
-    /* GPU kernel */
-    status = cusolverDnDpotrf(handle, CUBLAS_FILL_MODE_LOWER, tempkn, T, ldak, gpu_buffer, buffer_size, dev_info);
-    assert(CUSOLVER_STATUS_SUCCESS == status);
-
-    /* We are losing the iinfo in d_iinfo, because the kernel is asynchronous.
-     * We should register a complete function to read d_iinfo back in CPU memory,
-     * and update INFO with it... */
-#endif
-}
-END
-
-
 BODY [type=RECURSIVE]
 {
     if(enable_potrf == 0) return PARSEC_HOOK_RETURN_DONE;
+    if(DEBUG_INFO) printf("POTRF: %d\n", k);
     int tempkm = k == descA->mt-1 ? descA->m - k*descA->mb : descA->mb;
     int iinfo = 0;
 
@@ -286,7 +191,6 @@ BODY [type=RECURSIVE]
 
     if( tempkm > smallnb )
     {
-        if(DEBUG_INFO) printf("POTRF Recursive: %d\n", k);
         subtile_desc_t *small_descT;
         parsec_taskpool_t *parsec_dpotrf;
 
@@ -320,33 +224,8 @@ BODY
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descA->mb+iinfo; /* Should return here */
 
-    if(DEBUG_INFO) printf("HCORE_dpotrf( %d )\n\t( %s, %d, A(%d,%d)[%p], %d) return info = %d\n", k, dplasma_lapack_const(uplo), tempkm, k, 0, T, descA->mb, iinfo);
 }
 END
-
-/**************************************************
- *           potrf_dpotrf_copy                    *
- **************************************************/
-potrf_dpotrf_copy(k) [high_priority = on]
-
-// Execution space
-k = 0 .. descA->mt-1
-
-// Parallel partitioning
-:descA(k, k)
-
-// Parameters
-READ T <- T potrf_dpotrf(k)                                                                    [ type = FULL ]
-       -> (k < descA->lmt-band_size)? T potrf_dtrsm(k+band_size..descA->mt-1, k)               [ type = FULL ]
-
-; (k >= (descA->mt - PRI_CHANGE)) ? (descA->mt - k) * (descA->mt - k) * (descA->mt - k) : PRI_MAX
-
-BODY
-{
-
-}
-END
-
 
 
 /**************************************************
@@ -364,14 +243,11 @@ size = 1
 // Added for evaluated of gpu chores
 band_size_local = band_size
 
-// End index
-my_end_index = %{ return parsec_imin(descA->lmt-1, m+band_size-1); %}
-
 // Parallel partitioning
 : descA(m, k)
 
 // Parameters
-READ  T <- (m-k < band_size)? T potrf_dpotrf(k): T potrf_dpotrf_copy(k)      [ type = FULL ]
+READ  T <- T potrf_dpotrf(k)                                                 [ type = FULL ]
 
 RW    C <- (k == 0 && m-k < band_size) ? descA(m, k)                         [ type = FULL ]
         <- (k == 0 && m-k >= band_size) ? descA(m, k)                        [ type = UV ]
@@ -379,8 +255,7 @@ RW    C <- (k == 0 && m-k < band_size) ? descA(m, k)                         [ t
         <- C potrf_dgemm(m, k, k-1)                                          [ type = UV ]
         -> (m-k < band_size) ? A potrf_dsyrk(k, m)                           [ type = FULL ]
         -> (m-k < band_size) ? A potrf_dgemm(m, k+1..m-1, k)                 [ type = FULL ]
-        -> (m-k < band_size) ? B potrf_dgemm(m+1..my_end_index, m, k)        [ type = FULL ]
-        -> (m-k < band_size) ? C potrf_dtrsm_copy(m, k)                      [ type = FULL ]
+        -> (m-k < band_size) ? B potrf_dgemm(m+1..descA->lmt-1, m, k)        [ type = FULL ]
         -> (m-k < band_size) ? descA(m, k)                                   [ type = FULL ]
         -> (m-k >= band_size) ? A potrf_dsyrk(k, m)                          [ layout = MPI_DOUBLE count = size ]
         -> (m-k >= band_size) ? A potrf_dgemm(m, k+1..m-1, k)                [ layout = MPI_DOUBLE count = size ]
@@ -399,32 +274,6 @@ CTL ctl1 <- (lookahead > 1 && m > lookahead+k)? ctl2 potrf_dtrsm(k+2, k)
 CTL ctl2 -> (lookahead > 1 && m == k+2)? ctl1 potrf_dtrsm(lookahead+k+1 .. descA->mt-1, k)
 
 ; (m >= (descA->mt - PRI_CHANGE)) ? (descA->mt - m) * (descA->mt - m) * (descA->mt - m) + 3 * ((2 * descA->mt) - k - m - 1) * (m - k) : PRI_MAX
-
-BODY [type=CUDA weight=(m+1-k)]
-{
-#if defined(PARSEC_HAVE_CUDA)
-    int tempmm = m == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
-    int ldak = BLKLDD( descA, k );
-    int ldam = BLKLDD( descA, m );
-
-    if ( m-k < band_size ) {
-        if(DEBUG_INFO) printf("GPU_trsm %d %d\n", m, k);
-        cublasStatus_t status;
-        cublasSetKernelStream( parsec_body.stream );
-        cublasDtrsm('R', 'L', 'T', 'N',
-                   tempmm, descA->mb,
-                   (double)1.0, T /*A(k, k)*/, ldak,
-                                C /*A(m, k)*/, ldam);
-        status = cublasGetError();
-        PARSEC_CUDA_CHECK_ERROR( "cublasDtrsm ", status,
-                                {return -1;} );
-    }
-    else
-        /* Go to CPU kernel */
-        return PARSEC_HOOK_RETURN_NEXT;
-#endif
-}
-END
 
 BODY [type=RECURSIVE]
 {
@@ -510,14 +359,6 @@ BODY
                    (double)1.0, T /*A(k, k)*/, ldak,
                                            C /*A(m, k)*/, ldam);
 
-        if(DEBUG_INFO) printf("CORE_dtrsm( %d, %d )\n\t( %s, %s, %s, %s, %d, %d, %f, A(%d,%d)[%p], %d,  A(%d,%d)[%p], %d)\n",
-                 m, k,
-                 dplasma_lapack_const( PlasmaRight ), dplasma_lapack_const( PlasmaLower ),
-                 dplasma_lapack_const( PlasmaTrans ), dplasma_lapack_const( PlasmaNonUnit ),
-                 tempmm, descA->mb,
-                 1.0, k, k, T, ldak,
-                      m, k, C, ldam);
-
     } else {
         /* If rank is 0, return and set communication count to 0 */
         if( 0 == *((int *)Cr) ) {
@@ -534,14 +375,6 @@ BODY
                    tempmm, descA->mb, (double)1.0, T, ldak,
                    Cv, ldam, Cr, k, 0, m, k);
 
-        if(DEBUG_INFO) printf("HCORE_dtrsm( %d, %d )\n\t( %s, %s, %s, %s, %d, %d, %f, A(%d,%d)[%p], %d,  A(%d,%d)[%p], %d)\n",
-                 m, k,
-                 dplasma_lapack_const( PlasmaRight ), dplasma_lapack_const( PlasmaLower ),
-                 dplasma_lapack_const( PlasmaTrans ), dplasma_lapack_const( PlasmaNonUnit ),
-                 tempmm, descA->mb,
-                 1.0, k, k, T, ldak,
-                      m, k, Cv, ldam);
-
         /* Pass Cr value to size */
         if(send_full_tile == 1){
             this_task->locals.size.value = descA->mb * storage_maxrank * 2;
@@ -554,29 +387,6 @@ BODY
 }
 END
 
-/**************************************************
- *            potrf_dtrsm_copy                    *
- **************************************************/
-potrf_dtrsm_copy(m, k) [high_priority = on]
-
-// Execution space
-m = 1 .. descA->mt-1
-k = 0 .. m-1
-
-// Parallel partitioning
-: descA(m, k)
-
-// Parameters
-READ  C <- (m-k < band_size) ? C potrf_dtrsm(m, k): NULL                            [ type = FULL ]
-        -> (m-k < band_size) ? B potrf_dgemm(m+band_size .. descA->lmt-1, m, k)     [ type = FULL ]
-
-; (m >= (descA->mt - PRI_CHANGE)) ? (descA->mt - m) * (descA->mt - m) * (descA->mt - m) + 3 * ((2 * descA->mt) - k - m - 1) * (m - k) : PRI_MAX
-
-BODY
-{
-
-}
-END
 
 /**************************************************
  *               potrf_dsyrk                      *
@@ -606,66 +416,6 @@ CTL ctl -> (lookahead == 1 && m == k+1)? ctl potrf_dtrsm(lookahead+m .. descA->m
 
 ; (m >= (descA->mt - PRI_CHANGE)) ? (descA->mt - m) * (descA->mt - m) * (descA->mt - m) + 3 * (m - k) : PRI_MAX
 
-BODY [type=CUDA weight=(m+1-k)]
-{
-#if defined(PARSEC_HAVE_CUDA)
-    int tempmm = m == descA->mt-1 ? descA->m - m*descA->mb : descA->mb;
-    int ldam = BLKLDD( descA, m );
-
-    if ( m-k < band_size ) {
-        if( DEBUG_INFO ) printf("GPU_syrk of 'm-k < band_size':  %d %d\n", m, k);
-        cublasStatus_t status;
-        cublasSetKernelStream( parsec_body.stream );
-        cublasDsyrk('L', 'N',
-                   tempmm, descA->mb,
-                   (double)-1.0, A /*A(m, k)*/, ldam,
-                   (double) 1.0, T /*A(m, m)*/, ldam);
-        status = cublasGetError();
-        PARSEC_CUDA_CHECK_ERROR( "cublasDtrsm ", status,
-                                {return -1;} );
-    }
-    else {
-        if( DEBUG_INFO ) printf("GPU_syrk of 'm-k >= band_size':  %d %d\n", m, k);
-        /* Get Arank on CPU */
-        int Arank = ((int *)this_task->data._f_Ar.data_in->original->device_copies[0]->device_private)[0]; 
-
-        /* Au, Av, Bu, Bv */
-        void *Au = (void *)A;
-        void *Av = (void *)A + descA->mb * Arank * sizeof(double);
-
-        /* Get the temporary buffer */
-        parsec_potrf_stream_workspace_t stream_mbr = lookup_gpu_workspace(gpu_device, gpu_stream, ws_mbr);
-        double *my_buffer_mbr = (double *)stream_mbr.gpu_buffer;
-        assert(NULL != my_buffer_mbr);
-
-        parsec_potrf_stream_workspace_t stream_rr = lookup_gpu_workspace(gpu_device, gpu_stream, ws_rr);
-        double *my_buffer_rr = (double *)stream_rr.gpu_buffer;
-        assert(NULL != my_buffer_rr);
-
-        /* tmp_rr = trans(Av) * Av */
-        cublasDgemm('T', 'N',
-                   Arank, Arank, descA->mb,
-                   (double) 1.0, Av             /*A(k, m)*/, descA->mb,
-                                 Av             /*A(k, n)*/, descA->mb,
-                   (double) 0.0, my_buffer_rr   /*A(m, n)*/, Arank);
-
-        /* tmp_mbr = tmp_rr * trans(Au) */
-        cublasDgemm('N', 'T',
-                    Arank, descA->mb, Arank,
-                    (double) 1.0, my_buffer_rr    /*A(m, k)*/, Arank,
-                                  Au              /*A(n, k)*/, descA->mb,
-                    (double) 0.0, my_buffer_mbr   /*A(m, n)*/, Arank);
-
-        /* T = T - Au * tmp_mbr */
-        cublasDgemm('N', 'N',
-                    descA->mb, descA->mb, Arank,
-                    (double)-1.0, Au              /*A(m, k)*/, descA->mb,
-                                  my_buffer_mbr   /*A(k, n)*/, Arank,
-                    (double) 1.0, T               /*A(m, n)*/, descA->mb);
-    }
-#endif
-}
-END
 
 BODY [type=RECURSIVE]
 {
@@ -744,13 +494,6 @@ BODY
                    (double)-1.0, A /*A(m, k)*/, ldam,
                    (double) 1.0, T /*A(m, m)*/, ldam);
 
-        if(DEBUG_INFO) printf(
-                 "CORE_dsyrk( %d, %d )\n\t( %s, %s, %d, %d, %f, A(%d,%d)[%p], %d, %f, A(%d,%d)[%p], %d)\n",
-                 k, m,
-                 dplasma_lapack_const( PlasmaLower ), dplasma_lapack_const( PlasmaNoTrans ),
-                 tempmm, descA->mb,
-                 -1.0, m, k, A, ldam,
-                  1.0, m, m, T, ldam);
     } else {
         /* If rank is 0, return */
         if( 0 == *((int *)Ar) ) {
@@ -807,13 +550,6 @@ BODY
         parsec_private_memory_push( p_work_rr, p_elem_work_rr );
 #endif
 
-        if(DEBUG_INFO) printf(
-                 "HCORE_dsyrk( %d, %d )\n\t( %s, %s, %d, %d, %f, A(%d,%d)[%p], %d, %f, A(%d,%d)[%p], %d)\n",
-                 k, m,
-                 dplasma_lapack_const( PlasmaLower ), dplasma_lapack_const( PlasmaNoTrans ),
-                 tempmm, descA->mb,
-                 -1.0, m, k, Av, ldam,
-                  1.0, m, 0, T, ldam);
     }
 }
 END
@@ -836,8 +572,6 @@ size = 1
 band_size_local = band_size
 send_full_tile_local = send_full_tile
 
-//k_pre = %{ return define_k_pre(descRG, m, n, k); %} 
-//k_next = %{ return define_k_next(descRG, m, n, k); %} 
 k_pre = k-1
 k_next = k+1
 
@@ -850,8 +584,7 @@ READ   A <- (m-k < band_size) ? C potrf_dtrsm(m, k)                             
 
 READ  Ar <- (m-k >= band_size) ? Cr potrf_dtrsm(m, k): NULL                            [ type = AR ]
 
-READ   B <- (n-k < band_size && m-n < band_size) ? C potrf_dtrsm(n, k)                 [ type = FULL ] 
-         <- (n-k < band_size && m-n >= band_size) ? C potrf_dtrsm_copy(n, k)           [ type = FULL ] 
+READ   B <- (n-k < band_size) ? C potrf_dtrsm(n, k)                                    [ type = FULL ] 
          <- C potrf_dtrsm(n, k)                                                        [ type = UV ]
 
 READ  Br <- (n-k >= band_size) ? Cr potrf_dtrsm(n, k): NULL                            [ type = AR ]
@@ -872,128 +605,6 @@ RW    Cr <- (k == 0 && m-n >= band_size) ? Cr READ_Cr(m, n)                     
 
 ; (m >= (descA->mt - PRI_CHANGE)) ? (descA->mt - m) * (descA->mt - m) * (descA->mt - m) + 3 * ((2 * descA->mt) - m - n - 3) * (m - n) + 6 * (m - k) : PRI_MAX
 
-BODY [type=CUDA weight=(n+1-k)]
-{
-#if defined(PARSEC_HAVE_CUDA)
-    int tempmm = m == descA->mt-1 ? descA->m - m * descA->mb : descA->mb;
-    int ldam = BLKLDD( descA, m );
-    int ldan = BLKLDD( descA, n );
-
-    cublasStatus_t status;
-    cudaError_t err;
-    cublasSetKernelStream( parsec_body.stream );
-    parsec_potrf_stream_workspace_t wp_mbr;
-    parsec_potrf_stream_workspace_t wp_rr;
-
-    if ( m-k < band_size ) {
-        if( DEBUG_INFO ) printf("GPU_gemm of 'm-k < band_size': %d %d %d; band_size: %d\n", m, n, k, band_size);
-        cublasDgemm( 'N', 'T',
-                 tempmm, descA->mb, descA->mb,
-                 (double)-1.0, (double*)A, ldam,
-                        (double*)B, ldan,
-                 (double)1.0,  (double*)C, ldam );
-        status = cublasGetError();
-        PARSEC_CUDA_CHECK_ERROR( "cublasDgemm_1 ", status,
-                                {return -1;} );
-
-    } else if( n-k < band_size && m-n < band_size ) {
-        if( DEBUG_INFO ) printf("GPU_gemm of 'n-k < band_size && m-n < band_size':  %d %d %d; band_size: %d\n", m, n, k, band_size);
-        /* Get Arank on CPU */
-        int Arank = ((int *)this_task->data._f_Ar.data_in->original->device_copies[0]->device_private)[0]; 
-
-        /* Au and Av */
-        void *Au = (void *)A;
-        void *Av = (void *)A + descA->mb * Arank * sizeof(double);
-
-        /* Get the temporary buffer */
-        wp_mbr = lookup_gpu_workspace(gpu_device, gpu_stream, ws_mbr);
-        double *my_buffer_mbr = (double *)wp_mbr.gpu_buffer;
-        assert(NULL != my_buffer_mbr);
-
-        /* tmp_mbr = trans(Av) * trans(B) */
-        cublasDgemm('T', 'T',
-                   Arank, descA->mb, descA->mb,
-                   (double)1.0, Av /*A(m, k)*/, descA->mb,
-                                 B /*A(n, m)*/, descA->mb,
-                   (double) 0.0, my_buffer_mbr /*A(k, n)*/, Arank);
-        status = cublasGetError();
-        PARSEC_CUDA_CHECK_ERROR( "cublasDgemmi_2 ", status,
-                                {return -1;} );
-
-        /* C = C - Au * tmp_mbr */
-        cublasDgemm('N', 'N',
-                   descA->mb, descA->mb, Arank,
-                   (double)-1.0, Au              /*A(m, k)*/, descA->mb,
-                                 my_buffer_mbr /*A(k, n)*/, Arank,
-                   (double) 1.0, C               /*A(m, n)*/, descA->mb);
-        status = cublasGetError();
-        PARSEC_CUDA_CHECK_ERROR( "cublasDgemm_3 ", status,
-                                {return -1;} );
-
-    } else if( m-n < band_size ) {
-        if( DEBUG_INFO ) printf("GPU_gemm of 'm-n < band_size':  %d %d %d\n", m, n, k);
-        /* Get Arank on CPU */
-        int Arank = ((int *)this_task->data._f_Ar.data_in->original->device_copies[0]->device_private)[0]; 
-        int Brank = ((int *)this_task->data._f_Br.data_in->original->device_copies[0]->device_private)[0]; 
-
-        /* Au, Av, Bu, Bv */
-        void *Au = (void *)A;
-        void *Av = (void *)A + descA->mb * Arank * sizeof(double);
-        void *Bu = (void *)B;
-        void *Bv = (void *)B + descA->mb * Brank * sizeof(double);
-
-        /* Get the temporary buffer */
-        wp_mbr = lookup_gpu_workspace(gpu_device, gpu_stream, ws_mbr);
-        double *my_buffer_mbr = (double *)wp_mbr.gpu_buffer;
-        assert(NULL != my_buffer_mbr);
-
-        wp_rr = lookup_gpu_workspace(gpu_device, gpu_stream, ws_rr);
-        double *my_buffer_rr = (double *)wp_rr.gpu_buffer;
-        assert(NULL != my_buffer_rr);
-
-        /* tmp_rr = trans(Av) * Bv */
-        cublasDgemm('T', 'N',
-                   Arank, Brank, descA->mb,
-                   (double) 1.0, Av             /*A(k, m)*/, descA->mb,
-                                 Bv             /*A(k, n)*/, descA->mb,
-                   (double) 0.0, my_buffer_rr   /*A(m, n)*/, Arank);
-
-        if( Arank > Brank ) {
-            /* tmp_mbr = Au * tmp_rr */
-            cublasDgemm('N', 'N',
-                       descA->mb, Brank, Arank,
-                       (double) 1.0, Au              /*A(m, k)*/, descA->mb,
-                                     my_buffer_rr    /*A(k, n)*/, Arank,
-                       (double) 0.0, my_buffer_mbr   /*A(m, n)*/, descA->mb);
-
-            /* C = C - tmp_mbr * trans(Bu) */
-            cublasDgemm('N', 'T',
-                       descA->mb, descA->mb, Brank,
-                       (double)-1.0, my_buffer_mbr   /*A(m, k)*/, descA->mb,
-                                     Bu              /*A(n, k)*/, descA->mb,
-                       (double) 1.0, C               /*A(m, n)*/, descA->mb);
-        } else {
-            /* tmp_mbr = tmp_rr * trans(Bu) */
-            cublasDgemm('N', 'T',
-                       Arank, descA->mb, Brank,
-                       (double) 1.0, my_buffer_rr    /*A(m, k)*/, Arank,
-                                     Bu              /*A(n, k)*/, descA->mb,
-                       (double) 0.0, my_buffer_mbr   /*A(m, n)*/, Arank);
-
-            /* C = C - Au * tmp_mbr */
-            cublasDgemm('N', 'N',
-                       descA->mb, descA->mb, Arank,
-                       (double)-1.0, Au              /*A(m, k)*/, descA->mb,
-                                     my_buffer_mbr   /*A(k, n)*/, Arank,
-                       (double) 1.0, C               /*A(m, n)*/, descA->mb);
-        }
-
-    } else
-        /* Go to CPU kernel */
-        return PARSEC_HOOK_RETURN_NEXT;
-#endif
-}
-END
 
 BODY [type=RECURSIVE]
 {
@@ -1246,7 +857,7 @@ BODY
         /* If new_UVrk > Crank_old, re-allocate */
         if( new_UVrk > Crank_old && !send_full_tile ) {
             if( DEBUG_INFO ) printf("Reallocate %d %d %d\n", m, n, k);
-	    if( NULL != this_task->data._f_C.data_out->device_private )
+            if( NULL != this_task->data._f_C.data_out->device_private )
                 free( this_task->data._f_C.data_out->device_private ); 
             this_task->data._f_C.data_out->device_private = calloc( descA->mb * new_UVrk * 2, sizeof(double) );
             this_task->data._f_C.data_out->original->nb_elts = descA->mb * new_UVrk * 2 * sizeof(double);
@@ -1345,117 +956,109 @@ BODY
             First step reveals ACTUAL_RANK.
             Second step constructs new CU and CV.
             Provided CU and CV buffers must have at least ACTUAL_RANK number of columns.
-        */
-	double* work_new;
-	double* _CU;
-	double* _CV;
-	int CU_ncols;
-	int new_UVrk;
-	double* newU;
-	int ld_newU;
-	double* qrtauA;
-	int CV_ncols;
-	double* newV;
-	int ld_newV;
-	double* qrtauB;
-	int use_CUV_clone;
-	double* CUclone;
-	int ld_CUclone;
-	double *_CU_save;
-	double* CVclone;
-	int ld_CVclone;
-	double* _CV_save;
-    flop_counter flops;
-	HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
-			tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
-			tempmmv,
-			(double)-1.0,
-			Au, Av, Ar, ldamu,
-			Bu, Bv, Br, ldamv,
-			(double)1.0,
-			Cu, Cv, Cr, ldamu,
-			rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
-            &flops,
-			/** parameters that will be passed to HCORE_dgemm_ormqr */
-			&work_new,
-			&_CU,
-			&_CV,
-			&CU_ncols,
-			&new_UVrk,
-			&newU,
-			&ld_newU,
-			&qrtauA,
-			&CV_ncols,
-			&newV,
-			&ld_newV,
-			&qrtauB,
-			&use_CUV_clone,
-			&CUclone,
-			&ld_CUclone,
-			&_CU_save,
-			&CVclone,
-			&ld_CVclone,
-			&_CV_save
-				);
+         */
+        double* work_new;
+        double* _CU;
+        double* _CV;
+        int CU_ncols;
+        int new_UVrk;
+        double* newU;
+        int ld_newU;
+        double* qrtauA;
+        int CV_ncols;
+        double* newV;
+        int ld_newV;
+        double* qrtauB;
+        int use_CUV_clone;
+        double* CUclone;
+        int ld_CUclone;
+        double *_CU_save;
+        double* CVclone;
+        int ld_CVclone;
+        double* _CV_save;
+        flop_counter flops;
+        HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
+                tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
+                tempmmv,
+                (double)-1.0,
+                Au, Av, Ar, ldamu,
+                Bu, Bv, Br, ldamv,
+                (double)1.0,
+                Cu, Cv, Cr, ldamu,
+                rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
+                &flops,
+                /** parameters that will be passed to HCORE_dgemm_ormqr */
+                &work_new,
+                &_CU,
+                &_CV,
+                &CU_ncols,
+                &new_UVrk,
+                &newU,
+                &ld_newU,
+                &qrtauA,
+                &CV_ncols,
+                &newV,
+                &ld_newV,
+                &qrtauB,
+                &use_CUV_clone,
+                &CUclone,
+                &ld_CUclone,
+                &_CU_save,
+                &CVclone,
+                &ld_CVclone,
+                &_CV_save
+                    );
 
-	/* If new_UVrk > Crank_old, re-allocate */
-	if( new_UVrk > Crank_old && !send_full_tile ) {
-		if( DEBUG_INFO ) printf("\nReallocate %d %d %d\n\n", m, n, k);
-		if( NULL != this_task->data._f_C.data_out->device_private )
-		    free( this_task->data._f_C.data_out->device_private ); 
-		this_task->data._f_C.data_out->device_private = calloc( descA->mb * new_UVrk * 2, sizeof(double) );
-		this_task->data._f_C.data_out->original->nb_elts = descA->mb * new_UVrk * 2 * sizeof(double);
-	}
+        /* If new_UVrk > Crank_old, re-allocate */
+        if( new_UVrk > Crank_old && !send_full_tile ) {
+            if( DEBUG_INFO ) printf("\nReallocate %d %d %d\n\n", m, n, k);
+            if( NULL != this_task->data._f_C.data_out->device_private )
+                free( this_task->data._f_C.data_out->device_private ); 
+            this_task->data._f_C.data_out->device_private = calloc( descA->mb * new_UVrk * 2, sizeof(double) );
+            this_task->data._f_C.data_out->original->nb_elts = descA->mb * new_UVrk * 2 * sizeof(double);
+        }
 
-	/* Address for Cu and Cv to be copied to */
-	_CU_save = this_task->data._f_C.data_out->device_private;
-	_CV_save = this_task->data._f_C.data_out->device_private + descA->mb * new_UVrk * sizeof(double);
+        /* Address for Cu and Cv to be copied to */
+        _CU_save = this_task->data._f_C.data_out->device_private;
+        _CV_save = this_task->data._f_C.data_out->device_private + descA->mb * new_UVrk * sizeof(double);
 
-	HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
-			tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
-			tempmmv,
-			(double)-1.0,
-			Au, Av, Ar, ldamu,
-			(double)1.0,
-			Cu, Cv, Cr, ldamu,
-			rk, storage_maxrank, computation_maxrank, acc, work_new,
-            &flops,
-			/** parameters coming from HCORE_dgemm_qr_svd */
-			_CU,
-			_CV,
-			CU_ncols,
-			new_UVrk,
-			newU,
-			ld_newU,
-			qrtauA,
-			CV_ncols,
-			newV,
+        HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+                tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
+                tempmmv,
+                (double)-1.0,
+                Au, Av, Ar, ldamu,
+                (double)1.0,
+                Cu, Cv, Cr, ldamu,
+                rk, storage_maxrank, computation_maxrank, acc, work_new,
+                &flops,
+                /** parameters coming from HCORE_dgemm_qr_svd */
+                _CU,
+                _CV,
+                CU_ncols,
+                new_UVrk,
+                newU,
+                ld_newU,
+                qrtauA,
+                CV_ncols,
+                newV,
 			ld_newV,
 			qrtauB,
 			use_CUV_clone,
 			CUclone,
-			ld_CUclone,
-			_CU_save,
-			CVclone,
-			ld_CVclone,
-			_CV_save
-				);
+            ld_CUclone,
+            _CU_save,
+            CVclone,
+            ld_CVclone,
+            _CV_save
+                );
 
-	Cu = _CU_save;
-	Cv = _CV_save;
+        Cu = _CU_save;
+        Cv = _CV_save;
 
         /* Update new rank */
         parsec_private_memory_push( p_work, p_elem_work );
         int Crank_new = ((int*)Cr)[0];
         if(DEBUG_INFO) printf("Cr value in DGEMM (%d, %d, %d): %d\n", m, n, k, ((int *)Cr)[0]);
-
-        if(DEBUG_INFO) printf("HCORE_dgemm( %d, %d, %d )\n\t( %s, %s, %d, %d, %d, %f, A(%d,%d)[%p], %d-%d, A(%d,%d)[%p], %d-%d, %f, A(%d,%d)[%p], %d-%d)\n",
-                 m, n, k,
-                 dplasma_lapack_const( PlasmaNoTrans ),  dplasma_lapack_const( PlasmaTrans ),
-                 tempmmu, tempmmv, descA->mb,
-                 -1.0, m, k, Au, ldamu, ldamv,
-                       n, k, Bu, ldanu, ldanv,
-                  1.0, m, n, Cu, ldamu, ldamv);
 
         /* Pass Cr value to size */
         if(send_full_tile == 1){
@@ -1493,7 +1096,7 @@ BODY
     if( m-n >= band_size && descRank->super.myrank == descRank->super.rank_of(&descRank->super, m, n) ) {
         if( ((int *)Cr)[0] < ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] ) 
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[1] = ((int *)Cr)[0];
-  
+
         if( ((int *)Cr)[0] > ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] ) 
             ((int *)((descRank->super.data_of(&descRank->super, m, n))->device_copies[0]->device_private))[2] = ((int *)Cr)[0];
 
