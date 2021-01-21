@@ -38,19 +38,19 @@ int HiCMA_dpotrf_L( parsec_context_t* parsec,
               parsec_tiled_matrix_dc_t *Ar,
               parsec_tiled_matrix_dc_t *Rank,
               double acc,
-	      int fixed_rank,
+              int fixed_rank,
               int maxrank,
-	      int *lookahead,
+              int *lookahead,
               int band_size,
               int hmb,
-	      int compmaxrank,
+              int compmaxrank,
               int send_full_tile,
               int *two_flow, 
               unsigned long* tileopcounters,
               unsigned long* opcounters,
               double *critical_path_time,
-	      int verbose
-              );
+              int verbose
+        );
 
 /**
  * Set offset in Av based on A for the 3flow version
@@ -121,7 +121,7 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
 int parsec_rank_gather(parsec_context_t *parsec,
                 parsec_tiled_matrix_dc_t *dcAr,
                 int *rank_array,
-		int band_size);
+                int band_size);
 
 /**
  * Check rank correctness and set -1 to tiles on band

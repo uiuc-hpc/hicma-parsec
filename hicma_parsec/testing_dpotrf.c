@@ -384,7 +384,7 @@ int main(int argc, char ** argv)
     /* If auto select band_size, band_size set to 1 at the beginning */
     if( auto_band ) {
         if( rank == 0 && verbose) { 
-            printf("\n%d: Auto-tuning band_size, set band_size = 1 at the beginning\n", __LINE__);
+            printf(YEL "\n%d: Auto-tuning band_size, set band_size = 1 at the beginning\n" RESET, __LINE__);
             fflush(stdout);
         }
         band_size = 1;
@@ -765,9 +765,9 @@ int main(int argc, char ** argv)
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("HiCMA_potrf" "\tsend_full_tile= %d band_size= %d lookahead= %d "
-			    "reorder_gemm= %d kind_of_problem= %d HNB= %d PxQ= %3d %-3d "
+			    "kind_of_problem= %d HNB= %d PxQ= %3d %-3d "
 			    "NB= %4d N= %7d 2flow= %d : %14f gflops\n",
-			    send_full_tile, band_size, lookahead, reorder_gemm, kind_of_problem,
+			    send_full_tile, band_size, lookahead, kind_of_problem,
 			    HNB, P, Q, NB, N, two_flow, gflops=(flops/1e9)/sync_time_elapsed));
     /* Record time */
     time_hicma = sync_time_elapsed;
@@ -785,8 +785,8 @@ int main(int argc, char ** argv)
 
     /* Timer end */
     SYNC_TIME_PRINT(rank, ("rank_print" "\tPxQ= %3d %-3d NB= %4d N= %7d maxrank= %d "
-			    "send_full= %d band_size= %d reorder_gemm= %d\n\n",
-			    P, Q, NB, N, maxrank, send_full_tile, band_size, reorder_gemm));
+			    "send_full= %d band_size= %d\n\n",
+			    P, Q, NB, N, maxrank, send_full_tile, band_size));
 #endif
 
 #if DEBUG_INFO
@@ -972,7 +972,7 @@ int main(int argc, char ** argv)
         printf("%d %d   ", HNB, HNB);
         printf("%d %d %d %d   ", nodes, P, Q, cores);
         printf("%d %s %.1e %g %d %g   ", kind_of_problem, str_problem[kind_of_problem], tol, add_diag, fixedrk, wave_k);
-        printf("%d %d %d %d %d ", send_full_tile, band_size, lookahead, reorder_gemm, auto_band);
+        printf("%d %d %d %d %d ", send_full_tile, band_size, lookahead, 0, auto_band);
         printf("%d %d %d   ", maxrank, genmaxrank, compmaxrank);
         printf("%g %d %d   ", iavgrk_before, iminrk_before, imaxrk_before);
         printf("%g %d %d   ", iavgrk, iminrk, imaxrk);

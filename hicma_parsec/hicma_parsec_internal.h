@@ -192,7 +192,6 @@ enum iparam_t {
   IPARAM_SEND_FULL_TILE,
   IPARAM_LOOKAHEAD,
   IPARAM_AUTO_BAND,
-  IPARAM_REORDER_GEMM,
   IPARAM_TWO_FLOW,
   IPARAM_NUMOBJ,
   IPARAM_RBFKERNEL,
@@ -231,7 +230,6 @@ enum dparam_t {
     int lookahead = iparam[IPARAM_LOOKAHEAD];                          \
     int kind_of_problem = iparam[IPARAM_KIND_OF_PROBLEM];              \
     int send_full_tile = iparam[IPARAM_SEND_FULL_TILE];                \
-    int reorder_gemm = iparam[IPARAM_REORDER_GEMM];                    \
     int two_flow = iparam[IPARAM_TWO_FLOW];                            \
     int auto_band = iparam[IPARAM_AUTO_BAND];                          \
     double radius = dparam[DPARAM_RAD];                                \

@@ -64,27 +64,26 @@ static void print_usage(void)
 			" -Z --band             : if 0, normal two_dim_block_cyclic, but not contiguous memory allocation for whole matrix; if > 0, with band distribution \n"
 			" -Y --lookahead        : set lookahead, from -1 to NT-1; default -1, will set to auto_tuned band_size \n"
 			" -E --auto-band        : set auto select the most suitable band size \n"
-			" -I --reorder-gemm     : set reorder-gemm \n"
 			" -D --kind_of_problem  : 0: randtlr\n"
 			"                         1: electrodynamics-2d-sinus\n"
 			"                         2: statistics-2d-sqexp \n"
 			"                         3: statistics-3d-sqexp \n"
-			"                         4: statistics-3d-exp \n"
-			"                         5: electrodynamics-3d-sin \n"
-                        "                         6: md-3d-virus \n"
-                        "                         7: md-3d-cube \n"
-                        " -M --mesh_file       : path to mesh file\n"
-                        " -K --numobj          : numnber of objects (number of viurses within a population)\n"
-                        " -B --rbf_kernel      : type of RBF basis function (0:Gaussian, 1:Expon, 2:InvQUAD, 3:InvMQUAD, 4:Maternc1, 5:Maternc2, 6:TPS, 7:CTPS, and 8:Wendland)\n"
-                        " -R --radius          : radius of influential nodes\n"
-                        " -O --order              : No, Morton, or Hilbert ordering (0, 1, or 2, respectively) starsh supports only Morton ordering. For Hilbert ordering, you need to use python code by importing Hilbert package. SOON will be provides by starsh\n"
-                        " -S --density               : denstiy of sphere packing for rbf application. if you want random distibution, type -1 \n"
-			" -h --help             : this message\n"
+            "                         4: statistics-3d-exp \n"
+            "                         5: electrodynamics-3d-sin \n"
+            "                         6: md-3d-virus \n"
+            "                         7: md-3d-cube \n"
+            " -M --mesh_file       : path to mesh file\n"
+            " -K --numobj          : numnber of objects (number of viurses within a population)\n"
+            " -B --rbf_kernel      : type of RBF basis function (0:Gaussian, 1:Expon, 2:InvQUAD, 3:InvMQUAD, 4:Maternc1, 5:Maternc2, 6:TPS, 7:CTPS, and 8:Wendland)\n"
+            " -R --radius          : radius of influential nodes\n"
+            " -O --order           : No, Morton, or Hilbert ordering (0, 1, or 2, respectively) starsh supports only Morton ordering. For Hilbert ordering, you need to use python code by importing Hilbert package. SOON will be provides by starsh\n"
+            " -S --density               : denstiy of sphere packing for rbf application. if you want random distibution, type -1 \n"
+            " -h --help            : this message\n"
 			"\n");
 	parsec_usage();
 }
 
-#define GETOPT_STRING "c:P:Q:N:t:h::f:e:u:G:U::w:j:Z:D:F:Y:E:I:W:M:K:B:R:O:S"
+#define GETOPT_STRING "c:P:Q:N:t:h::f:e:u:G:U::w:j:Z:D:F:Y:E:W:M:K:B:R:O:S"
 
 #if defined(PARSEC_HAVE_GETOPT_LONG)
 static struct option long_options[] =
@@ -140,8 +139,6 @@ static struct option long_options[] =
 	{"F",           required_argument,  0, 'F'},
 	{"auto-band",   required_argument,  0, 'E'},
 	{"E",           required_argument,  0, 'E'},
-	{"reorder-gemm",required_argument,  0, 'I'},
-	{"I",           required_argument,  0, 'I'},
 	{"two-flow",    required_argument,  0, 'W'},
     {"W",           required_argument,  0, 'W'},
     {"mesh_file",    required_argument, 0, 'M'},
@@ -179,7 +176,6 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
     iparam[IPARAM_SEND_FULL_TILE]  = 0; // do not send full tile
     iparam[IPARAM_HNB] = 300;           // subtile size in recursive
     iparam[IPARAM_AUTO_BAND] = 1;       // enable auto-tuning band_size
-    iparam[IPARAM_REORDER_GEMM] = 0;    // no reordering GEMM 
     iparam[IPARAM_TWO_FLOW] = 0;        // not force to run 2flow version
     iparam[IPARAM_P] = 0;               // row process grid, with set to numberi_of_nodes if not set
     iparam[IPARAM_N] = 0;               // matrix size, need to set and will check later 
@@ -224,7 +220,6 @@ static void parse_arguments(int *_argc, char*** _argv, int* iparam, double* dpar
 			case 'D': iparam[IPARAM_KIND_OF_PROBLEM]  = atoi(optarg); break;
 			case 'F': iparam[IPARAM_SEND_FULL_TILE]  = atoi(optarg); break;
 			case 'E': iparam[IPARAM_AUTO_BAND]  = atoi(optarg); break;
-            case 'I': iparam[IPARAM_REORDER_GEMM]  = atoi(optarg); break;
             case 'W': iparam[IPARAM_TWO_FLOW]  = atoi(optarg); break;
             case 'M' : mesh_file = optarg; break;
             case 'K': iparam[IPARAM_NUMOBJ]  = atoi(optarg); break;

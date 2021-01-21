@@ -218,8 +218,8 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
             fprintf(stderr, "\n***************** START Check band_size %d ******************\n", band_size);
 
         parsec_band_size_auto_tuning = parsec_band_size_auto_tuning_New(dcAr, dcFake, rank_array, NB,
-                                                      band_size, ops_trsm_tlr, ops_trsm_dense,
-                                                      ops_gemm_tlr, ops_gemm_dense, band_maxrank_thread); 
+                band_size, ops_trsm_tlr, ops_trsm_dense,
+                ops_gemm_tlr, ops_gemm_dense, band_maxrank_thread); 
 
         if( parsec_band_size_auto_tuning != NULL ){
             parsec_context_add_taskpool(parsec, parsec_band_size_auto_tuning);
@@ -233,21 +233,21 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
         ops_total_dense = 0LL;
         sum_tlr = 0LL;
         sum_dense = 0LL;
-	int band_maxrank_process = band_maxrank_thread[0];
+        int band_maxrank_process = band_maxrank_thread[0];
 
         for( i = 0; i < nb_threads; i++ ) {
             ops_total_tlr += ops_trsm_tlr[i] + ops_gemm_tlr[i]; 
             ops_total_dense += ops_trsm_dense[i] + ops_gemm_dense[i]; 
 
             if( band_maxrank_process < band_maxrank_thread[i] )
-                    band_maxrank_process = band_maxrank_thread[i];
+                band_maxrank_process = band_maxrank_thread[i];
         }
 
         MPI_Barrier( MPI_COMM_WORLD );
 
         MPI_Allreduce(&ops_total_tlr, &sum_tlr, 1, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD); 
         MPI_Allreduce(&ops_total_dense, &sum_dense, 1, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD); 
-	MPI_Gather( &band_maxrank_process, 1, MPI_INT, band_maxrank_receive, 1, MPI_INT, root, MPI_COMM_WORLD);
+        MPI_Gather( &band_maxrank_process, 1, MPI_INT, band_maxrank_receive, 1, MPI_INT, root, MPI_COMM_WORLD);
 
         MPI_Barrier( MPI_COMM_WORLD ); 
 
@@ -255,15 +255,15 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
             int band_maxrank = band_maxrank_receive[0];
             for( int i = 1; i < dcAr->super.nodes; i++ ) {
                 if( band_maxrank < band_maxrank_receive[i] )
-		    band_maxrank = band_maxrank_receive[i];
+                    band_maxrank = band_maxrank_receive[i];
             }
 
             fprintf(stderr, "band_size: %d, nb_threads: %d, ops_sum_tlr: %lle, ops_sum_dense: %lle\n",
-                             band_size, nb_threads, (long double)sum_tlr, (long double)sum_dense);
+                    band_size, nb_threads, (long double)sum_tlr, (long double)sum_dense);
             fprintf(stderr, "***************** END Check band_size %d : %d ******************\n", band_size, band_maxrank);
         }
 
-	/* Min band size based on FLUCTUATION */
+        /* Min band size based on FLUCTUATION */
         if( sum_tlr * FLUCTUATION <= sum_dense && 0 == band_indicator_min ) { 
             band_indicator_min = 1;
             opt_band_size_min = band_size - 1;
@@ -279,15 +279,15 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
                 fprintf(stderr, "\n############################# Find the OPT band_size : %d #############################\n\n", opt_band_size_min);
             }
 
-	    /* Free memory */
-	    free( ops_trsm_tlr );
-	    free( ops_trsm_dense );
-	    free( ops_gemm_tlr );
-	    free( ops_gemm_dense );
-	    free( band_maxrank_thread );
-	    free( band_maxrank_receive );
+            /* Free memory */
+            free( ops_trsm_tlr );
+            free( ops_trsm_dense );
+            free( ops_gemm_tlr );
+            free( ops_gemm_dense );
+            free( band_maxrank_thread );
+            free( band_maxrank_receive );
 
-	    return opt_band_size_min;
+            return opt_band_size_min;
         }
     }
 
