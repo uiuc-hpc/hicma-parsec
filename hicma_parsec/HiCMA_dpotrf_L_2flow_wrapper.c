@@ -1,7 +1,12 @@
 /**
- * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
+ *
+ * @version 0.1.0
+ * @author Qinglei Cao
+ * @date 2021-01-24
+ *
  **/
 
 #include "hicma_parsec.h"
@@ -272,7 +277,7 @@ HiCMA_dpotrf_L_2flow_New( parsec_context_t *parsec,
         hook  = (void *)&hicma_dpotrf->super.task_classes_array[gemm_id]->incarnations[0].hook;
         *hook = &wrap_gemm;
 
-        /* Others */
+    /* Others */
     } else {
 
         hicma_dpotrf->_g_wrap_potrf = hicma_dpotrf->super.task_classes_array[potrf_id]->incarnations[1].hook;
@@ -307,21 +312,16 @@ HiCMA_dpotrf_L_2flow_New( parsec_context_t *parsec,
 
     /* Memory pool */
     hicma_dpotrf->_g_p_work = (parsec_memory_pool_t*)malloc(sizeof(parsec_memory_pool_t));
-    //parsec_private_memory_init( hicma_dpotrf->_g_p_work, A->nb * A->nb * sizeof(double) * 8 );
     /* size used for temporary buffers obtained from hicma/compute/pzpotrf.c line 96 */
-    // TODO @kadir why is this?
     size_t ws_worker = 0;
-    ws_worker =  //FIXME tentative size. Find exact size. I think syrk uses less memory
-        //This workspace need to be fixed, not all tasks below need it nor need that much
-        2 * A->mb * 2 * compmaxrank   // for copying CU and CV into temporary buffer instead of using CUV itself. There is 2*maxrk because these buffers will be used to put two U's side by side
-        + 2 * A->mb       // qrtauA qrtauB
-        + compmaxrank * compmaxrank    // qrb_aubut  AcolBcolT
-        + 2 * A->mb * 2 * compmaxrank // newU newV
+    ws_worker = 
+        2 * A->mb * 2 * compmaxrank            // for copying CU and CV into temporary buffer instead of using CUV itself. There is 2*maxrk because these buffers will be used to put two U's side by side
+        + 2 * A->mb                            // qrtauA qrtauB
+        + compmaxrank * compmaxrank            // qrb_aubut  AcolBcolT
+        + 2 * A->mb * 2 * compmaxrank          // newU newV
         + (2*compmaxrank) * (2*compmaxrank)    // svd_rA     _rA
-        //+ maxrk * maxrk    // svd_rB     _rB   I assume that use_trmm=1 so I commented out
-        //+ maxrk * maxrk    // svd_T      _T    I assume that use_trmm=1 so I commented out
-        + (2*compmaxrank)          // sigma
-        + (2*compmaxrank); // superb
+        + (2*compmaxrank)                      // sigma
+        + (2*compmaxrank);                     // superb
     ;
     ws_worker *= sizeof(double); 
     parsec_private_memory_init( hicma_dpotrf->_g_p_work, ws_worker ); 

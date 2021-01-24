@@ -1,8 +1,13 @@
 extern "C" %{
 /**
- * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
+ *
+ * @version 0.1.0
+ * @author Qinglei Cao, Yu Pei
+ * @date 2021-01-24
+ *
  **/
 
 #include "hicma_parsec.h"
@@ -277,13 +282,13 @@ size = 1
 
 // Parameters
 READ  T <- T potrf_dpotrf(k)                                         [ type = FULL ]
-RW    Cv <- (k == 0) ? descAv(m, k) : Cv potrf_dgemm(m, k, k-1)  [ type = UV ]
+RW    Cv <- (k == 0) ? descAv(m, k) : Cv potrf_dgemm(m, k, k-1)      [ type = UV ]
          -> Av potrf_dsyrk(k, m)                                     [ layout = MPI_DOUBLE count = size ]
          -> Av potrf_dgemm(m, k+1..m-1, k)                           [ layout = MPI_DOUBLE count = size ]
          -> Bv potrf_dgemm(m+1..descAg->mt-1, m, k)                  [ layout = MPI_DOUBLE count = size ]
          -> descAv(m, k)                                             [ layout = MPI_DOUBLE count = size ]
 
-READ Cr <- (k == 0) ? Cr READ_Cr(m, k) : Cr potrf_dgemm(m, k, k-1) [ type = AR ]
+READ Cr <- (k == 0) ? Cr READ_Cr(m, k) : Cr potrf_dgemm(m, k, k-1)   [ type = AR ]
 
 CTL ctl <- (lookahead > 0 && m > lookahead+k)? ctl potrf_dsyrk(k, k+1)
 

@@ -3,8 +3,9 @@
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
  * @version 0.1.0
- * @author Kadir Akbudak
+ * @author Qinglei Cao, Kadir Akbudak
  * @date 2021-01-24
+ *
  **/
 #ifndef _HICMA_PARSEC_INTERNAL_H
 #define _HICMA_PARSEC_INTERNAL_H 
@@ -88,7 +89,6 @@
 #define CYN   "\x1B[36m"
 #define WHT   "\x1B[37m"
 #define RESET "\x1B[0m"
-
 
 /* Dynamically select collective after band_size auto-tuning
  *

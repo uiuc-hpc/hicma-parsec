@@ -1,7 +1,12 @@
 /**
- * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
+ *
+ * @version 0.1.0
+ * @author Qinglei Cao, Yu Pei
+ * @date 2021-01-24
+ *
  **/
 
 #include "hicma_parsec.h"
@@ -194,13 +199,13 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
                   parsec_tiled_matrix_dc_t *Av,
                   parsec_tiled_matrix_dc_t *Ar,
                   parsec_tiled_matrix_dc_t *Rank,
-                  double acc, /* accuracy threshold */
-                  int fixed_rank,     /* rank threshold     */
-                  int storagemaxrank,  /* size of storage    */
+                  double acc,
+                  int fixed_rank,
+                  int storagemaxrank,
                   int lookahead,
                   int band_size,
                   int hmb,
-                  int compmaxrank, /* size of temporary buffers */
+                  int compmaxrank,
                   int send_full_tile,
                   unsigned long* tileopcounters,
                   unsigned long* opcounters,
@@ -304,21 +309,16 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
 
     /* Memory pool */
     hicma_dpotrf->_g_p_work = (parsec_memory_pool_t*)malloc(sizeof(parsec_memory_pool_t));
-    //parsec_private_memory_init( hicma_dpotrf->_g_p_work, A->nb * A->nb * sizeof(double) * 8 );
     /* size used for temporary buffers obtained from hicma/compute/pzpotrf.c line 96 */
-    // TODO @kadir why is this?
     size_t ws_worker = 0;
-    ws_worker =  //FIXME tentative size. Find exact size. I think syrk uses less memory
-        //This workspace need to be fixed, not all tasks below need it nor need that much
-        2 * A->mb * 2 * compmaxrank   // for copying CU and CV into temporary buffer instead of using CUV itself. There is 2*maxrk because these buffers will be used to put two U's side by side
-        + 2 * A->mb       // qrtauA qrtauB
-        + compmaxrank * compmaxrank    // qrb_aubut  AcolBcolT
-        + 2 * A->mb * 2 * compmaxrank // newU newV
+    ws_worker =
+        2 * A->mb * 2 * compmaxrank            // for copying CU and CV into temporary buffer instead of using CUV itself. There is 2*maxrk because these buffers will be used to put two U's side by side
+        + 2 * A->mb                            // qrtauA qrtauB
+        + compmaxrank * compmaxrank            // qrb_aubut  AcolBcolT
+        + 2 * A->mb * 2 * compmaxrank          // newU newV
         + (2*compmaxrank) * (2*compmaxrank)    // svd_rA     _rA
-        //+ maxrk * maxrk    // svd_rB     _rB   I assume that use_trmm=1 so I commented out
-        //+ maxrk * maxrk    // svd_T      _T    I assume that use_trmm=1 so I commented out
-        + (2*compmaxrank)          // sigma
-        + (2*compmaxrank); // superb
+        + (2*compmaxrank)                      // sigma
+        + (2*compmaxrank);                     // superb
     ;
     ws_worker *= sizeof(double); 
     parsec_private_memory_init( hicma_dpotrf->_g_p_work, ws_worker ); 

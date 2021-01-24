@@ -3,7 +3,7 @@
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
  * @version 0.1.0
- * @author Kadir Akbudak
+ * @author Qinglei Cao, Yu Pei, Kadir Akbudak
  * @date 2021-01-24
  **/
 
@@ -30,12 +30,6 @@ static int starsh_generate_map_operator(parsec_execution_stream_t *es,
     tempnn = ((n)==((descA->nt)-1)) ? ((descA->n)-(n*(descA->nb))) : (descA->nb);
     ldam   = BLKLDD( descA, m );
 
-    /*printf("tempmm=%d tempnn=%d ldam=%d m=%d n=%d mt=%d nt=%d mb=%d nb=%d M=%d N=%d\n",
-            tempmm, tempnn, ldam, m, n, descA->mt,
-            descA->nt, descA->mb, descA->nb, descA->m, descA->n);*/
-    /*CORE_dplgsy(
-        descA->m, tempmm, tempnn, A, ldam,
-        descA->m, m*descA->mb, n*descA->nb, 0);*/
     params->kernel(tempmm, tempnn, params->index + m*descA->mb,
             params->index + n*descA->nb, params->data, params->data, A, ldam);
 
@@ -287,7 +281,7 @@ int main(int argc, char ** argv)
     /* Placement template for particles */
     enum STARSH_PARTICLES_PLACEMENT place = STARSH_PARTICLES_UNIFORM;
         
-    srand(0); // FIXME
+    srand(0);
 
     /* Synthetic matrix with equal ranks */
     if(kind_of_problem == 0)

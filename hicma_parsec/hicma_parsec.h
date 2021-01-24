@@ -2,9 +2,11 @@
  * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
+ *
  * @version 0.1.0
- * @author Kadir Akbudak
+ * @author Qinglei Cao, Kadir Akbudak
  * @date 2021-01-24
+ *
  **/
 #ifndef _HICMA_PARSEC_H_
 #define _HICMA_PARSEC_H_
