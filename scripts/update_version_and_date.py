@@ -8,13 +8,9 @@ from __future__ import print_function
 from glob import glob
 from datetime import date
 
-src_files = glob("../src/*.c")
-src_files.extend(glob("../src/*/*.c"))
-src_files.extend(glob("../src/*/*/*.c"))
-src_files.extend(glob("../src/*/*/*/*.c"))
-src_files.extend(glob("../testing/*.c"))
+src_files = glob("../hicma_parsec/*.c")
 
-h_files = glob("../include/*.h")
+h_files = glob("../hicma_parsec/*.h")
 
 all_files = src_files+h_files
 
