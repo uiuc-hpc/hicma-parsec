@@ -163,7 +163,7 @@ BODY [type=RECURSIVE]
     int iinfo = 0;
 
     /* Operation count */
-    unsigned long int cnt = ka_counts('c', tempkm, 0, 0, 0);
+    unsigned long int cnt = op_counts('c', tempkm, 0, 0, 0);
     LOG_OPCOUNT(cnt, k, k);
     op_band[es->th_id] += cnt;
     op_path[es->th_id] += cnt;
@@ -282,7 +282,7 @@ BODY [type=RECURSIVE]
 
     /* Operation count */
     if( m-k < band_size ) { 
-        unsigned long int cnt = ka_counts('t', tempmm, tempmm, 1 /*side*/, 0);
+        unsigned long int cnt = op_counts('t', tempmm, tempmm, 1 /*side*/, 0);
         LOG_OPCOUNT(cnt, m, k);
         op_band[es->th_id] += cnt;
         if( 1 == m-k )
@@ -290,7 +290,7 @@ BODY [type=RECURSIVE]
         else
             op_offpath[es->th_id] += cnt;
     } else {
-        unsigned long int cnt = ka_counts('t', tempmm, ((int*)Cr)[0], 1 /*side*/, 0);
+        unsigned long int cnt = op_counts('t', tempmm, ((int*)Cr)[0], 1 /*side*/, 0);
         LOG_OPCOUNT(cnt, m, k);
         op_offband[es->th_id] += cnt;
         if( 1 == m-k )
@@ -424,7 +424,7 @@ BODY [type=RECURSIVE]
 
     /* Operation count */
     if( m-k < band_size ) {
-        unsigned long int cnt = ka_counts('m', tempmm, tempmm, tempmm, 0);
+        unsigned long int cnt = op_counts('m', tempmm, tempmm, tempmm, 0);
         LOG_OPCOUNT(cnt, m, m);
         op_band[es->th_id] += cnt;
         if( 1 == m-k )
@@ -437,11 +437,11 @@ BODY [type=RECURSIVE]
         /// C = C + alpha * ( (A^u * (A^v * A^v^T) ) * A^u^T)
         unsigned long int cnt = 0;
         /// A^v * B^v^T
-        cnt += ka_counts('m', rank, rank, tempmm, 0);
+        cnt += op_counts('m', rank, rank, tempmm, 0);
         /// A^u * (A^v * B^v^T)
-        cnt += ka_counts('m', tempmm, rank, rank, 0);
+        cnt += op_counts('m', tempmm, rank, rank, 0);
         /// (A^u * (A^v * B^v^T) ) * B^u^T
-        cnt += ka_counts('m', tempmm, tempmm, rank, 0);
+        cnt += op_counts('m', tempmm, tempmm, rank, 0);
         LOG_OPCOUNT(cnt, m, m);
         op_band[es->th_id] += cnt;
         if( 1 == m-k )
@@ -612,21 +612,21 @@ BODY [type=RECURSIVE]
 
     /* Operation count on band*/
     if ( m-k < band_size ) {
-        unsigned long int cnt = ka_counts('m', tempmm, tempmm, tempmm, 0);
+        unsigned long int cnt = op_counts('m', tempmm, tempmm, tempmm, 0);
         LOG_OPCOUNT(cnt, m, n);
         op_band[es->th_id] += cnt;
         op_offpath[es->th_id] += cnt;
     } else if( n-k < band_size && m-n < band_size ) {
         int Arank = ((int*)Ar)[0];
-        unsigned long int cnt = ka_counts('m', tempmm, tempmm, Arank, 0) * 2;
+        unsigned long int cnt = op_counts('m', tempmm, tempmm, Arank, 0) * 2;
         LOG_OPCOUNT(cnt, m, n);
         op_band[es->th_id] += cnt;
         op_offpath[es->th_id] += cnt;
     } else if( m-n < band_size ) {
         int Arank = ((int*)Ar)[0];
         int Brank = ((int*)Br)[0];
-        unsigned long int cnt = ka_counts('m', tempmm, tempmm, parsec_imin(Arank, Brank), 0)
-                                + ka_counts('m', tempmm, Arank, Brank, 0) * 2;
+        unsigned long int cnt = op_counts('m', tempmm, tempmm, parsec_imin(Arank, Brank), 0)
+                                + op_counts('m', tempmm, Arank, Brank, 0) * 2;
         LOG_OPCOUNT(cnt, m, n);
         op_band[es->th_id] += cnt;
         op_offpath[es->th_id] += cnt;
@@ -905,16 +905,16 @@ BODY
         unsigned long int cnt = 0;
 
         /// QR([CU AU])
-        unsigned long int qraflop = ka_counts('q', tempmmv, Crank_old__Arank, 0, 0);///ASSUMPTION:tempmmv is not totally correct if nrowsC<ncolsC
-        unsigned long int qrbflop = ka_counts('q', tempmmv, Crank_old__Arank, 0, 0);
+        unsigned long int qraflop = op_counts('q', tempmmv, Crank_old__Arank, 0, 0);///ASSUMPTION:tempmmv is not totally correct if nrowsC<ncolsC
+        unsigned long int qrbflop = op_counts('q', tempmmv, Crank_old__Arank, 0, 0);
         /// Au * B
-        qrbflop += ka_counts('m', Arank, tempmmv, tempmmv, 0);
+        qrbflop += op_counts('m', Arank, tempmmv, tempmmv, 0);
         int rA_nrows  = tempmmv < Crank_old__Arank ? tempmmv : Crank_old__Arank;
-        unsigned long int svdflop = ka_counts('r', Crank_old__Arank, Crank_old__Arank, 2, 0);// trmm is used
-        svdflop += ka_counts('s', Crank_old__Arank, 0, 0, 0);
+        unsigned long int svdflop = op_counts('r', Crank_old__Arank, Crank_old__Arank, 2, 0);// trmm is used
+        svdflop += op_counts('s', Crank_old__Arank, 0, 0, 0);
         svdflop += Crank_old__Arank * new_Crank;
-        unsigned long int newuflop = ka_counts('o', tempmmv, new_Crank, Crank_old__Arank, 1);
-        unsigned long int newvflop = ka_counts('o', new_Crank, tempmmv, Crank_old__Arank, 2);
+        unsigned long int newuflop = op_counts('o', tempmmv, new_Crank, Crank_old__Arank, 1);
+        unsigned long int newvflop = op_counts('o', new_Crank, tempmmv, Crank_old__Arank, 2);
 
         cnt = qraflop + qrbflop + svdflop + newuflop + newvflop;
         LOG_OPCOUNT(cnt, m, n);
@@ -1071,18 +1071,18 @@ BODY
         int Crank_old__Arank = Crank_old + Arank;
         unsigned long int cnt = 0;
         /// QR([CU AU])
-        unsigned long int qraflop = ka_counts('q', tempmmv, Crank_old__Arank, 0, 0);///ASSUMPTION:tempmmv is not totally correct if nrowsC<ncolsC
+        unsigned long int qraflop = op_counts('q', tempmmv, Crank_old__Arank, 0, 0);///ASSUMPTION:tempmmv is not totally correct if nrowsC<ncolsC
         /// AV*BV^T
-        unsigned long int qrbflop = ka_counts('m', Arank, Brank, tempmmv, 0);
+        unsigned long int qrbflop = op_counts('m', Arank, Brank, tempmmv, 0);
         /// (AV*BV^T) * BU^T
-        qrbflop += ka_counts('m', Arank, tempmmv, Brank, 0);
-        qrbflop += ka_counts('q', tempmmv, Crank_old__Arank, 0, 0);  
+        qrbflop += op_counts('m', Arank, tempmmv, Brank, 0);
+        qrbflop += op_counts('q', tempmmv, Crank_old__Arank, 0, 0);  
         int rA_nrows  = tempmmv < Crank_old__Arank ? tempmmv : Crank_old__Arank;
-        unsigned long int svdflop = ka_counts('r', Crank_old__Arank, Crank_old__Arank, 2, 0);// trmm is used
-        svdflop += ka_counts('s', Crank_old__Arank, 0, 0, 0);
+        unsigned long int svdflop = op_counts('r', Crank_old__Arank, Crank_old__Arank, 2, 0);// trmm is used
+        svdflop += op_counts('s', Crank_old__Arank, 0, 0, 0);
         svdflop += Crank_old__Arank * Crank_new; 
-        unsigned long int newuflop = ka_counts('o', tempmmv, Crank_new, Crank_old__Arank, 1);  
-        unsigned long int newvflop = ka_counts('o', Crank_new, tempmmv, Crank_old__Arank, 2); 
+        unsigned long int newuflop = op_counts('o', tempmmv, Crank_new, Crank_old__Arank, 1);  
+        unsigned long int newvflop = op_counts('o', Crank_new, tempmmv, Crank_old__Arank, 2); 
 
         cnt = qraflop + qrbflop + svdflop + newuflop + newvflop;
         LOG_OPCOUNT(cnt, m, n);

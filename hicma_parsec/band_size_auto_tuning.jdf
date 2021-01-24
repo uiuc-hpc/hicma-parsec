@@ -93,18 +93,18 @@ BODY
     /* Caculate FLOPS */
     int Crank_Arank = Crank + Arank;
     /// QR([CU AU])
-    unsigned long int qraflop = ka_counts('q', NB, Crank_Arank, 0, 0);///ASSUMPTION:NB is not totally correct if nrowsC<ncolsC
+    unsigned long int qraflop = op_counts('q', NB, Crank_Arank, 0, 0);///ASSUMPTION:NB is not totally correct if nrowsC<ncolsC
     /// AV*BV^T
-    unsigned long int qrbflop = ka_counts('m', Arank, Brank, NB, 0);
+    unsigned long int qrbflop = op_counts('m', Arank, Brank, NB, 0);
     /// (AV*BV^T) * BU^T
-    qrbflop += ka_counts('m', Arank, NB, Brank, 0);
-    qrbflop += ka_counts('q', NB, Crank_Arank, 0, 0);
+    qrbflop += op_counts('m', Arank, NB, Brank, 0);
+    qrbflop += op_counts('q', NB, Crank_Arank, 0, 0);
     int rA_nrows  = NB < Crank_Arank ? NB : Crank_Arank;
-    unsigned long int svdflop = ka_counts('r', Crank_Arank, Crank_Arank, 2, 0);// trmm is used
-    svdflop += ka_counts('s', Crank_Arank, 0, 0, 0);
+    unsigned long int svdflop = op_counts('r', Crank_Arank, Crank_Arank, 2, 0);// trmm is used
+    svdflop += op_counts('s', Crank_Arank, 0, 0, 0);
     svdflop += Crank_Arank * Crank;
-    unsigned long int newuflop = ka_counts('o', NB, Crank, Crank_Arank, 1);
-    unsigned long int newvflop = ka_counts('o', Crank, NB, Crank_Arank, 2);
+    unsigned long int newuflop = op_counts('o', NB, Crank, Crank_Arank, 1);
+    unsigned long int newvflop = op_counts('o', Crank, NB, Crank_Arank, 2);
 
     ops_gemm_tlr[myid] += (long long int)qraflop + qrbflop + svdflop + newuflop + newvflop;
 

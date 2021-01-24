@@ -43,7 +43,7 @@
 
 /* Local headers */
 #include "auxdescutil.h" // _printmat
-#include "ka_counts.h"
+#include "op_counts.h"
 #include "hicma_internal.h"
 #include "hcore.h" 
 #include "hcore_d.h"

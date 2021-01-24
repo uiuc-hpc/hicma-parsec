@@ -1,6 +1,6 @@
-#ifndef __KA_COUNTS__
-#define __KA_COUNTS__
-static unsigned long int ka_counts(char op, unsigned long int a, unsigned long int b, unsigned long int c, unsigned long int d){
+#ifndef __OP_COUNTS__
+#define __OP_COUNTS__
+static unsigned long int op_counts(char op, unsigned long int a, unsigned long int b, unsigned long int c, unsigned long int d){
   unsigned long int res = 0;
   if(op == 'q') {//geqrf  if m >= n
     unsigned long int m = a;
