@@ -392,7 +392,6 @@ int main(int argc, char ** argv)
     sym_two_dim_block_cyclic_init(&dcA.off_band, matrix_RealDouble,
                                   rank, NB, NB_UV, N, N_UV, 0, 0,
                                   N, N_UV, P, nodes/P, uplo);
-    parsec_data_collection_set_key((parsec_data_collection_t*)&dcA, "dcA_off_band");
 
     /* Init band */
     two_dim_block_cyclic_init(&dcA.band, matrix_RealDouble, matrix_Tile,
@@ -405,10 +404,11 @@ int main(int argc, char ** argv)
                                    (size_t)dcA.band.super.bsiz *
                                    (size_t)parsec_datadist_getsizeoftype(dcA.band.super.mtype));
 #endif
-    parsec_data_collection_set_key(&dcA.band.super.super, "dcA_band");
 
     /* Init two_dim_block_cyclic_band_t structure */
     sym_two_dim_block_cyclic_band_init( &dcA, nodes, rank, band_size );
+    parsec_data_collection_set_key((parsec_data_collection_t*)&dcA, "dcA_off_band");
+    parsec_data_collection_set_key(&dcA.band.super.super, "dcA_band");
 
 
     /* dcAr contains rank of each tile. It is NT by NT matrix for now. */
@@ -595,16 +595,16 @@ int main(int argc, char ** argv)
     sym_two_dim_block_cyclic_init(&dcRank.off_band, matrix_Integer,
                                   rank, 1, RANK_MAP_BUFF, NT, RANK_MAP_BUFF*NT, 0, 0,
                                   NT, RANK_MAP_BUFF*NT, P, nodes/P, uplo);
-    parsec_data_collection_set_key((parsec_data_collection_t*)&dcRank, "dcRank_super");
 
     /* Init band */
     two_dim_block_cyclic_init(&dcRank.band, matrix_Integer, matrix_Tile,
                               rank, 1, RANK_MAP_BUFF, band_size, RANK_MAP_BUFF*NT, 0, 0,
                               band_size, RANK_MAP_BUFF*NT, P_BAND, nodes/P_BAND, 1, 1, 0, 0);
-    parsec_data_collection_set_key(&dcRank.band.super.super, "dcRank_band");
 
     /* Init two_dim_block_cyclic_band_t structure */
     sym_two_dim_block_cyclic_band_init( &dcRank, nodes, rank, band_size );
+    parsec_data_collection_set_key((parsec_data_collection_t*)&dcRank, "dcRank_super");
+    parsec_data_collection_set_key(&dcRank.band.super.super, "dcRank_band");
 
 
     /* Used for checking results */
