@@ -1,9 +1,8 @@
-/*
- * Copyright (c) 2009-2018 The University of Tennessee and The University
- *                         of Tennessee Research Foundation.  All rights
- *                         reserved.
- *
- */
+/**
+ * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ **/
 
 #include "hicma_parsec.h"
 

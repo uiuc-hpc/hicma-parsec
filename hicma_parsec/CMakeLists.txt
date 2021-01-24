@@ -1,3 +1,8 @@
+#
+# @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
+#                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+#                     All rights reserved.
+
 cmake_policy(SET CMP0074 NEW)
 include(FindPkgConfig)
 

@@ -1,9 +1,13 @@
 /**
- * @copyright (c) 2020 King Abdullah University of Science and Technology (KAUST).
+ * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
  *
  * This file declares the HICMA auxiliary functions. 
+ *
+ * @version 0.1.0
+ * @author Kadir Akbudak
+ * @date 2021-01-24
  **/
 #ifndef _HICMA_INTERNAL_H_
 #define _HICMA_INTERNAL_H_

@@ -1,3 +1,11 @@
+/**
+ * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
+ *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                     All rights reserved.
+ * @version 0.1.0
+ * @author Kadir Akbudak
+ * @date 2021-01-24
+ **/
 #ifndef __OP_COUNTS__
 #define __OP_COUNTS__
 static unsigned long int op_counts(char op, unsigned long int a, unsigned long int b, unsigned long int c, unsigned long int d){
