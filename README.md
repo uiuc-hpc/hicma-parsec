@@ -163,3 +163,11 @@ Additional PaRSEC flags:
     for -D 3 (statistics-3d-sqexp), set maxrank= 500;
     for -D 4 (statistics-3d-exp), set maxrank= tile_size / 2. 
 ```
+
+References
+-----------
+1. Q. Cao, Y. Pei, T. Herauldt, K. Akbudak, A. Mikhalev, G. Bosilca, H. Ltaief, D. E. Keyes, and J. Dongarra, *Performance Analysis of Tile Low-Rank Cholesky Factorization Using PaRSEC Instrumentation Tools*, **2019 IEEE/ACM International Workshop on Programming and Performance Visualization Tools (ProTools)**, Denver, CO, USA, 2019, pp. 25-32.
+
+2. Q. Cao, Y. Pei, K. Akbudak, A. Mikhalev, G. Bosilca, H. Ltaief, D. E. Keyes, and J. Dongarra, *Extreme-Scale Task-Based Cholesky Factorization Toward Climate and Weather Prediction Applications*, **The Platform for Advanced Scientific Computing (PASC 2020)**.
+
+3. Q. Cao, Y. Pei, K. Akbudak, G. Bosilca, H. Ltaief, D. E. Keyes, and J. Dongarra, *Leveraging PaRSEC Runtime Support to Tackle Challenging 3D Data-Sparse Matrix Problems*, **IEEE International Parallel & Distributed Processing Symposium (IPDPS 2021)**.
