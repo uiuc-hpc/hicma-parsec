@@ -1,8 +1,8 @@
 extern "C" %{
 /**
- * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
- *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
- *                     All rights reserved.
+ * @copyright (c) 2021     King Abdullah University of Science and Technology (KAUST).
+ * @copyright (c) 2021     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                         All rights reserved.
  * @version 0.1.0
  * @date 2021-01-24
  *
@@ -143,7 +143,6 @@ READ A <- NULL                     [ type = UV ]
 
 BODY
 {
-    // TODO @kadir: Do we have guarantee that U and V will be initially zero??
     int iinfo = 0;
     int size = 0;
     int ldU = BLKLDD(descA, m);

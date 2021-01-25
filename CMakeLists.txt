@@ -1,9 +1,6 @@
-# @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
-#                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
-#                     All rights reserved.
-# @version 0.1.0
-# @author Qinglei Cao, Yu Pei, Kadir Akbudak
-# @date 2021-01-24
+# @copyright (c) 2021     King Abdullah University of Science and Technology (KAUST).
+# @copyright (c) 2021     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+#                         All rights reserved.
 
 cmake_minimum_required (VERSION 3.16)
 project (DTRSM C)
@@ -34,10 +31,6 @@ if(POLICY CMP0094)
   #          of searching for the largest available version number (which defeats our selection logic)
   cmake_policy(SET CMP0094 NEW)
 ENDIF(POLICY CMP0094)
-
-
-option(BUILD_64bits
-  "Build 64 bits mode" ON)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are None, Debug, Release, RelWithDebInfo and MinSizeRel." FORCE)

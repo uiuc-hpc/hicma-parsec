@@ -1,7 +1,7 @@
 /**
- * @copyright (c) 2021 King Abdullah University of Science and Technology (KAUST).
- *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
- *                     All rights reserved.
+ * @copyright (c) 2021     King Abdullah University of Science and Technology (KAUST).
+ * @copyright (c) 2021     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
+ *                         All rights reserved.
  * @version 0.1.0
  * @date 2021-01-24
  *

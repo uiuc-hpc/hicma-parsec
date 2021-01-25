@@ -17,7 +17,7 @@ The following modules can be used on ECRC systems:
 mkl/2018-update-1   gcc/5.5.0    cmake/3.17.3   openmpi/3.0.0-gcc-5.5.0
 ```
 
-DPLASMA, HCORE and STARS-H are required. 
+DPLASMA as well as PaRSEC which is a submodule in DPLASMA, HCORE and STARS-H are required. 
 These libraries are provided as submodules of this repository 
 so use these submodules for installation.
 
@@ -71,7 +71,6 @@ Submodules must be updated via `git submodule update --init --recursive`.
 
 ```
 cd $HOME/hicma-x-dev
-git checkout band_tlr_pasc 
 mkdir -p build && cd build 
 cmake .. 
 ```
@@ -166,7 +165,7 @@ Additional PaRSEC flags:
 
 References
 -----------
-1. Q. Cao, Y. Pei, T. Herauldt, K. Akbudak, A. Mikhalev, G. Bosilca, H. Ltaief, D. E. Keyes, and J. Dongarra, *Performance Analysis of Tile Low-Rank Cholesky Factorization Using PaRSEC Instrumentation Tools*, **2019 IEEE/ACM International Workshop on Programming and Performance Visualization Tools (ProTools)**, Denver, CO, USA, 2019, pp. 25-32.
+1. Q. Cao, Y. Pei, T. Herault, K. Akbudak, A. Mikhalev, G. Bosilca, H. Ltaief, D. E. Keyes, and J. Dongarra, *Performance Analysis of Tile Low-Rank Cholesky Factorization Using PaRSEC Instrumentation Tools*, **2019 IEEE/ACM International Workshop on Programming and Performance Visualization Tools (ProTools)**, Denver, CO, USA, 2019, pp. 25-32.
 
 2. Q. Cao, Y. Pei, K. Akbudak, A. Mikhalev, G. Bosilca, H. Ltaief, D. E. Keyes, and J. Dongarra, *Extreme-Scale Task-Based Cholesky Factorization Toward Climate and Weather Prediction Applications*, **The Platform for Advanced Scientific Computing (PASC 2020)**.
 
