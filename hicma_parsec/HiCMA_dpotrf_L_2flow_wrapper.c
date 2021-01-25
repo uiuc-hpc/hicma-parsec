@@ -4,7 +4,6 @@
  *                     All rights reserved.
  *
  * @version 0.1.0
- * @author Qinglei Cao
  * @date 2021-01-24
  *
  **/

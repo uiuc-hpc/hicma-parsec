@@ -9,7 +9,6 @@
  * This file contains the declarations of auxiliary functions for printing matrices.
  *
  * @version 0.1.0
- * @author Kadir Akbudak
  * @date 2021-01-24
  **/
 #ifndef __AUXDESCUTIL__

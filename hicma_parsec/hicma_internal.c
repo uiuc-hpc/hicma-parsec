@@ -6,7 +6,6 @@
  * This file declares the HICMA auxiliary functions. 
  *
  * @version 0.1.0
- * @author Kadir Akbudak
  * @date 2021-01-24
  **/
 #include "hicma_internal.h"

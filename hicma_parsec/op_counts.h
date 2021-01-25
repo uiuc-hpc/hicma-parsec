@@ -3,7 +3,6 @@
  *                     The Universiy of Tennessee and The Universiy of Tennessee Research Foundation.
  *                     All rights reserved.
  * @version 0.1.0
- * @author Kadir Akbudak
  * @date 2021-01-24
  **/
 #ifndef __OP_COUNTS__
