@@ -641,7 +641,7 @@ int main(int argc, char ** argv)
         STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA0,
                              (parsec_tiled_matrix_dc_t*)&dcA,
                              (parsec_tiled_matrix_dc_t*)&dcAr,
-			     band_size, &info);
+                             band_size, maxrank, &info);
 
         /* Timer end */
         SYNC_TIME_PRINT(rank, ("STARSH_check" "\tPxQ= %3d %-3d NB= %4d N= %7d\n",
@@ -724,7 +724,7 @@ int main(int argc, char ** argv)
 	    STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcA0,
 			    (parsec_tiled_matrix_dc_t*)&dcA,
 			    (parsec_tiled_matrix_dc_t*)&dcAr,
-			    band_size, &info);
+			    band_size, maxrank, &info);
 
 	    /* Timer end */
 	    SYNC_TIME_PRINT(rank, ("STARSH_check" "\tPxQ= %3d %-3d NB= %4d N= %7d\n\n",
@@ -809,7 +809,7 @@ int main(int argc, char ** argv)
 	    STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcAd,
 			    (parsec_tiled_matrix_dc_t*)&dcA,
 			    (parsec_tiled_matrix_dc_t*)&dcAr,
-			    band_size, &info);
+			    band_size, maxrank, &info);
 
 	    if(rank == 0) {
 		    printf("+++++++++++++++++++++++++++\n");
@@ -856,7 +856,7 @@ int main(int argc, char ** argv)
         STARSH_check(parsec, uplo, (parsec_tiled_matrix_dc_t*)&dcAd,
                              (parsec_tiled_matrix_dc_t*)&dcA,
                              (parsec_tiled_matrix_dc_t*)&dcAr,
-			     band_size, &info);
+                             band_size, maxrank, &info);
 
         /* ~/parsec/build/dplasma/lib/dplasma_dcheck.c */
         ret |= check_dpotrf2( parsec, (rank == 0) ? verbose : 0, uplo,

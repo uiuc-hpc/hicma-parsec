@@ -21,8 +21,8 @@ descA0          [type = "parsec_tiled_matrix_dc_t*"]
 descA           [type = "parsec_tiled_matrix_dc_t*"]
 descAr          [type = "parsec_tiled_matrix_dc_t*"]
 band_size       [type = "int"]
+maxrank         [type = "int"]
 INFO            [type = "int*"]
-old_destruct    [type = "parsec_destruct_fn_t" hidden = on default = NULL]
 
 
 /**************************************************
@@ -98,9 +98,7 @@ n = %{ return parsec_imax(m-band_size+1, 0); %} .. m
 
 // Parameters
 READ D  <- D READ_band(m, n)             [ type = FULL ]
-
-RW D2 <- descA0(m, n)                    [ type = FULL ]
-      -> descA0(m, n)                    [ type = FULL ]
+READ D2 <- descA0(m, n)                  [ type = FULL ]
 
 BODY
 {
@@ -153,6 +151,7 @@ extern "C" %{
  * @param [in] dcA:          the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated
  * @param [in] band_size:    band size
+ * @param [in] maxrank:      maxrank 
  * @param [inout] info:      info to check result
  * @return the parsec object to schedule
  */
@@ -161,7 +160,8 @@ STARSH_check_New(int uplo,
                   parsec_tiled_matrix_dc_t *A0,
                   parsec_tiled_matrix_dc_t *A,
                   parsec_tiled_matrix_dc_t *Ar,
-		  int band_size,
+                  int band_size,
+                  int maxrank, 
                   int *info)
 {
     parsec_taskpool_t *tp = NULL;
@@ -175,7 +175,7 @@ STARSH_check_New(int uplo,
 
     *info = 0;
     parsec_STARSH_check_taskpool_t *starsh_check =
-        parsec_STARSH_check_new(uplo, A0, A, Ar, band_size, info);
+    parsec_STARSH_check_new(uplo, A0, A, Ar, band_size, maxrank, info);
 
     tp = (parsec_taskpool_t*)starsh_check;
 
@@ -186,7 +186,7 @@ STARSH_check_New(int uplo,
 
     parsec_matrix_add2arena(&starsh_check->arenas_datatypes[PARSEC_STARSH_check_UV_ARENA],
                             parsec_datatype_double_t, matrix_UpperLower,
-                            1, A->mb, A->nb, A->mb,
+                            1, A->mb, 2*maxrank, A->mb,
                             PARSEC_ARENA_ALIGNMENT_SSE, -1 );
 
     parsec_matrix_add2arena(&starsh_check->arenas_datatypes[PARSEC_STARSH_check_AR_ARENA],
@@ -217,6 +217,7 @@ void STARSH_check_Destruct(parsec_taskpool_t *taskpool)
  * @param [in] dcA:          the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated
  * @param [in] band_size:    band size
+ * @param [in] maxrank:      maxrank 
  * @param [inout] info:      info to check result 
  */
 int STARSH_check( parsec_context_t *parsec,
@@ -225,12 +226,13 @@ int STARSH_check( parsec_context_t *parsec,
                 parsec_tiled_matrix_dc_t *dcA,
                 parsec_tiled_matrix_dc_t *dcAr,
                 int band_size,
+                int maxrank,
                 int *info)
 {
     parsec_taskpool_t *parsec_STARSH_check = NULL;
 
     parsec_STARSH_check = STARSH_check_New(
-             uplo, dcA0, dcA, dcAr, band_size, info);
+            uplo, dcA0, dcA, dcAr, band_size, maxrank, info);
 
     parsec_context_add_taskpool(parsec, parsec_STARSH_check);
     parsec_context_start(parsec);

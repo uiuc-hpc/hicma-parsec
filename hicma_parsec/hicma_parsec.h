@@ -156,6 +156,7 @@ int parsec_rank_print(parsec_context_t *parsec,
  * @param [in] dcA:          the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated
  * @param [in] band_size:    band size
+ * @param [in] maxrank:      maxrank 
  * @param [inout] info:      info to check result
  */
 int STARSH_check( parsec_context_t *parsec,
@@ -164,6 +165,7 @@ int STARSH_check( parsec_context_t *parsec,
                 parsec_tiled_matrix_dc_t *dcA,
                 parsec_tiled_matrix_dc_t *dcAr,
                 int band_size,
+                int maxrank, 
                 int *info);
 
 /**
