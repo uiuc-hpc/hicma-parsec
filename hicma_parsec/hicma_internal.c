@@ -13,29 +13,6 @@
 // Use work array while using HCORE functions.
 int use_scratch = 1;
 
-int tile_dpotrf( int uplo, int m, double* A, int lda, int Am, int An) {
-    if(HICMA_get_print_index() == 1){
-        printf("%d+POTRF\t|AD(%d,%d) m:%d lda(11):%d\n", 0, Am, An, m, lda);
-    }
-    if(HICMA_get_print_mat() == 1){
-        printf("%d\tpotrf-input A\n", __LINE__);
-        _printmat(A, m, m, lda);
-    }
-    int iinfo = 0;
-
-    CORE_dpotrf( uplo, m, A, lda, &iinfo );
-
-    if(iinfo != 0){
-        printf("%s %d: dpotrf failed with a return value of %d. uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, uplo, m, A, lda);
-        fflush(stdout);
-        exit(-1);
-    }
-    if(HICMA_get_print_mat() == 1){
-        printf("%d\tpotrf-output A\n", __LINE__);
-        _printmat(A, m, m, lda);
-    }
-    return iinfo;
-}
 int tile_dtrsm( int side, int uplo, int transA, int diag, int m, int n, double alpha, double* A, int lda, double* B, int ldb, int* Brk, int Am, int An, int Bm, int Bn) {
     struct timeval tvalBefore, tvalAfter;  // removed comma
     gettimeofday (&tvalBefore, NULL);

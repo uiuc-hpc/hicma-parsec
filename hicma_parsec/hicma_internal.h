@@ -34,11 +34,6 @@ void HICMA_get_stat(char uplo, int *Ark, size_t m, size_t n, size_t ld,  HICMA_s
 void HICMA_get_stat2(int *Ark, size_t m, int maxrank,  HICMA_stat_t *stat);
 void HICMA_print_stat(HICMA_stat_t stat);
 /**
- * Wrapper for potrf.
- * Gets tile indices and print them.
- */
-int tile_dpotrf( int uplo, int m, double* A, int lda , int Am, int An ) ;
-/**
  * Wrapper for trsm.
  * Gets tile indices and print them.
  */

@@ -221,8 +221,14 @@ BODY
     int tempkm = k == descA->mt-1 ? descA->m - k*descA->mb : descA->mb;
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descA, k );
+    flop_counter flops;
+    HCORE_dpotrf( lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
 
-    iinfo = tile_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
+    if(iinfo != 0){
+        printf("%s %d: dpotrf failed with a return value of %d. uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, uplo, tempkm, T, ld_Ag_k);
+        fflush(stdout);
+        //exit(-1);
+    }
 
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descA->mb+iinfo; /* Should return here */

@@ -255,7 +255,8 @@ BODY
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descAg, k );
 
-    iinfo = tile_dpotrf( uplo, tempkm, T, ld_Ag_k, k, 0 );
+    flop_counter flops;
+    HCORE_dpotrf( lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
 
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descAg->mb+iinfo; /* Should return here */
