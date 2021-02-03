@@ -380,9 +380,10 @@ BODY
         int ldam = BLKLDD( descA, m );
         void *Cv = (void *)C + descA->mb * ((int *)Cr)[0] * sizeof(double);
 
-        tile_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
-                   tempmm, descA->mb, (double)1.0, T, ldak,
-                   Cv, ldam, Cr, k, 0, m, k);
+        flop_counter flops;
+        int Crank = *((int *)Cr);
+        HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+                tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
 
         /* Pass Cr value to size */
         if(send_full_tile == 1){

@@ -257,6 +257,12 @@ BODY
 
     flop_counter flops;
     HCORE_dpotrf( lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
+    
+    if(iinfo != 0){
+        printf("%s %d: dpotrf failed with a return value of %d. uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, uplo, tempkm, T, ld_Ag_k);
+        fflush(stdout);
+        //exit(-1);
+    }
 
     if ( iinfo != 0 && *INFO == 0 )
             *INFO = k*descAg->mb+iinfo; /* Should return here */
@@ -320,9 +326,10 @@ BODY
     int ldak = BLKLDD( descAg, k );
     int ldam = BLKLDD( descAv, m );
 
-    tile_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
-               tempmm, storage_maxrank, (double)1.0, T, ldak,
-               Cv, ldam, Cr, k, 0, m, k);
+    flop_counter flops;
+    int Crank = *((int *)Cr);
+    HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+            tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
 
     /* Pass Cr value to size */
     if(send_full_tile == 1){

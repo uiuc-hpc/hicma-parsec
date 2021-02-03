@@ -13,43 +13,6 @@
 // Use work array while using HCORE functions.
 int use_scratch = 1;
 
-int tile_dtrsm( int side, int uplo, int transA, int diag, int m, int n, double alpha, double* A, int lda, double* B, int ldb, int* Brk, int Am, int An, int Bm, int Bn) {
-    struct timeval tvalBefore, tvalAfter;  // removed comma
-    gettimeofday (&tvalBefore, NULL);
-    double *BUV;
-    int _Brk;
-    _Brk = Brk[0];
-    if(HICMA_get_print_index() == 1){
-        printf("%d+TRSM\t|AD(%d,%d) BV(%d,%d)%d m:%d lda(11):%d ldb(12):%d\n", 0,Am,An, Bm, Bn, _Brk, m, lda, ldb);
-    }
-    if(HICMA_get_print_mat() == 1){
-        printf("%d\ttrsm-input A\n", __LINE__);
-        _printmat(A, m, m, lda);
-        printf("%d\ttrsm-input B\n", __LINE__);
-        _printmat(B, m, _Brk, ldb);
-    }
-    cblas_dtrsm(
-        CblasColMajor,
-        side, uplo,
-        transA, diag,
-        m,
-        _Brk,
-        alpha, A, lda,
-        B, ldb);
-    if(HICMA_get_print_index() == 1 || HICMA_get_print_index_end() == 1){
-        gettimeofday (&tvalAfter, NULL);
-        printf("%d-TRSM\t|AD(%d,%d)%dx%d-%d BV(%d,%d)%dx%d-%d m:%d\t\t\t\tTRSM: %.4f\n", 0, Am,An, m, m, lda,Bm, Bn, m, _Brk, ldb, m,
-                (tvalAfter.tv_sec - tvalBefore.tv_sec)
-                 +(tvalAfter.tv_usec - tvalBefore.tv_usec)/1000000.0
-                );
-    }
-    if(HICMA_get_print_mat() == 1){
-        printf("%d\ttrsm-output\n", __LINE__);
-        _printmat(B, m, _Brk, ldb);
-    }
-    return 0;
-}
-
 void HICMA_get_stat(char uplo, int *Ark, size_t m, size_t n, size_t ld,  HICMA_stat_t *stat) {
     double final_avgrank;
     int final_maxrank = 0;

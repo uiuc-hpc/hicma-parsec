@@ -33,9 +33,4 @@ int HICMA_set_fixed_rank(int rank);
 void HICMA_get_stat(char uplo, int *Ark, size_t m, size_t n, size_t ld,  HICMA_stat_t *stat);
 void HICMA_get_stat2(int *Ark, size_t m, int maxrank,  HICMA_stat_t *stat);
 void HICMA_print_stat(HICMA_stat_t stat);
-/**
- * Wrapper for trsm.
- * Gets tile indices and print them.
- */
-int tile_dtrsm( int side, int uplo, int transa, int diag, int m, int n, double alpha, double* A, int lda, double* B, int ldb, int* Brk, int Am, int An, int Bm, int Bn);
 #endif
