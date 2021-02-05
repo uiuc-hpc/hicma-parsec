@@ -405,7 +405,7 @@ int main(int argc, char ** argv)
 #endif
 
     /* Init two_dim_block_cyclic_band_t structure */
-    sym_two_dim_block_cyclic_band_init( &dcA, nodes, rank, band_size );
+    hicma_parsec_sym_two_dim_block_cyclic_band_init( &dcA, nodes, rank, band_size );
     parsec_data_collection_set_key((parsec_data_collection_t*)&dcA, "dcA_off_band");
     parsec_data_collection_set_key(&dcA.band.super.super, "dcA_band");
 
@@ -601,7 +601,7 @@ int main(int argc, char ** argv)
                               band_size, RANK_MAP_BUFF*NT, P_BAND, nodes/P_BAND, 1, 1, 0, 0);
 
     /* Init two_dim_block_cyclic_band_t structure */
-    sym_two_dim_block_cyclic_band_init( &dcRank, nodes, rank, band_size );
+    hicma_parsec_sym_two_dim_block_cyclic_band_init( &dcRank, nodes, rank, band_size );
     parsec_data_collection_set_key((parsec_data_collection_t*)&dcRank, "dcRank_super");
     parsec_data_collection_set_key(&dcRank.band.super.super, "dcRank_band");
 

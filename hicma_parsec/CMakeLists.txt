@@ -28,6 +28,7 @@ set( SRC
      hicma_internal.c
      hicma_init.c
      hicma_parsec.c
+     hicma_parsec_distribution.c
    )
 
 set( JDF

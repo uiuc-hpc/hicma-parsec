@@ -203,4 +203,11 @@ parsec_context_t *setup_parsec(int argc, char* argv[], int *iparam, double *dpar
 /* Clean parsec */
 void cleanup_parsec(parsec_context_t* parsec, int *iparam);
 
+/* 
+ * New band distribution: tiles of each row in band have the same process id. 
+ * Different from PaRSEC master when band_size > 1
+ */
+void hicma_parsec_sym_two_dim_block_cyclic_band_init( sym_two_dim_block_cyclic_band_t *desc,
+                                         int nodes, int myrank, int band_size );
+
 #endif /* #ifndef _HICMA_PARSEC_H_ */
