@@ -249,9 +249,6 @@ k = 0 .. m-1
 // Control message size to send, it's the new Cr
 size = 1
 
-// Added for evaluated of gpu chores
-band_size_local = band_size
-
 // Parallel partitioning
 : descA(m, k)
 
@@ -406,9 +403,6 @@ potrf_dsyrk(k, m) [high_priority = on]
 // Execution space
 k = 0   .. descA->mt-2
 m = k+1 .. descA->mt-1
-
-// Added for evaluated of gpu chores
-band_size_local = band_size
 
 // Parallel partitioning
 : descA(m, m)
@@ -578,13 +572,6 @@ n = k+1 .. m-1
 // Control message size to send, it's the new Cr
 size = 1
 
-// Added for evaluated of gpu chores
-band_size_local = band_size
-send_full_tile_local = send_full_tile
-
-k_pre = k-1
-k_next = k+1
-
 // Parallel partitioning
 : descA(m, n)
 
@@ -601,17 +588,17 @@ READ  Br <- (n-k >= band_size) ? Cr potrf_dtrsm(n, k): NULL                     
 
 RW     C <- (k == 0 && m-n < band_size) ? descA(m, n)                                  [ type = FULL ]
          <- (k == 0 && m-n >= band_size) ? descA(m, n)                                 [ type = UV ]
-         <- (m-n < band_size) ? C potrf_dgemm(m, n, k_pre)                             [ type = FULL ]
-         <- C potrf_dgemm(m, n, k_pre)                                                 [ type = UV ]
+         <- (m-n < band_size) ? C potrf_dgemm(m, n, k-1)                               [ type = FULL ]
+         <- C potrf_dgemm(m, n, k-1)                                                   [ type = UV ]
          -> (n == k+1 && m-n < band_size) ? C potrf_dtrsm(m, n)                        [ type = FULL ]
-         -> (n != k+1 && m-n < band_size) ? C potrf_dgemm(m, n, k_next)                [ type = FULL ]
+         -> (n != k+1 && m-n < band_size) ? C potrf_dgemm(m, n, k+1)                   [ type = FULL ]
          -> (n == k+1 && m-n >= band_size) ? C potrf_dtrsm(m, n)                       [ layout = MPI_DOUBLE count = size ]
-         -> (n != k+1 && m-n >= band_size) ? C potrf_dgemm(m, n, k_next)               [ layout = MPI_DOUBLE count = size ]
+         -> (n != k+1 && m-n >= band_size) ? C potrf_dgemm(m, n, k+1)                  [ layout = MPI_DOUBLE count = size ]
 
 RW    Cr <- (k == 0 && m-n >= band_size) ? Cr READ_Cr(m, n)                            [ type = AR ]
-         <- (k != 0 && m-n >= band_size) ? Cr potrf_dgemm(m, n, k_pre): NULL           [ type = AR ]
+         <- (k != 0 && m-n >= band_size) ? Cr potrf_dgemm(m, n, k-1): NULL             [ type = AR ]
          -> (n == k+1 && m-n >= band_size) ? Cr potrf_dtrsm(m, n)                      [ type = AR ]
-         -> (n != k+1 && m-n >= band_size) ? Cr potrf_dgemm(m, n, k_next)              [ type = AR ]
+         -> (n != k+1 && m-n >= band_size) ? Cr potrf_dgemm(m, n, k+1)                 [ type = AR ]
 
 ; (m >= (descA->mt - PRI_CHANGE)) ? (descA->mt - m) * (descA->mt - m) * (descA->mt - m) + 3 * ((2 * descA->mt) - m - n - 3) * (m - n) + 6 * (m - k) : PRI_MAX
 
@@ -698,7 +685,7 @@ BODY
 #endif
 
     if(enable_gemm == 0) return PARSEC_HOOK_RETURN_DONE;
-    if(DEBUG_INFO) printf("GEMM (%d, %d, %d): k_pre %d, k_next %d\n", m, n, k, k_pre, k_next);
+    if(DEBUG_INFO) printf("GEMM (%d, %d, %d)\n", m, n, k);
 
     /* No recursive */
     if ( m-k < band_size ) {
