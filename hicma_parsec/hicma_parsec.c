@@ -582,12 +582,14 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 	}
 
 	/* Print execution time for each process, max and min time for threads in a process */
-	fprintf(stderr, "Execution_time_each_process %d : %lf %lf %lf\n", parsec->my_rank, total_time, max_time, min_time);
+	fprintf(stderr, "Execution_time_each_process %d : %lf %lf %lf\n", parsec->my_rank, total_time/nb_threads, max_time, min_time);
 
+#if 0
 	/* Print execution time for each thread */
 	for( int i = 0; i < nb_threads; i++ )
 		fprintf(stderr, "Execution_time_each_thread %d %d : %lf\n",
 				parsec->my_rank, i, gather_time[i]);
+#endif
 #endif
 
 	/* Free memory */
