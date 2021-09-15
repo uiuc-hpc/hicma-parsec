@@ -24,15 +24,15 @@
 #include <parsec/private_mempool.h>
 #include <parsec/data_internal.h>
 #include <parsec/utils/mca_param.h>
-#include "parsec/tests/interfaces/superscalar/common_timing.h"
 
 /* DPLASMA headers */
 #include <dplasma.h>
-#include "src/dplasmajdf.h"
-#include "src/dplasmaaux.h"
-#include "src/flops.h"
-#include "src/cores/core_blas.h"
-#include "src/cores/core_dblas.h"
+
+/* Copied from PaRSEC and DPLASMA source */
+#include "common_timing.h"
+#include "dplasmaaux.h"
+#include "flops.h"
+#include "core_dblas.h"
 
 /* BLAS and LAPACKE headers */
 #include <cblas.h>
