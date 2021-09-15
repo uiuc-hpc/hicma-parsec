@@ -9,25 +9,25 @@
 #ifndef _HICMA_PARSEC_INTERNAL_H
 #define _HICMA_PARSEC_INTERNAL_H 
 
-/* PaRSEC hearders */
-#include "parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic.h"
-#include "parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic_band.h"
-#include "parsec/data_dist/matrix/two_dim_rectangle_cyclic.h"
-#include "parsec/data_dist/matrix/two_dim_rectangle_cyclic_band.h"
-#include "parsec/execution_stream.h"
-#include "parsec/runtime.h"
-#include "parsec/profiling.h"
-#include "parsec/parsec_internal.h"
-#include "parsec/utils/debug.h"
-#include "parsec/utils/zone_malloc.h"
-#include "parsec/data_dist/matrix/matrix.h"
-#include "parsec/private_mempool.h"
-#include "parsec/data_internal.h"
-#include "parsec/utils/mca_param.h"
+/* PaRSEC headers */
+#include <parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic.h>
+#include <parsec/data_dist/matrix/sym_two_dim_rectangle_cyclic_band.h>
+#include <parsec/data_dist/matrix/two_dim_rectangle_cyclic.h>
+#include <parsec/data_dist/matrix/two_dim_rectangle_cyclic_band.h>
+#include <parsec/execution_stream.h>
+#include <parsec/runtime.h>
+#include <parsec/profiling.h>
+#include <parsec/parsec_internal.h>
+#include <parsec/utils/debug.h>
+#include <parsec/utils/zone_malloc.h>
+#include <parsec/data_dist/matrix/matrix.h>
+#include <parsec/private_mempool.h>
+#include <parsec/data_internal.h>
+#include <parsec/utils/mca_param.h>
 #include "parsec/tests/interfaces/superscalar/common_timing.h"
 
 /* DPLASMA headers */
-#include "dplasma.h"
+#include <dplasma.h>
 #include "src/dplasmajdf.h"
 #include "src/dplasmaaux.h"
 #include "src/flops.h"
@@ -71,8 +71,8 @@
 
 /* Recursive headers */
 #if defined(PARSEC_HAVE_RECURSIVE)
-#include "parsec/data_dist/matrix/subtile.h"
-#include "parsec/recursive.h"
+#include <parsec/data_dist/matrix/subtile.h>
+#include <parsec/recursive.h>
 #endif
 
 /* string print */ 
