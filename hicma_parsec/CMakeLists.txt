@@ -63,3 +63,7 @@ add_test(NAME "dpotrf-3flow"
     COMMAND make -j && mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v -E 0 -Z 1 --check)
 add_test(NAME "dpotrf-2flow"
     COMMAND make -j && mpirun -n 4 ./testing_dpotrf_tlr -N 2700 -t 270 -e 1e-8 -u 130 -D 2 -P 2 -v --check)
+
+include(GNUInstallDirs)
+install(TARGETS testing_dpotrf_tlr
+        DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/hicma)
