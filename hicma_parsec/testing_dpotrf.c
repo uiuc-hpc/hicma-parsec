@@ -124,11 +124,10 @@ int check_dpotrf2( parsec_context_t *parsec, int verbose,
     int side;
 
     two_dim_block_cyclic_init(&LLt, matrix_RealDouble, matrix_Tile,
-                              twodA->grid.rank,
+                              A->super.nodes, twodA->grid.rank,
                               A->mb, A->nb, N, N, 0, 0, N, N,
-			      twodA->grid.rows, A->super.nodes/twodA->grid.rows,
-			      twodA->grid.krows, twodA->grid.kcols,
-			      twodA->grid.ip, twodA->grid.jq);
+                              twodA->grid.krows, twodA->grid.kcols,
+                              twodA->grid.rows);
 
     LLt.mat = parsec_data_allocate((size_t)LLt.super.nb_local_tiles *
                                   (size_t)LLt.super.bsiz *
@@ -394,9 +393,8 @@ int main(int argc, char ** argv)
 
     /* Init band */
     two_dim_block_cyclic_init(&dcA.band, matrix_RealDouble, matrix_Tile,
-                              rank, NB, NB_BAND, NB*band_size, N_BAND, 0, 0,
-                              NB*band_size, N_BAND, P_BAND, nodes/P_BAND,
-			      1, 1, 0, 0);
+                              nodes, rank, NB, NB_BAND, NB*band_size, N_BAND,
+                              0, 0, NB*band_size, N_BAND, 1, 1, P_BAND);
 #if BAND_MEMORY_CONTIGUOUS
     /* Allocate memory on band */
     dcA.band.mat = parsec_data_allocate((size_t)dcA.band.super.nb_local_tiles *
@@ -413,8 +411,8 @@ int main(int argc, char ** argv)
     /* dcAr contains rank of each tile. It is NT by NT matrix for now. */
     two_dim_block_cyclic_t dcAr;
     two_dim_block_cyclic_init(&dcAr, matrix_Integer, matrix_Tile,
-                              rank, 1, 1, NT, NT, 0, 0,
-                              NT, NT, P, nodes/P, 1, 1, 0, 0);
+                              nodes, rank, 1, 1, NT, NT, 0, 0,
+                              NT, NT, 1, 1, P);
     dcAr.mat = parsec_data_allocate((size_t)dcAr.super.nb_local_tiles *
                                    (size_t)dcAr.super.bsiz *
                                    (size_t)parsec_datadist_getsizeoftype(dcAr.super.mtype));
@@ -487,8 +485,8 @@ int main(int argc, char ** argv)
         /* dcFake to control process rank working on*/ 
         two_dim_block_cyclic_t dcFake;
         two_dim_block_cyclic_init(&dcFake, matrix_Integer, matrix_Tile,
-                                  rank, 1, 1, 1, nodes, 0, 0,
-                                  1, nodes, 1, nodes, 1, 1, 0, 0);
+                                  nodes, rank, 1, 1, 1, nodes, 0, 0,
+                                  1, nodes, 1, 1, 1);
         dcFake.mat = parsec_data_allocate((size_t)dcFake.super.nb_local_tiles *
                                           (size_t)dcFake.super.bsiz *
                                           (size_t)parsec_datadist_getsizeoftype(dcFake.super.mtype));
@@ -529,9 +527,8 @@ int main(int argc, char ** argv)
 
             /* Re-init band */
             two_dim_block_cyclic_init(&dcA.band, matrix_RealDouble, matrix_Tile,
-                                      rank, NB, NB_BAND, NB*band_size, N_BAND, 0, 0,
-                                      NB*band_size, N_BAND, P_BAND, nodes/P_BAND,
-				      1, 1, 0, 0);
+                                      nodes, rank, NB, NB_BAND, NB*band_size, N_BAND,
+                                      0, 0, NB*band_size, N_BAND, 1, 1, P_BAND);
 #if BAND_MEMORY_CONTIGUOUS
             /* Re-allocate memory on band */
             dcA.band.mat = parsec_data_allocate((size_t)dcA.band.super.nb_local_tiles *
@@ -597,8 +594,9 @@ int main(int argc, char ** argv)
 
     /* Init band */
     two_dim_block_cyclic_init(&dcRank.band, matrix_Integer, matrix_Tile,
-                              rank, 1, RANK_MAP_BUFF, band_size, RANK_MAP_BUFF*NT, 0, 0,
-                              band_size, RANK_MAP_BUFF*NT, P_BAND, nodes/P_BAND, 1, 1, 0, 0);
+                              nodes, rank, 1, RANK_MAP_BUFF,
+                              band_size, RANK_MAP_BUFF*NT, 0, 0,
+                              band_size, RANK_MAP_BUFF*NT, 1, 1, P_BAND);
 
     /* Init two_dim_block_cyclic_band_t structure */
     hicma_parsec_sym_two_dim_block_cyclic_band_init( &dcRank, nodes, rank, band_size );
