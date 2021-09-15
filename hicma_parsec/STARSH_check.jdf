@@ -146,7 +146,7 @@ extern "C" %{
 
 /** Uncompresses approximate matrix dcA into dcA0
  *
- * @param [in] uplo:         support PlasmaLower now
+ * @param [in] uplo:         support dplasmaLower now
  * @param [inout] dcA0:      the data, already distributed and allocated
  * @param [in] dcA:          the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated
@@ -168,7 +168,7 @@ STARSH_check_New(int uplo,
     parsec_arena_t* default_arena;
 
     /* Check input arguments */
-    if ((uplo != PlasmaUpper) && (uplo != PlasmaLower)) {
+    if ((uplo != dplasmaUpper) && (uplo != dplasmaLower)) {
         dplasma_error("STARSH_appr_New", "illegal value of uplo");
         return NULL /*-1*/;
     }
@@ -212,7 +212,7 @@ void STARSH_check_Destruct(parsec_taskpool_t *taskpool)
 /** Uncompresses approximate matrix dcA into dcA0
  *
  * @param [in] parsec:       parsec context
- * @param [in] uplo:         support PlasmaLower now
+ * @param [in] uplo:         support dplasmaLower now
  * @param [inout] dcA0:      the data, already distributed and allocated
  * @param [in] dcA:          the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated

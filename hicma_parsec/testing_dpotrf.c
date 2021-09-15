@@ -42,9 +42,9 @@ static int starsh_generate_map(parsec_context_t *parsec, int uplo,
     parsec_taskpool_t *pool = NULL;
 
     /* Check input arguments */
-    if ((uplo != PlasmaLower) &&
-        (uplo != PlasmaUpper) &&
-        (uplo != PlasmaUpperLower))
+    if ((uplo != dplasmaLower) &&
+        (uplo != dplasmaUpper) &&
+        (uplo != dplasmaUpperLower))
     {
         dplasma_error("starsh_generate_map", "illegal value of type");
         return -3;
@@ -134,20 +134,20 @@ int check_dpotrf2( parsec_context_t *parsec, int verbose,
                                   (size_t)LLt.super.bsiz *
                                   (size_t)parsec_datadist_getsizeoftype(LLt.super.mtype));
 
-    dplasma_dlaset( parsec, PlasmaUpperLower, 0., 0.,(parsec_tiled_matrix_dc_t *)&LLt );
+    dplasma_dlaset( parsec, dplasmaUpperLower, 0., 0.,(parsec_tiled_matrix_dc_t *)&LLt );
     dplasma_dlacpy( parsec, uplo, A, (parsec_tiled_matrix_dc_t *)&LLt );
 
     /* Compute LL' or U'U  */
-    side = (uplo == PlasmaUpper ) ? PlasmaLeft : PlasmaRight;
-    dplasma_dtrmm( parsec, side, uplo, PlasmaTrans, PlasmaNonUnit, 1.0,
+    side = (uplo == dplasmaUpper ) ? dplasmaLeft : dplasmaRight;
+    dplasma_dtrmm( parsec, side, uplo, dplasmaTrans, dplasmaNonUnit, 1.0,
                    A, (parsec_tiled_matrix_dc_t*)&LLt);
 
     /* compute LL' - A or U'U - A */
-    dplasma_dtradd( parsec, uplo, PlasmaNoTrans,
+    dplasma_dtradd( parsec, uplo, dplasmaNoTrans,
                     -1.0, A0, 1., (parsec_tiled_matrix_dc_t*)&LLt);
 
-    Anorm = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo, A0);
-    Rnorm = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo,
+    Anorm = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo, A0);
+    Rnorm = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo,
                            (parsec_tiled_matrix_dc_t*)&LLt);
 
     //result = Rnorm / ( Anorm * N * eps ) ;
@@ -197,14 +197,14 @@ int check_diff( parsec_context_t *parsec, int verbose,
     double eps = LAPACKE_dlamch_work('e');
     int side;
 
-    Anorm = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo, A);
-    A0norm = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo, A0);
+    Anorm = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo, A);
+    A0norm = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo, A0);
 
     /* compute A = A - A0 */
-    dplasma_dtradd( parsec, uplo, PlasmaNoTrans,
+    dplasma_dtradd( parsec, uplo, dplasmaNoTrans,
                     -1.0, A0, 1., A);
 
-    Rnorm = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo, A);
+    Rnorm = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo, A);
 
     if ( verbose ) {
         printf("============\n");
@@ -235,7 +235,7 @@ int main(int argc, char ** argv)
     parsec_context_t* parsec;
     int iparam[IPARAM_SIZEOF] = {0};
     double dparam[DPARAM_SIZEOF];
-    int uplo = PlasmaLower;
+    int uplo = dplasmaLower;
     int info = 0;
     int ret = 0;
     double time_opt_band = 0.0, time_regenerate = 0.0;
@@ -650,9 +650,9 @@ int main(int argc, char ** argv)
         if(rank == 0) {
             printf("Check matrix generation:\n");
         }
-        double norm1 = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo,
+        double norm1 = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo,
                 (parsec_tiled_matrix_dc_t *)&dcAd);
-        double norm2 = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo,
+        double norm2 = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo,
                 (parsec_tiled_matrix_dc_t *)&dcA0);
         if(rank == 0) {
             printf("Norms: map=%e lr_jdf=%e\n", norm1, norm2);
@@ -660,11 +660,11 @@ int main(int argc, char ** argv)
 
         /* B = alpha * op(A) + beta * B*/
         /* dcA0 = -1 * dcAd + 1 * dcA0 */
-        dplasma_dtradd(parsec, uplo, PlasmaNoTrans, -1.0,
+        dplasma_dtradd(parsec, uplo, dplasmaNoTrans, -1.0,
                 (parsec_tiled_matrix_dc_t *)&dcAd, 1.0,
                 (parsec_tiled_matrix_dc_t *)&dcA0);
 
-        double diff = dplasma_dlansy(parsec, PlasmaFrobeniusNorm, uplo,
+        double diff = dplasma_dlansy(parsec, dplasmaFrobeniusNorm, uplo,
                 (parsec_tiled_matrix_dc_t *)&dcA0);
 
         if(rank == 0) {

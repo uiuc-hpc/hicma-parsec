@@ -44,7 +44,7 @@ static double start_time_potrf;
 
 /* Globals
  */
-uplo         [ type = PLASMA_enum ]
+uplo         [ type = dplasma_enum_t ]
 descAg       [ type = "parsec_tiled_matrix_dc_t*" ]
 descAu       [ type = "parsec_tiled_matrix_dc_t*" aligned = descAg ]
 descAv       [ type = "parsec_tiled_matrix_dc_t*" aligned = descAg ]
@@ -256,7 +256,7 @@ BODY
     int ld_Ag_k = BLKLDD( descAg, k );
 
     flop_counter flops;
-    HCORE_dpotrf( lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
+    HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
     
     if(iinfo != 0){
         printf("%s %d: dpotrf failed with a return value of %d. uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, uplo, tempkm, T, ld_Ag_k);
@@ -328,7 +328,7 @@ BODY
 
     flop_counter flops;
     int Crank = *((int *)Cr);
-    HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+    HCORE_dtrsm(dplasmaLeft, dplasmaLower, dplasmaNoTrans, dplasmaNonUnit,
             tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
 
     /* Pass Cr value to size */
@@ -393,7 +393,7 @@ BODY
     p_elem_work = parsec_private_memory_pop( p_work );
 
     flop_counter flops;
-    HCORE_dsyrk(PlasmaLower, PlasmaNoTrans,
+    HCORE_dsyrk(dplasmaLower, dplasmaNoTrans,
                tempmm, rank,
                (double)-1.0, 
                Au /*A(m, k)*/, ldau,
@@ -523,7 +523,7 @@ BODY
     int ld_CVclone;
     double* _CV_save;
     flop_counter flops;
-    HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
+    HCORE_dgemm_qr_svd( dplasmaNoTrans, dplasmaTrans,
 		    tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
 		    tempmmv,
 		    (double)-1.0,
@@ -572,7 +572,7 @@ BODY
     //this_task->data._f_Cv.data_out = parsec_data_copy_new(data_of_descAv(m, n), 0);
     this_task->data._f_Cv.data_out->device_private = _CV_save; 
 
-    HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+    HCORE_dgemm_ormqr( dplasmaNoTrans, dplasmaTrans,
 		    tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
 		    tempmmv,
 		    (double)-1.0,

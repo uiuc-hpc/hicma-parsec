@@ -214,12 +214,12 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
     void** hook;
 
     /* Check input arguments */
-    if ((uplo != PlasmaUpper) && (uplo != PlasmaLower)) {
+    if ((uplo != dplasmaUpper) && (uplo != dplasmaLower)) {
         dplasma_error("HiCMA_dpotrf_L_3flow_New", "illegal value of uplo");
         return NULL /*-1*/;
     }
-    if ((uplo == PlasmaUpper)) {
-        dplasma_error("HiCMA_dpotrf_L_3flow_New", "HiCMA_dpotrf_L_3flow does not support PlasmaUpper for now");
+    if ((uplo == dplasmaUpper)) {
+        dplasma_error("HiCMA_dpotrf_L_3flow_New", "HiCMA_dpotrf_L_3flow does not support dplasmaUpper for now");
         return NULL /*-1*/;
     }
 

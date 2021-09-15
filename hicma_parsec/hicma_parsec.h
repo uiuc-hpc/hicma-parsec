@@ -84,7 +84,7 @@ int parsec_band_free(parsec_context_t *parsec,
  * Generate tile on band
  *              
  * @param [in] parsec:       parsec context
- * @param [in] uplo:         support PlasmaLower now
+ * @param [in] uplo:         support dplasmaLower now
  * @param [inout] dcA:       the data, already distributed and allocated
  * @param [in] data:         data in generate tiles
  * @param [in] kernel:       kernels in generate matrix
@@ -151,7 +151,7 @@ int parsec_rank_print(parsec_context_t *parsec,
 /** Uncompresses approximate matrix dcA into dcA0 
  *
  * @param [in] parsec:       parsec context
- * @param [in] uplo:         support PlasmaLower now
+ * @param [in] uplo:         support dplasmaLower now
  * @param [inout] dcA0:      the data, already distributed and allocated
  * @param [in] dcA:          the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated
@@ -172,7 +172,7 @@ int STARSH_check( parsec_context_t *parsec,
  * Generate matrix
  *
  * @param [in] parsec:       parsec context
- * @param [in] uplo:         support PlasmaLower now
+ * @param [in] uplo:         support dplasmaLower now
  * @param [inout] dcA:       the data, already distributed and allocated
  * @param [in] dcAr:         the rank data, already distributed and allocated
  * @param [in] data:         data in generate tiles

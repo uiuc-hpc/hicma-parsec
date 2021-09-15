@@ -222,7 +222,7 @@ BODY
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descA, k );
     flop_counter flops;
-    HCORE_dpotrf( lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
+    HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
 
     if(iinfo != 0){
         printf("%s %d: dpotrf failed with a return value of %d. uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, uplo, tempkm, T, ld_Ag_k);
@@ -320,8 +320,8 @@ BODY [type=RECURSIVE]
                                            smallnb, smallnb, 0, 0, tempmm, descA->mb );
         small_descC->mat = C;
 
-        parsec_dtrsm = dplasma_dtrsm_New(PlasmaRight, PlasmaLower,
-                                        PlasmaTrans, PlasmaNonUnit,
+        parsec_dtrsm = dplasma_dtrsm_New(dplasmaRight, dplasmaLower,
+                                        dplasmaTrans, dplasmaNonUnit,
                                         (double)1.0,
                                         (parsec_tiled_matrix_dc_t *)small_descT,
                                         (parsec_tiled_matrix_dc_t *)small_descC );
@@ -360,7 +360,7 @@ BODY
         int ldak = BLKLDD( descA, k );
         int ldam = BLKLDD( descA, m );
 
-        CORE_dtrsm(PlasmaRight, PlasmaLower, PlasmaTrans, PlasmaNonUnit,
+        CORE_dtrsm(dplasmaRight, dplasmaLower, dplasmaTrans, dplasmaNonUnit,
                    tempmm, descA->mb,
                    (double)1.0, T /*A(k, k)*/, ldak,
                                            C /*A(m, k)*/, ldam);
@@ -379,7 +379,7 @@ BODY
 
         flop_counter flops;
         int Crank = *((int *)Cr);
-        HCORE_dtrsm(PlasmaLeft, PlasmaLower, PlasmaNoTrans, PlasmaNonUnit,
+        HCORE_dtrsm(dplasmaLeft, dplasmaLower, dplasmaNoTrans, dplasmaNonUnit,
                 tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
 
         /* Pass Cr value to size */
@@ -470,7 +470,7 @@ BODY [type=RECURSIVE]
                                            smallnb, smallnb, 0, 0, tempmm, descA->mb );
         small_descA->mat = A;
 
-        parsec_dsyrk = dplasma_dsyrk_New( PlasmaLower, PlasmaNoTrans,
+        parsec_dsyrk = dplasma_dsyrk_New( dplasmaLower, dplasmaNoTrans,
                                          (double)-1.0, (parsec_tiled_matrix_dc_t*) small_descA,
                                          (double)1.0,  (parsec_tiled_matrix_dc_t*) small_descT);
 
@@ -493,7 +493,7 @@ BODY
 
     /* No recursive, dense SYRK or low rank LR_SYRK */
     if( m-k < band_size ) {
-        CORE_dsyrk(PlasmaLower, PlasmaNoTrans,
+        CORE_dsyrk(dplasmaLower, dplasmaNoTrans,
                    tempmm, descA->mb,
                    (double)-1.0, A /*A(m, k)*/, ldam,
                    (double) 1.0, T /*A(m, m)*/, ldam);
@@ -516,7 +516,7 @@ BODY
 #if call_hcore_dsyrk
         void *p_elem_work = parsec_private_memory_pop( p_work );
         flop_counter flops;
-        HCORE_dsyrk(PlasmaLower, PlasmaNoTrans,
+        HCORE_dsyrk(dplasmaLower, dplasmaNoTrans,
                    tempmm, rank,
                    (double)-1.0, 
                    Au /*A(m, k)*/, ldau,
@@ -530,21 +530,21 @@ BODY
         void *p_elem_work_rr = parsec_private_memory_pop( p_work_rr );
 
         /* tmp_rr = trans(Av) * Av */
-        CORE_dgemm(PlasmaTrans, PlasmaNoTrans,
+        CORE_dgemm(dplasmaTrans, dplasmaNoTrans,
                    rank, rank, descA->mb,
                    (double) 1.0, Av             /*A(k, m)*/, descA->mb,
                                  Av             /*A(k, n)*/, descA->mb,
                    (double) 0.0, p_elem_work_rr /*A(m, n)*/, rank);
 
         /* tmp_mbr = tmp_rr * trans(Au) */
-        CORE_dgemm(PlasmaNoTrans, PlasmaTrans,
+        CORE_dgemm(dplasmaNoTrans, dplasmaTrans,
                    rank, descA->mb, rank,
                    (double) 1.0, p_elem_work_rr  /*A(m, k)*/, rank,
                                  Au              /*A(n, k)*/, descA->mb,
                    (double) 0.0, p_elem_work_mbr /*A(m, n)*/, rank);
 
         /* T = T - Au * tmp_mbr */
-        CORE_dgemm(PlasmaNoTrans, PlasmaNoTrans,
+        CORE_dgemm(dplasmaNoTrans, dplasmaNoTrans,
                    descA->mb, descA->mb, rank,
                    (double)-1.0, Au              /*A(m, k)*/, descA->mb,
                                  p_elem_work_mbr /*A(k, n)*/, rank,
@@ -649,7 +649,7 @@ BODY [type=RECURSIVE]
                                            smallnb, smallnb, 0, 0, tempmm, descA->mb );
         small_descC->mat = C;
 
-        parsec_dgemm = dplasma_dgemm_New(PlasmaNoTrans, PlasmaTrans,
+        parsec_dgemm = dplasma_dgemm_New(dplasmaNoTrans, dplasmaTrans,
                                         (double)-1.0,
                                         (parsec_tiled_matrix_dc_t *)small_descA,
                                         (parsec_tiled_matrix_dc_t *)small_descB,
@@ -693,7 +693,7 @@ BODY
         int ldam = BLKLDD( descA, m );
         int ldan = BLKLDD( descA, n );
 
-        CORE_dgemm(PlasmaNoTrans, PlasmaTrans,
+        CORE_dgemm(dplasmaNoTrans, dplasmaTrans,
                    tempmm, descA->mb, descA->mb,
                    (double)-1.0, A /*A(m, k)*/, ldam,
                                  B /*A(n, k)*/, ldan,
@@ -706,14 +706,14 @@ BODY
         void *Av = (void *)A + descA->mb * Arank * sizeof(double);
 
         /* tmp_mbr = trans(Av) * trans(B) */
-        CORE_dgemm(PlasmaTrans, PlasmaTrans,
+        CORE_dgemm(dplasmaTrans, dplasmaTrans,
                    Arank, descA->mb, descA->mb,
                    (double)1.0, Av /*A(m, k)*/, descA->mb,
                                  B /*A(n, m)*/, descA->mb,
                    (double) 0.0, p_elem_work_mbr /*A(k, n)*/, Arank);
 
         /* C = C - Au * tmp_mbr */ 
-        CORE_dgemm(PlasmaNoTrans, PlasmaNoTrans,
+        CORE_dgemm(dplasmaNoTrans, dplasmaNoTrans,
                    descA->mb, descA->mb, Arank,
                    (double)-1.0, Au              /*A(m, k)*/, descA->mb,
                                  p_elem_work_mbr /*A(k, n)*/, Arank,
@@ -734,7 +734,7 @@ BODY
         void *Bv = (void *)B + descA->mb * Brank * sizeof(double);
 
         /* tmp_rr = trans(Av) * Bv */
-        CORE_dgemm(PlasmaTrans, PlasmaNoTrans,
+        CORE_dgemm(dplasmaTrans, dplasmaNoTrans,
                    Arank, Brank, descA->mb,
                    (double) 1.0, Av             /*A(k, m)*/, descA->mb,
                                  Bv             /*A(k, n)*/, descA->mb,
@@ -742,28 +742,28 @@ BODY
 
         if( Arank > Brank ) {
             /* tmp_mbr = Au * tmp_rr */
-            CORE_dgemm(PlasmaNoTrans, PlasmaNoTrans,
+            CORE_dgemm(dplasmaNoTrans, dplasmaNoTrans,
                        descA->mb, Brank, Arank,
                        (double) 1.0, Au              /*A(m, k)*/, descA->mb,
                                      p_elem_work_rr  /*A(k, n)*/, Arank,
                        (double) 0.0, p_elem_work_mbr /*A(m, n)*/, descA->mb);
 
             /* C = C - tmp_mbr * trans(Bu) */
-            CORE_dgemm(PlasmaNoTrans, PlasmaTrans,
+            CORE_dgemm(dplasmaNoTrans, dplasmaTrans,
                        descA->mb, descA->mb, Brank,
                        (double)-1.0, p_elem_work_mbr /*A(m, k)*/, descA->mb,
                                      Bu              /*A(n, k)*/, descA->mb,
                        (double) 1.0, C               /*A(m, n)*/, descA->mb);
         } else {
             /* tmp_mbr = tmp_rr * trans(Bu) */
-            CORE_dgemm(PlasmaNoTrans, PlasmaTrans,
+            CORE_dgemm(dplasmaNoTrans, dplasmaTrans,
                        Arank, descA->mb, Brank,
                        (double) 1.0, p_elem_work_rr  /*A(m, k)*/, Arank,
                                      Bu              /*A(n, k)*/, descA->mb,
                        (double) 0.0, p_elem_work_mbr /*A(m, n)*/, Arank);
 
             /* C = C - Au * tmp_mbr */
-            CORE_dgemm(PlasmaNoTrans, PlasmaNoTrans,
+            CORE_dgemm(dplasmaNoTrans, dplasmaNoTrans,
                        descA->mb, descA->mb, Arank,
                        (double)-1.0, Au              /*A(m, k)*/, descA->mb,
                                      p_elem_work_mbr /*A(k, n)*/, Arank,
@@ -819,7 +819,7 @@ BODY
         int ld_CVclone;
         double* _CV_save;
         flop_counter flops;
-        HCORE_dgemm_qr_svd_b_dense( PlasmaNoTrans, PlasmaTrans,
+        HCORE_dgemm_qr_svd_b_dense( dplasmaNoTrans, dplasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
                 (double)-1.0,
@@ -864,7 +864,7 @@ BODY
         _CU_save = this_task->data._f_C.data_out->device_private;
         _CV_save = this_task->data._f_C.data_out->device_private + descA->mb * new_UVrk * sizeof(double);
 
-        HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+        HCORE_dgemm_ormqr( dplasmaNoTrans, dplasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
                 (double)-1.0,
@@ -974,7 +974,7 @@ BODY
         int ld_CVclone;
         double* _CV_save;
         flop_counter flops;
-        HCORE_dgemm_qr_svd( PlasmaNoTrans, PlasmaTrans,
+        HCORE_dgemm_qr_svd( dplasmaNoTrans, dplasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
                 (double)-1.0,
@@ -1019,7 +1019,7 @@ BODY
         _CU_save = this_task->data._f_C.data_out->device_private;
         _CV_save = this_task->data._f_C.data_out->device_private + descA->mb * new_UVrk * sizeof(double);
 
-        HCORE_dgemm_ormqr( PlasmaNoTrans, PlasmaTrans,
+        HCORE_dgemm_ormqr( dplasmaNoTrans, dplasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
                 (double)-1.0,
