@@ -45,8 +45,7 @@ set( LD_LIB_HICMA_PARSEC
    )
 
 # If MKL, make sure the sequential lib is used
-string(FIND "${CBLAS_DIR_FOUND}" "mkl" _match_mkl)
-if( _match_mkl )
+if(CBLAS_DIR_FOUND MATCHES "mkl")
     set( LD_LIB_HICMA_PARSEC
          mkl_intel_lp64
          mkl_sequential
