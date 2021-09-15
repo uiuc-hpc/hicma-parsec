@@ -157,7 +157,7 @@
 #define DEBUG_INFO 0
 
 /* path to mesh file */
-char *mesh_file;
+extern char *mesh_file;
 
 /* Update PASTE_CODE_PROGRESS_KERNEL below if you change this list */
 enum iparam_t {

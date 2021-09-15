@@ -27,6 +27,7 @@ double time_elapsed = 0.0;
 double sync_time_elapsed = 0.0;
 double *gather_time;
 double *gather_time_tmp;
+char *mesh_file;
 
 #if DYNAMIC_COLLECTIVE_PATTERN
 /* Parsec routines for collective pattern */
