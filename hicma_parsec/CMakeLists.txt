@@ -8,18 +8,8 @@ cmake_policy(SET CMP0074 NEW)
 include(FindPkgConfig)
 
 include(ParsecCompilePTG)
-include_directories("${PROJECT_SOURCE_DIR}/dplasma/parsec")
-include_directories("${PROJECT_SOURCE_DIR}/dplasma")
-include_directories("${PROJECT_SOURCE_DIR}/dplasma/src")
-include_directories(BEFORE "${PROJECT_SOURCE_DIR}/dplasma/src/include")
-include_directories("${PROJECT_SOURCE_DIR}/dplasma/src/cores")
-include_directories("${PROJECT_SOURCE_DIR}/dplasma/parsec")
-include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
-include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
-include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/../dplasma")
-include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/../dplasma")
-link_directories(${STARSH_LIBRARY_DIRS})
-link_directories(${HCORE_LIBRARY_DIRS})
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set( SRC
      descprint.c
@@ -49,8 +39,8 @@ set( JDF
 set( CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -DGITHASH=8cdc2d9 -D_GNU_SOURCE ")
 
 set( LD_LIB_HICMA_PARSEC
-     parsec
-     dplasma
+     ${PARSEC_LIBRARIES}
+     ${DPLASMA_LIBRARIES}
      ${HICMA_DEP}
    )
 
