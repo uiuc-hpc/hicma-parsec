@@ -388,8 +388,8 @@ int main(int argc, char ** argv)
     /* dcA data descriptor */
     sym_two_dim_block_cyclic_band_t dcA;
     sym_two_dim_block_cyclic_init(&dcA.off_band, matrix_RealDouble,
-                                  rank, NB, NB_UV, N, N_UV, 0, 0,
-                                  N, N_UV, P, nodes/P, uplo);
+                                  nodes, rank, NB, NB_UV, N, N_UV, 0, 0,
+                                  N, N_UV, P, uplo);
 
     /* Init band */
     two_dim_block_cyclic_init(&dcA.band, matrix_RealDouble, matrix_Tile,
@@ -589,8 +589,9 @@ int main(int argc, char ** argv)
     /* dcRank data descriptor : init_rank, min_rank, max_rank, final_rank */
     sym_two_dim_block_cyclic_band_t dcRank;
     sym_two_dim_block_cyclic_init(&dcRank.off_band, matrix_Integer,
-                                  rank, 1, RANK_MAP_BUFF, NT, RANK_MAP_BUFF*NT, 0, 0,
-                                  NT, RANK_MAP_BUFF*NT, P, nodes/P, uplo);
+                                  nodes, rank, 1, RANK_MAP_BUFF,
+                                  NT, RANK_MAP_BUFF*NT, 0, 0,
+                                  NT, RANK_MAP_BUFF*NT, P, uplo);
 
     /* Init band */
     two_dim_block_cyclic_init(&dcRank.band, matrix_Integer, matrix_Tile,
@@ -612,8 +613,8 @@ int main(int argc, char ** argv)
     {
         /* dcAd */
         sym_two_dim_block_cyclic_init(&dcAd, matrix_RealDouble,
-                                      rank, NB, NB, N, N, 0, 0,
-                                      N, N, P, nodes/P, uplo);
+                                      nodes, rank, NB, NB, N, N, 0, 0,
+                                      N, N, P, uplo);
         dcAd.mat = parsec_data_allocate((size_t)dcAd.super.nb_local_tiles *
                                         (size_t)dcAd.super.bsiz *
                                         (size_t)parsec_datadist_getsizeoftype(dcAd.super.mtype));
@@ -625,8 +626,8 @@ int main(int argc, char ** argv)
 
         /* dcA0 */
         sym_two_dim_block_cyclic_init(&dcA0, matrix_RealDouble,
-                                  rank, NB, NB, N, N, 0, 0,
-                                  N, N, P, nodes/P, uplo);
+                                  nodes, rank, NB, NB, N, N, 0, 0,
+                                  N, N, P, uplo);
         dcA0.mat = parsec_data_allocate((size_t)dcA0.super.nb_local_tiles *
                                         (size_t)dcA0.super.bsiz *
                                         (size_t)parsec_datadist_getsizeoftype(dcA0.super.mtype));
@@ -831,8 +832,8 @@ int main(int argc, char ** argv)
         /* Check the factorization obtained from HiCMA */
         sym_two_dim_block_cyclic_t dcA2;
         sym_two_dim_block_cyclic_init(&dcA2, matrix_RealDouble,
-                                      rank, NB, NB, N, N, 0, 0,
-                                      N, N, P, nodes/P, uplo);
+                                      nodes, rank, NB, NB, N, N, 0, 0,
+                                      N, N, P, uplo);
         dcA2.mat = parsec_data_allocate((size_t)dcA2.super.nb_local_tiles *
                                         (size_t)dcA2.super.bsiz *
                                         (size_t)parsec_datadist_getsizeoftype(dcA2.super.mtype));
