@@ -13,6 +13,40 @@ extern "C" %{
 /* Used for operation count */
 extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 
+#include "HiCMA_dpotrf_L_2flow.h"
+
+#if defined(DPLASMA_WITH_RECURSIVE)
+/*
+ * A function to recursively update the value of the INFO argument for
+ * recursive calls. We need a special function because the recursive calls being asynchronous
+ * will be completed by another thread at a later date. This means we cannot use the stack of
+ * the thread creating the recursive algorithm to store any temporary value (such as INFO).
+ * We are therefore forced to create a local variable on the task, and use it as the INFO
+ * for the recursive calls.
+ *
+ * As we are handling the diagonal tiles recursively, we have to scale the INFO in case of errors
+ * to reflect the position in the global matrix and not on the current tile.
+ */
+static void HiCMA_dpotrf_L_2flow_update_INFO(parsec_taskpool_t* _tp, const parsec_recursive_cb_data_t* data)
+{
+    /* data->task points to parent task */
+    __parsec_HiCMA_dpotrf_L_2flow_potrf_dpotrf_task_t* task = (__parsec_HiCMA_dpotrf_L_2flow_potrf_dpotrf_task_t*)data->task;
+    /* _tp points to child taskpool, we need parent taskpool, task->taskpool */
+    parsec_HiCMA_dpotrf_L_2flow_taskpool_t* task_tp = (parsec_HiCMA_dpotrf_L_2flow_taskpool_t*)task->taskpool;
+
+    int iinfo = task->locals.info.value;
+    int *INFO = task_tp->_g_INFO;
+    int k = task->locals.k.value;
+    parsec_tiled_matrix_dc_t* descA = task_tp->_g_descA;
+
+    if ( iinfo != 0 && *INFO == 0 ) {
+        /* we need to scale the INFO according to the parent taskpool tile size */
+        *INFO = k*descA->mb+iinfo;
+    }
+    dplasma_dpotrf_Destruct(_tp);
+}
+#endif  /* defined(DPLASMA_WITH_RECURSIVE) */
+
 /*
  * Priorities used in this jdf:
  *      - potrf_dpotrf(k)    : (MT-k)**3
@@ -142,6 +176,7 @@ potrf_dpotrf(k) [high_priority = on]
 
 // Execution space
 k = 0 .. descA->mt-1
+info = 0  /* For the info in the case of recursive calls */
 
 // Parallel partitioning
 :descA(k, k)
@@ -158,7 +193,6 @@ BODY [type=RECURSIVE]
     if(enable_potrf == 0) return PARSEC_HOOK_RETURN_DONE;
     if(DEBUG_INFO) printf("POTRF: %d\n", k);
     int tempkm = k == descA->mt-1 ? descA->m - k*descA->mb : descA->mb;
-    int iinfo = 0;
 
     /* Operation count */
     unsigned long int cnt = op_counts('c', tempkm, 0, 0, 0);
@@ -175,10 +209,10 @@ BODY [type=RECURSIVE]
                                            smallnb, smallnb, 0, 0, tempkm, tempkm );
         small_descT->mat = T;
 
-        parsec_dpotrf = dplasma_dpotrf_New(uplo, (parsec_tiled_matrix_dc_t *)small_descT, &iinfo );
+        parsec_dpotrf = dplasma_dpotrf_New(uplo, (parsec_tiled_matrix_dc_t *)small_descT, &this_task->locals.info.value );
 
         parsec_recursivecall(es, (parsec_task_t*)this_task,
-                             parsec_dpotrf, dplasma_dpotrf_Destruct,
+                             parsec_dpotrf, HiCMA_dpotrf_L_2flow_update_INFO,
                              1, small_descT);
 
         return PARSEC_HOOK_RETURN_ASYNC;
