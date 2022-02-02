@@ -73,6 +73,17 @@ void parsec_rank_gather_Destruct(parsec_taskpool_t *taskpool)
     parsec_taskpool_free(taskpool);
 }
 
+#if defined(PARSEC_HAVE_LCI)
+static void lci_sum_op(void *dst, void *src, size_t count)
+{
+    int *d = dst;
+    int *s = src;
+    size_t c = count / sizeof(int);
+    for (size_t i = 0; i < c; i++)
+        d[i] += s[i];
+}
+#endif
+
 /**
  * @brief Gather dcAr to rank_array 
  *
@@ -104,7 +115,13 @@ int parsec_rank_gather(parsec_context_t *parsec,
     parsec_rank_gather_Destruct(parsec_rank_gather);
 
     /* Call MPI_Allreduce to reduce rank_array */
+#if   defined(PARSEC_HAVE_MPI)
     MPI_Allreduce( rank_array_tmp, rank_array, dcAr->lm * dcAr->ln, MPI_INT, MPI_SUM, MPI_COMM_WORLD ); 
+#elif defined(PARSEC_HAVE_LCI)
+    lc_alreduce(rank_array_tmp, rank_array, (dcAr->lm * dcAr->ln) * sizeof(int), lci_sum_op, *lci_global_ep);
+#else
+    memcpy(rank_array, rank_array_tmp, (dcAr->lm * dcAr->ln) * sizeof(int));
+#endif
 
     /* Free memory */
     free( rank_array_tmp );

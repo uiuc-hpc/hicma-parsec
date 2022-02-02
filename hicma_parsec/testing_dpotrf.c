@@ -229,6 +229,36 @@ int check_diff( parsec_context_t *parsec, int verbose,
     return info_factorization;
 }
 
+#if defined(PARSEC_HAVE_LCI)
+static void lci_sum_op_ul(void *dst, void *src, size_t count)
+{
+    unsigned long *d = dst;
+    unsigned long *s = src;
+    size_t c = count / sizeof(unsigned long);
+    for (size_t i = 0; i < c; i++)
+        d[i] += s[i];
+}
+
+static void lci_max_op_ul(void *dst, void *src, size_t count)
+{
+    unsigned long *d = dst;
+    unsigned long *s = src;
+    size_t c = count / sizeof(unsigned long);
+    for (size_t i = 0; i < c; i++)
+        if (s[i] > d[i])
+            d[i] = s[i];
+}
+
+static void lci_sum_op_d(void *dst, void *src, size_t count)
+{
+    double *d = dst;
+    double *s = src;
+    size_t c = count / sizeof(double);
+    for (size_t i = 0; i < c; i++)
+        d[i] += s[i];
+}
+#endif
+
 int main(int argc, char ** argv)
 {
     parsec_context_t* parsec;
@@ -881,10 +911,22 @@ int main(int argc, char ** argv)
     /* Count operations */
     SYNC_TIME_START();
     unsigned long* alltileopcounters = calloc(nelm_tileopcounters, sizeof(unsigned long));
+#if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(tileopcounters, alltileopcounters, nelm_tileopcounters, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);  
+#elif defined(PARSEC_HAVE_LCI)
+    lc_alreduce(tileopcounters, alltileopcounters, nelm_tileopcounters * sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+#else
+    memcpy(alltileopcounters, tileopcounters, nelm_tileopcounters * sizeof(unsigned long));
+#endif
     
     unsigned long* allopcounters     = calloc(nelm_opcounters,     sizeof(unsigned long));
+#if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(opcounters, allopcounters, nelm_opcounters, MPI_UNSIGNED_LONG, MPI_MAX, 0, MPI_COMM_WORLD);  
+#elif defined(PARSEC_HAVE_LCI)
+    lc_alreduce(opcounters, allopcounters, nelm_opcounters * sizeof(unsigned long), lci_max_op_ul, *lci_global_ep);
+#else
+    memcpy(allopcounters, opcounters, nelm_opcounters * sizeof(unsigned long));
+#endif
 
     /* Parameters for band and critcal path operation count */
     unsigned long sum_band = 0UL;
@@ -903,13 +945,29 @@ int main(int argc, char ** argv)
     }
 
     /* Reduce to process 0 */
+#if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(&op_band[0], &total_band, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&op_offband[0], &total_offband, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&op_path[0], &total_path, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&op_offpath[0], &total_offpath, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+#elif defined(PARSEC_HAVE_LCI)
+    lc_alreduce(&op_band[0],    &total_band,    sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+    lc_alreduce(&op_offband[0], &total_offband, sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+    lc_alreduce(&op_path[0],    &total_path,    sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+    lc_alreduce(&op_offpath[0], &total_offpath, sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+#else
+    total_band = op_band[0];
+    total_offband = op_offband[0];
+    total_path = op_path[0];
+    total_offpath = op_offpath[0];
+#endif
 
     /* Synchronization */ 
+#if   defined(PARSEC_HAVE_MPI)
     MPI_Barrier(MPI_COMM_WORLD);
+#elif defined(PARSEC_HAVE_LCI)
+    lc_barrier(*lci_global_ep);
+#endif
 
     unsigned long total_numop = 0;
     if(rank == 0) {
@@ -957,7 +1015,13 @@ int main(int argc, char ** argv)
 
     /* Time for critical path */
     SYNC_TIME_START();
+#if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(critical_path_time, g_time, 6, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+#elif defined(PARSEC_HAVE_LCI)
+    lc_alreduce(critical_path_time, g_time, 6 * sizeof(double), lci_sum_op_d, *lci_global_ep);
+#else
+    memcpy(g_time, critical_path_time, 6 * sizeof(double));
+#endif
     SYNC_TIME_PRINT(rank, ("Total_critical_path_time %lf, potrf %lf, trsm %lf, syrk %lf\n\n", g_time[0] + g_time[1] + g_time[2], g_time[0], g_time[1], g_time[2]));
 
     /* Print info during computation */

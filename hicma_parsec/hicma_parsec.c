@@ -336,13 +336,20 @@ static void print_arguments(int* iparam)
 
 parsec_context_t* setup_parsec(int argc, char **argv, int *iparam, double *dparam)
 {
-#ifdef PARSEC_HAVE_MPI
+#if   defined(PARSEC_HAVE_MPI)
 	{
 		int provided;
 		MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
 	}
 	MPI_Comm_size(MPI_COMM_WORLD, &iparam[IPARAM_NNODES]);
 	MPI_Comm_rank(MPI_COMM_WORLD, &iparam[IPARAM_RANK]);
+#elif defined(PARSEC_HAVE_LCI)
+	/* address leaks via lci_global_ep, so must have static duration */
+	static lc_ep ep;
+	lc_init(1, &ep);
+	lci_global_ep = &ep;
+	lc_get_num_proc(&iparam[IPARAM_NNODES]);
+	lc_get_proc_num(&iparam[IPARAM_RANK]);
 #else
 	iparam[IPARAM_NNODES] = 1;
 	iparam[IPARAM_RANK] = 0;
@@ -396,13 +403,38 @@ parsec_context_t* setup_parsec(int argc, char **argv, int *iparam, double *dpara
 
 void cleanup_parsec(parsec_context_t* parsec, int *iparam)
 {
+#if 0 && defined(PARSEC_DEBUG_HISTORY)
+    for (int i = 0; i < iparam[IPARAM_NNODES]; i++) {
+        if (i == iparam[IPARAM_RANK])
+            parsec_debug_history_dump();
+        const struct timespec ts = { .tv_sec = 2, .tv_nsec = 0L };
+        nanosleep(&ts, NULL);
+#if   defined(PARSEC_HAVE_MPI)
+        MPI_Barrier(MPI_COMM_WORLD);
+#elif defined(PARSEC_HAVE_LCI)
+        lc_barrier(*lci_global_ep);
+#endif
+    }
+#endif
 	parsec_fini(&parsec);
 
-#ifdef PARSEC_HAVE_MPI
+#if   defined(PARSEC_HAVE_MPI)
 	MPI_Finalize();
+#elif defined(PARSEC_HAVE_LCI)
+	lc_finalize();
 #endif
 	(void)iparam;
 }
+
+#if defined(PARSEC_HAVE_LCI)
+static void lci_max_op(void *dst, void *src, size_t count)
+{
+	int *d = dst;
+	int *s = src;
+	if (*s > *d)
+		*d = *s;
+}
+#endif
 
 /* Main routine for TLR Cholesky
  *
@@ -599,12 +631,15 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 
 	/* This covers both cases when we have not compiled with MPI, or we don't need to do the reduce */
 	ginfo = info;
-#if defined(PARSEC_HAVE_MPI)
+#if   defined(PARSEC_HAVE_MPI)
 	/* If we don't need to reduce, don't do it, this way we don't require MPI to be initialized */
 	if( A->super.nodes > 1 )
 		MPI_Allreduce( &info, &ginfo, 1, MPI_INT, MPI_MAX,
 				MPI_COMM_WORLD
 			     );
+#elif defined(PARSEC_HAVE_LCI)
+	if( A->super.nodes > 1 )
+		lc_alreduce(&info, &ginfo, sizeof(int), lci_max_op, *lci_global_ep);
 #endif
 
 	return ginfo;

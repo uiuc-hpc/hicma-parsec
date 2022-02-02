@@ -172,6 +172,23 @@ void parsec_band_size_auto_tuning_Destruct(parsec_taskpool_t *taskpool)
     parsec_taskpool_free(taskpool);
 }
 
+#if defined(PARSEC_HAVE_LCI)
+static void lci_sum_op_ll(void *dst, void *src, size_t count)
+{
+    long long int *d = dst;
+    long long int *s = src;
+    *d += *s;
+}
+
+static void lci_max_op(void *dst, void *src, size_t count)
+{
+    int *d = dst;
+    int *s = src;
+    if (*s > *d)
+        *d = *s;
+}
+#endif
+
 /**
  * Band size auto auto_tuning
  *
@@ -200,10 +217,10 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
     long long int *ops_gemm_tlr = (long long int *)calloc(sizeof(long long int), nb_threads);
     long long int *ops_gemm_dense = (long long int *)calloc(sizeof(long long int), nb_threads);
     long long int ops_total_tlr, ops_total_dense, sum_tlr, sum_dense;
+    int band_maxrank_process, band_maxrank;
 
     /* For maxrank of each band */
     int *band_maxrank_thread = (int *)calloc(sizeof(int), nb_threads);
-    int *band_maxrank_receive = (int *)calloc( sizeof(int), dcAr->super.nodes );
 
     /* band_size starts from 2 */
     for(band_size = 2; band_size < dcAr->lmt; band_size++) {
@@ -234,33 +251,36 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
         /* Init value */
         ops_total_tlr = 0LL;
         ops_total_dense = 0LL;
+        band_maxrank_process = 0;
         sum_tlr = 0LL;
         sum_dense = 0LL;
-        int band_maxrank_process = band_maxrank_thread[0];
+        band_maxrank = 0;
 
         for( i = 0; i < nb_threads; i++ ) {
             ops_total_tlr += ops_trsm_tlr[i] + ops_gemm_tlr[i]; 
             ops_total_dense += ops_trsm_dense[i] + ops_gemm_dense[i]; 
 
-            if( band_maxrank_process < band_maxrank_thread[i] )
+            if( band_maxrank_thread[i] > band_maxrank_process )
                 band_maxrank_process = band_maxrank_thread[i];
         }
 
-        MPI_Barrier( MPI_COMM_WORLD );
-
+#if   defined(PARSEC_HAVE_MPI)
         MPI_Allreduce(&ops_total_tlr, &sum_tlr, 1, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD); 
         MPI_Allreduce(&ops_total_dense, &sum_dense, 1, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD); 
-        MPI_Gather( &band_maxrank_process, 1, MPI_INT, band_maxrank_receive, 1, MPI_INT, root, MPI_COMM_WORLD);
-
-        MPI_Barrier( MPI_COMM_WORLD ); 
+        MPI_Allreduce(&band_maxrank_process, &band_maxrank, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
+#elif defined(PARSEC_HAVE_LCI)
+        lc_alreduce(&ops_total_tlr, &sum_tlr, sizeof(long long int), lci_sum_op_ll, *lci_global_ep);
+        lc_alreduce(&ops_total_dense, &sum_dense, sizeof(long long int), lci_sum_op_ll, *lci_global_ep);
+        lc_alreduce(&band_maxrank_process, &band_maxrank, sizeof(int), lci_max_op, *lci_global_ep);
+        lc_barrier(*lci_global_ep);
+#else
+        sum_tlr = ops_total_tlr;
+        sum_dense = ops_total_dense;
+        band_maxrank = band_maxrank_process;
+#endif
 
         if( root == dcAr->super.myrank ) {
-            int band_maxrank = band_maxrank_receive[0];
-            for( int i = 1; i < dcAr->super.nodes; i++ ) {
-                if( band_maxrank < band_maxrank_receive[i] )
-                    band_maxrank = band_maxrank_receive[i];
-            }
-
             fprintf(stderr, "band_size: %d, nb_threads: %d, ops_sum_tlr: %lle, ops_sum_dense: %lle\n",
                     band_size, nb_threads, (long double)sum_tlr, (long double)sum_dense);
             fprintf(stderr, "***************** END Check band_size %d : %d ******************\n", band_size, band_maxrank);
@@ -288,7 +308,6 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
             free( ops_gemm_tlr );
             free( ops_gemm_dense );
             free( band_maxrank_thread );
-            free( band_maxrank_receive );
 
             return opt_band_size_min;
         }

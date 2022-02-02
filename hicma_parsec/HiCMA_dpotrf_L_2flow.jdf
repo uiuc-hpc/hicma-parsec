@@ -10,9 +10,6 @@ extern "C" %{
 
 #include "hicma_parsec.h"
 
-/* Record the start time of potrf(0) */
-static double start_time_potrf;
-
 /* Used for operation count */
 extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 
@@ -32,15 +29,13 @@ extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 /* Count operations */
 #define LOG_OPCOUNT(cnt, i, j) \
     do{\
-        int myrank; \
-        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);\
+        int myrank = es->virtual_process->parsec_context->my_rank; \
         int nth = es->virtual_process->nb_cores;\
         if(0) printf("%s rank:%d th_id:%d nthreads per node:%d\n", __func__, myrank, es->th_id, nth);\
         int myid = es->th_id;\
         opcounters[myrank*nth+myid] += cnt;  \
         tileopcounters[i*descA->nt+j] += cnt; \
     }while(0);
-
 %}
 
 /* Globals
@@ -171,27 +166,6 @@ BODY [type=RECURSIVE]
     op_band[es->th_id] += cnt;
     op_path[es->th_id] += cnt;
 
-    /* Print the progress */ 
-    int total_time_print = 100;
-    if( descA->nt/total_time_print ) {
-        struct timeval tstart;
-        if( 0 == k ) {
-	    gettimeofday(&tstart, NULL);
-            start_time_potrf = tstart.tv_sec + tstart.tv_usec / 1.0e6; 
-        }
-
-        if( k < descA->super.nodes )
-            MPI_Bcast( &start_time_potrf, 1, MPI_DOUBLE, descA->super.rank_of(&descA->super, 0, 0), MPI_COMM_WORLD );
-  
-        gettimeofday(&tstart, NULL);
-        double start_time = tstart.tv_sec + tstart.tv_usec / 1.0e6 - start_time_potrf;
-        double estimated_time = start_time * descA->nt / (k+1);
-
-        if( 0 == k % (descA->nt/total_time_print) || descA->mt-1 == k )
-            fprintf(stderr, "In potrf, k %d, %.2lf %% is finished; time: %lf of estimated total %lf\n",
-			    k, 100.0*k/descA->nt, start_time, estimated_time); 
-    }
-
     if( tempkm > smallnb )
     {
         subtile_desc_t *small_descT;
@@ -263,10 +237,10 @@ RW    C <- (k == 0 && m-k < band_size) ? descA(m, k)                         [ t
         -> (m-k < band_size) ? A potrf_dgemm(m, k+1..m-1, k)                 [ type = FULL ]
         -> (m-k < band_size) ? B potrf_dgemm(m+1..descA->lmt-1, m, k)        [ type = FULL ]
         -> (m-k < band_size) ? descA(m, k)                                   [ type = FULL ]
-        -> (m-k >= band_size) ? A potrf_dsyrk(k, m)                          [ layout = MPI_DOUBLE count = size ]
-        -> (m-k >= band_size) ? A potrf_dgemm(m, k+1..m-1, k)                [ layout = MPI_DOUBLE count = size ]
-        -> (m-k >= band_size) ? B potrf_dgemm(m+1..descA->mt-1, m, k)        [ layout = MPI_DOUBLE count = size ]
-        -> (m-k >= band_size) ? descA(m, k)                                  [ layout = MPI_DOUBLE count = size ]
+        -> (m-k >= band_size) ? A potrf_dsyrk(k, m)                          [ layout = parsec_datatype_double_t count = size ]
+        -> (m-k >= band_size) ? A potrf_dgemm(m, k+1..m-1, k)                [ layout = parsec_datatype_double_t count = size ]
+        -> (m-k >= band_size) ? B potrf_dgemm(m+1..descA->mt-1, m, k)        [ layout = parsec_datatype_double_t count = size ]
+        -> (m-k >= band_size) ? descA(m, k)                                  [ layout = parsec_datatype_double_t count = size ]
 
 READ  Cr <- (k == 0 && m-k >= band_size) ? Cr READ_Cr(m, k)                  [ type = AR ]
          <- (k != 0 && m-k >= band_size) ? Cr potrf_dgemm(m, k, k-1): NULL   [ type = AR ]
@@ -592,8 +566,8 @@ RW     C <- (k == 0 && m-n < band_size) ? descA(m, n)                           
          <- C potrf_dgemm(m, n, k-1)                                                   [ type = UV ]
          -> (n == k+1 && m-n < band_size) ? C potrf_dtrsm(m, n)                        [ type = FULL ]
          -> (n != k+1 && m-n < band_size) ? C potrf_dgemm(m, n, k+1)                   [ type = FULL ]
-         -> (n == k+1 && m-n >= band_size) ? C potrf_dtrsm(m, n)                       [ layout = MPI_DOUBLE count = size ]
-         -> (n != k+1 && m-n >= band_size) ? C potrf_dgemm(m, n, k+1)                  [ layout = MPI_DOUBLE count = size ]
+         -> (n == k+1 && m-n >= band_size) ? C potrf_dtrsm(m, n)                       [ layout = parsec_datatype_double_t count = size ]
+         -> (n != k+1 && m-n >= band_size) ? C potrf_dgemm(m, n, k+1)                  [ layout = parsec_datatype_double_t count = size ]
 
 RW    Cr <- (k == 0 && m-n >= band_size) ? Cr READ_Cr(m, n)                            [ type = AR ]
          <- (k != 0 && m-n >= band_size) ? Cr potrf_dgemm(m, n, k-1): NULL             [ type = AR ]

@@ -13,8 +13,6 @@ extern "C" %{
 /* Used for operation count */
 extern unsigned long *op_band, *op_offband, *op_path, *op_offpath;
 
-/* Record the start time of potrf(0) */
-static double start_time_potrf;
 
 /*
  * Priorities used in this jdf:
@@ -32,8 +30,7 @@ static double start_time_potrf;
 /* Count operations */
 #define LOG_OPCOUNT(cnt, i, j) \
     do{\
-        int myrank; \
-        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);\
+        int myrank = es->virtual_process->parsec_context->my_rank; \
         int nth = es->virtual_process->nb_cores;\
         if(0) printf("%s rank:%d th_id:%d nthreads per node:%d\n", __func__, myrank, es->th_id, nth);\
         int myid = es->th_id;\
@@ -115,9 +112,9 @@ size = 1
 :descAu(m, n)
 
 READ Cu <- descAu(m, n)                                    [ type = UV ]
-        -> Au potrf_dsyrk(n, m)                            [ layout = MPI_DOUBLE count = size ]
-        -> Au potrf_dgemm(m, 1..m-1, 0)                    [ layout = MPI_DOUBLE count = size ]
-        -> Bu potrf_dgemm(m+1..descAu->mt-1, m, 0)         [ layout = MPI_DOUBLE count = size ]
+        -> Au potrf_dsyrk(n, m)                            [ layout = parsec_datatype_double_t count = size ]
+        -> Au potrf_dgemm(m, 1..m-1, 0)                    [ layout = parsec_datatype_double_t count = size ]
+        -> Bu potrf_dgemm(m+1..descAu->mt-1, m, 0)         [ layout = parsec_datatype_double_t count = size ]
 
 READ Cr <- Cr READ_Cr(m, n)                                [ type = AR ]
 
@@ -204,27 +201,6 @@ BODY [type=RECURSIVE]
     op_band[es->th_id] += cnt;
     op_path[es->th_id] += cnt;
 
-    /* Print the progress */
-    int total_time_print = 100;
-    if( descAg->nt/total_time_print ) {
-        struct timeval tstart;
-        if( 0 == k ) {
-            gettimeofday(&tstart, NULL);
-            start_time_potrf = tstart.tv_sec + tstart.tv_usec / 1.0e6;
-        }
-
-        if( k < descAg->super.nodes )
-            MPI_Bcast( &start_time_potrf, 1, MPI_DOUBLE, descAg->super.rank_of(&descAg->super, 0, 0), MPI_COMM_WORLD );
-  
-        gettimeofday(&tstart, NULL);
-        double start_time = tstart.tv_sec + tstart.tv_usec / 1.0e6 - start_time_potrf;
-        double estimated_time = start_time * descAg->nt / (k+1);
-
-        if( 0 == k % (descAg->nt/total_time_print) || descAg->mt-1 == k )
-            fprintf(stderr, "In potrf, k %d, %.2lf %% is finished; time: %lf of estimated total %lf\n",
-                            k, 100.0*k/descAg->nt, start_time, estimated_time);
-    }
-
     if (tempkm > smallnb)
     {
         subtile_desc_t *small_descT;
@@ -288,10 +264,10 @@ size = 1
 // Parameters
 READ  T <- T potrf_dpotrf(k)                                         [ type = FULL ]
 RW    Cv <- (k == 0) ? descAv(m, k) : Cv potrf_dgemm(m, k, k-1)      [ type = UV ]
-         -> Av potrf_dsyrk(k, m)                                     [ layout = MPI_DOUBLE count = size ]
-         -> Av potrf_dgemm(m, k+1..m-1, k)                           [ layout = MPI_DOUBLE count = size ]
-         -> Bv potrf_dgemm(m+1..descAg->mt-1, m, k)                  [ layout = MPI_DOUBLE count = size ]
-         -> descAv(m, k)                                             [ layout = MPI_DOUBLE count = size ]
+         -> Av potrf_dsyrk(k, m)                                     [ layout = parsec_datatype_double_t count = size ]
+         -> Av potrf_dgemm(m, k+1..m-1, k)                           [ layout = parsec_datatype_double_t count = size ]
+         -> Bv potrf_dgemm(m+1..descAg->mt-1, m, k)                  [ layout = parsec_datatype_double_t count = size ]
+         -> descAv(m, k)                                             [ layout = parsec_datatype_double_t count = size ]
 
 READ Cr <- (k == 0) ? Cr READ_Cr(m, k) : Cr potrf_dgemm(m, k, k-1)   [ type = AR ]
 
@@ -328,6 +304,7 @@ BODY
 
     flop_counter flops;
     int Crank = *((int *)Cr);
+
     HCORE_dtrsm(dplasmaLeft, dplasmaLower, dplasmaNoTrans, dplasmaNonUnit,
             tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
 
@@ -441,15 +418,15 @@ size = 1
 READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)                      [ type = UV ]
 READ  Bu <- (k == 0) ? Cu READ_Cu(n, 0) : Cu potrf_dgemm(n, k, k-1)                      [ type = UV ]
 RW    Cu <- (k == 0) ? descAu(m, n) : Cu potrf_dgemm(m, n, k-1)                      [ type = UV ]
-         -> (n == k+1) ? Au potrf_dgemm(m, n+1..m-1, n) : Cu potrf_dgemm(m, n, k+1)      [ layout = MPI_DOUBLE count = size ]
-         -> (n == k+1) ? Bu potrf_dgemm(m+1..descAu->mt-1, m, n)                         [ layout = MPI_DOUBLE count = size ]
-         -> (n == k+1) ? Au potrf_dsyrk(n, m)                                            [ layout = MPI_DOUBLE count = size ]
-         -> (n == k+1) ? descAu(m, n)                                                    [ layout = MPI_DOUBLE count = size ]
+         -> (n == k+1) ? Au potrf_dgemm(m, n+1..m-1, n) : Cu potrf_dgemm(m, n, k+1)      [ layout = parsec_datatype_double_t count = size ]
+         -> (n == k+1) ? Bu potrf_dgemm(m+1..descAu->mt-1, m, n)                         [ layout = parsec_datatype_double_t count = size ]
+         -> (n == k+1) ? Au potrf_dsyrk(n, m)                                            [ layout = parsec_datatype_double_t count = size ]
+         -> (n == k+1) ? descAu(m, n)                                                    [ layout = parsec_datatype_double_t count = size ]
 
 READ  Av <- Cv potrf_dtrsm(m, k)                                                         [ type = UV ]
 READ  Bv <- Cv potrf_dtrsm(n, k)                                                         [ type = UV ]
 RW    Cv <- (k == 0) ? descAv(m, n) : Cv potrf_dgemm(m, n, k-1)                      [ type = UV ]
-         -> (n == k+1) ? Cv potrf_dtrsm(m, n) : Cv potrf_dgemm(m, n, k+1)                [ layout = MPI_DOUBLE count = size ]
+         -> (n == k+1) ? Cv potrf_dtrsm(m, n) : Cv potrf_dgemm(m, n, k+1)                [ layout = parsec_datatype_double_t count = size ]
 
 READ  Ar <- (k == 0) ? Cr READ_Cr(m, 0) : Cr potrf_dgemm(m, k, k-1)                      [ type = AR ]
 READ  Br <- (k == 0) ? Cr READ_Cr(n, 0) : Cr potrf_dgemm(n, k, k-1)                      [ type = AR ]
