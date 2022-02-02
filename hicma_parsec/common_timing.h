@@ -8,17 +8,14 @@
 extern double time_elapsed;
 extern double sync_time_elapsed;
 
-#if defined( PARSEC_HAVE_MPI)
-# define get_cur_time() MPI_Wtime()
+#ifdef PARSEC_HAVE_MPI
+#define Wtime() MPI_Wtime()
 #else
-static inline double get_cur_time(void)
+static inline double Wtime(void)
 {
-    struct timeval tv;
-    double t;
-
-    gettimeofday(&tv,NULL);
-    t = tv.tv_sec + tv.tv_usec / 1e6;
-    return t;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_COARSE, &ts);
+    return ((double)ts.tv_sec) + (((double)ts.tv_nsec) * 1.0e-9);
 }
 #endif
 
@@ -28,8 +25,8 @@ static inline double get_cur_time(void)
 #define PARSEC_PROFILING_START()
 #endif  /* defined(PARSEC_PROF_TRACE) */
 
-#define TIME_START() do { time_elapsed = get_cur_time(); } while(0)
-#define TIME_STOP() do { time_elapsed = get_cur_time() - time_elapsed; } while(0)
+#define TIME_START() do { time_elapsed = Wtime(); } while(0)
+#define TIME_STOP() do { time_elapsed = Wtime() - time_elapsed; } while(0)
 #define TIME_PRINT(rank, print) do { \
   TIME_STOP(); \
   printf("[%4d] TIME(s) %12.5f : ", rank, time_elapsed); \
@@ -40,11 +37,11 @@ static inline double get_cur_time(void)
 # define SYNC_TIME_START() do {                 \
         MPI_Barrier(MPI_COMM_WORLD);            \
         PARSEC_PROFILING_START();                \
-        sync_time_elapsed = get_cur_time();     \
+        sync_time_elapsed = Wtime();            \
     } while(0)
 # define SYNC_TIME_STOP() do {                                  \
         MPI_Barrier(MPI_COMM_WORLD);                            \
-        sync_time_elapsed = get_cur_time() - sync_time_elapsed; \
+        sync_time_elapsed = Wtime() - sync_time_elapsed;        \
     } while(0)
 # define SYNC_TIME_PRINT(rank, print) do {                          \
         SYNC_TIME_STOP();                                           \
@@ -58,15 +55,15 @@ static inline double get_cur_time(void)
 #   define exit(ret) MPI_Abort(MPI_COMM_WORLD, ret)
 
 #elif defined(PARSEC_HAVE_LCI)
-#include "parsec/parsec_lci.h"
+extern _Noreturn void lci_abort(int exit_code);
 # define SYNC_TIME_START() do {                 \
         lc_barrier(*lci_global_ep);             \
         PARSEC_PROFILING_START();               \
-        sync_time_elapsed = get_cur_time();     \
+        sync_time_elapsed = Wtime();            \
     } while(0)
 # define SYNC_TIME_STOP() do {                                  \
         lc_barrier(*lci_global_ep);                             \
-        sync_time_elapsed = get_cur_time() - sync_time_elapsed; \
+        sync_time_elapsed = Wtime() - sync_time_elapsed;        \
     } while(0)
 # define SYNC_TIME_PRINT(rank, print) do {                          \
         SYNC_TIME_STOP();                                           \
@@ -80,8 +77,8 @@ static inline double get_cur_time(void)
 #   define exit(ret) lci_abort(ret)
 
 #else
-# define SYNC_TIME_START() do { sync_time_elapsed = get_cur_time(); } while(0)
-# define SYNC_TIME_STOP() do { sync_time_elapsed = get_cur_time() - sync_time_elapsed; } while(0)
+# define SYNC_TIME_START() do { sync_time_elapsed = Wtime(); } while(0)
+# define SYNC_TIME_STOP() do { sync_time_elapsed = Wtime() - sync_time_elapsed; } while(0)
 # define SYNC_TIME_PRINT(rank, print) do {                           \
         SYNC_TIME_STOP();                                           \
         if(0 == rank) {                                             \
