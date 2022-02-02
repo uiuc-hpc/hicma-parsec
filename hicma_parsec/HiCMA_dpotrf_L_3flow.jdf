@@ -268,7 +268,7 @@ BODY
     HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
     
     if(iinfo != 0){
-        printf("%s %d: dpotrf failed with a return value of %d. uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, uplo, tempkm, T, ld_Ag_k);
+        printf("%s %d: dpotrf failed with a return value of %d. k:%d uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, k, uplo, tempkm, T, ld_Ag_k);
         fflush(stdout);
         //exit(-1);
     }
