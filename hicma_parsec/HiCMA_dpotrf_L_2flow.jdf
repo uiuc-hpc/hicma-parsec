@@ -264,9 +264,9 @@ size = 1
 READ  T <- T potrf_dpotrf(k)                                                 [ type = FULL ]
 
 RW    C <- (k == 0 && m-k < band_size) ? descA(m, k)                         [ type = FULL ]
-        <- (k == 0 && m-k >= band_size) ? descA(m, k)                        [ type = UV ]
+        <- (k == 0 && m-k >= band_size) ? descA(m, k)                        [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ]
         <- (m-k < band_size) ? C potrf_dgemm(m, k, k-1)                      [ type = FULL ]
-        <- C potrf_dgemm(m, k, k-1)                                          [ type = UV ]
+        <- C potrf_dgemm(m, k, k-1)                                          [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ]
         -> (m-k < band_size) ? A potrf_dsyrk(k, m)                           [ type = FULL ]
         -> (m-k < band_size) ? A potrf_dgemm(m, k+1..m-1, k)                 [ type = FULL ]
         -> (m-k < band_size) ? B potrf_dgemm(m+1..descA->lmt-1, m, k)        [ type = FULL ]
@@ -417,7 +417,7 @@ m = k+1 .. descA->mt-1
 
 //Parameters
 READ  A <- (m-k < band_size) ? C potrf_dtrsm(m, k)                      [ type = FULL ]
-        <- C potrf_dtrsm(m, k)                                          [ type = UV ]
+        <- C potrf_dtrsm(m, k)                                          [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ]
 
 READ  Ar <- (m-k >= band_size) ? Cr potrf_dtrsm(m, k): NULL             [ type = AR ]
 
@@ -585,19 +585,19 @@ size = 1
 
 // Parameters
 READ   A <- (m-k < band_size) ? C potrf_dtrsm(m, k)                                    [ type = FULL ] 
-         <- C potrf_dtrsm(m, k)                                                        [ type = UV ] 
+         <- C potrf_dtrsm(m, k)                                                        [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ] 
 
 READ  Ar <- (m-k >= band_size) ? Cr potrf_dtrsm(m, k): NULL                            [ type = AR ]
 
 READ   B <- (n-k < band_size) ? C potrf_dtrsm(n, k)                                    [ type = FULL ] 
-         <- C potrf_dtrsm(n, k)                                                        [ type = UV ]
+         <- C potrf_dtrsm(n, k)                                                        [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ]
 
 READ  Br <- (n-k >= band_size) ? Cr potrf_dtrsm(n, k): NULL                            [ type = AR ]
 
 RW     C <- (k == 0 && m-n < band_size) ? descA(m, n)                                  [ type = FULL ]
-         <- (k == 0 && m-n >= band_size) ? descA(m, n)                                 [ type = UV ]
+         <- (k == 0 && m-n >= band_size) ? descA(m, n)                                 [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ]
          <- (m-n < band_size) ? C potrf_dgemm(m, n, k-1)                               [ type = FULL ]
-         <- C potrf_dgemm(m, n, k-1)                                                   [ type = UV ]
+         <- C potrf_dgemm(m, n, k-1)                                                   [ type = UV layout = parsec_datatype_double_t count = (descA->mb * storage_maxrank * 2) ]
          -> (n == k+1 && m-n < band_size) ? C potrf_dtrsm(m, n)                        [ type = FULL ]
          -> (n != k+1 && m-n < band_size) ? C potrf_dgemm(m, n, k+1)                   [ type = FULL ]
          -> (n == k+1 && m-n >= band_size) ? C potrf_dtrsm(m, n)                       [ layout = parsec_datatype_double_t count = size ]

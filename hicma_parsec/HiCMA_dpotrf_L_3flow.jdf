@@ -144,7 +144,7 @@ size = 1
 
 :descAu(m, n)
 
-READ Cu <- descAu(m, n)                                    [ type = UV ]
+READ Cu <- descAu(m, n)                                    [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
         -> Au potrf_dsyrk(n, m)                            [ layout = parsec_datatype_double_t count = size ]
         -> Au potrf_dgemm(m, 1..m-1, 0)                    [ layout = parsec_datatype_double_t count = size ]
         -> Bu potrf_dgemm(m+1..descAu->mt-1, m, 0)         [ layout = parsec_datatype_double_t count = size ]
@@ -296,7 +296,7 @@ size = 1
 
 // Parameters
 READ  T <- T potrf_dpotrf(k)                                         [ type = FULL ]
-RW    Cv <- (k == 0) ? descAv(m, k) : Cv potrf_dgemm(m, k, k-1)      [ type = UV ]
+RW    Cv <- (k == 0) ? descAv(m, k) : Cv potrf_dgemm(m, k, k-1)      [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
          -> Av potrf_dsyrk(k, m)                                     [ layout = parsec_datatype_double_t count = size ]
          -> Av potrf_dgemm(m, k+1..m-1, k)                           [ layout = parsec_datatype_double_t count = size ]
          -> Bv potrf_dgemm(m+1..descAg->mt-1, m, k)                  [ layout = parsec_datatype_double_t count = size ]
@@ -375,8 +375,8 @@ m = k+1 .. descAg->mt-1
 : descAg(m, m)
 
 //Parameters
-READ  Av <- Cv potrf_dtrsm(m, k)                                       [ type = UV ]
-READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)    [ type = UV ]
+READ  Av <- Cv potrf_dtrsm(m, k)                                       [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
+READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)    [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
 READ  Ar <- (k == 0) ? Cr READ_Cr(m, 0) : Cr potrf_dgemm(m, k, k-1)    [ type = AR ]
 
 RW    T <- (k == 0) ? descAg(m, m) : T potrf_dsyrk(k-1, m)             [ type = FULL ] 
@@ -448,17 +448,17 @@ size = 1
 : descAu(m, n)
 
 // Parameters
-READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)                      [ type = UV ]
-READ  Bu <- (k == 0) ? Cu READ_Cu(n, 0) : Cu potrf_dgemm(n, k, k-1)                      [ type = UV ]
-RW    Cu <- (k == 0) ? descAu(m, n) : Cu potrf_dgemm(m, n, k-1)                      [ type = UV ]
+READ  Au <- (k == 0) ? Cu READ_Cu(m, 0) : Cu potrf_dgemm(m, k, k-1)                      [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
+READ  Bu <- (k == 0) ? Cu READ_Cu(n, 0) : Cu potrf_dgemm(n, k, k-1)                      [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
+RW    Cu <- (k == 0) ? descAu(m, n) : Cu potrf_dgemm(m, n, k-1)                          [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
          -> (n == k+1) ? Au potrf_dgemm(m, n+1..m-1, n) : Cu potrf_dgemm(m, n, k+1)      [ layout = parsec_datatype_double_t count = size ]
          -> (n == k+1) ? Bu potrf_dgemm(m+1..descAu->mt-1, m, n)                         [ layout = parsec_datatype_double_t count = size ]
          -> (n == k+1) ? Au potrf_dsyrk(n, m)                                            [ layout = parsec_datatype_double_t count = size ]
          -> (n == k+1) ? descAu(m, n)                                                    [ layout = parsec_datatype_double_t count = size ]
 
-READ  Av <- Cv potrf_dtrsm(m, k)                                                         [ type = UV ]
-READ  Bv <- Cv potrf_dtrsm(n, k)                                                         [ type = UV ]
-RW    Cv <- (k == 0) ? descAv(m, n) : Cv potrf_dgemm(m, n, k-1)                      [ type = UV ]
+READ  Av <- Cv potrf_dtrsm(m, k)                                                         [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
+READ  Bv <- Cv potrf_dtrsm(n, k)                                                         [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
+RW    Cv <- (k == 0) ? descAv(m, n) : Cv potrf_dgemm(m, n, k-1)                          [ type = UV layout = parsec_datatype_double_t count = (descAu->mb * storage_maxrank) ]
          -> (n == k+1) ? Cv potrf_dtrsm(m, n) : Cv potrf_dgemm(m, n, k+1)                [ layout = parsec_datatype_double_t count = size ]
 
 READ  Ar <- (k == 0) ? Cr READ_Cr(m, 0) : Cr potrf_dgemm(m, k, k-1)                      [ type = AR ]
