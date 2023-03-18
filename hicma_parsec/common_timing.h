@@ -14,7 +14,7 @@ extern double sync_time_elapsed;
 static inline double Wtime(void)
 {
     struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC_COARSE, &ts);
+    clock_gettime(CLOCK_MONOTONIC, &ts);
     return ((double)ts.tv_sec) + (((double)ts.tv_nsec) * 1.0e-9);
 }
 #endif
@@ -57,12 +57,12 @@ static inline double Wtime(void)
 #elif defined(PARSEC_HAVE_LCI)
 extern _Noreturn void lci_abort(int exit_code);
 # define SYNC_TIME_START() do {                 \
-        lc_barrier(*lci_global_ep);             \
+        lci_barrier();                          \
         PARSEC_PROFILING_START();               \
         sync_time_elapsed = Wtime();            \
     } while(0)
 # define SYNC_TIME_STOP() do {                                  \
-        lc_barrier(*lci_global_ep);                             \
+        lci_barrier();                                          \
         sync_time_elapsed = Wtime() - sync_time_elapsed;        \
     } while(0)
 # define SYNC_TIME_PRINT(rank, print) do {                          \

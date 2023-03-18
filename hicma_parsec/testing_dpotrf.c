@@ -230,29 +230,29 @@ int check_diff( parsec_context_t *parsec, int verbose,
 }
 
 #if defined(PARSEC_HAVE_LCI)
-static void lci_sum_op_ul(void *dst, void *src, size_t count)
+static void lci_sum_op_ul(void *dst, const void *src, size_t count)
 {
     unsigned long *d = dst;
-    unsigned long *s = src;
+    const unsigned long *s = src;
     size_t c = count / sizeof(unsigned long);
     for (size_t i = 0; i < c; i++)
         d[i] += s[i];
 }
 
-static void lci_max_op_ul(void *dst, void *src, size_t count)
+static void lci_max_op_ul(void *dst, const void *src, size_t count)
 {
     unsigned long *d = dst;
-    unsigned long *s = src;
+    const unsigned long *s = src;
     size_t c = count / sizeof(unsigned long);
     for (size_t i = 0; i < c; i++)
         if (s[i] > d[i])
             d[i] = s[i];
 }
 
-static void lci_sum_op_d(void *dst, void *src, size_t count)
+static void lci_sum_op_d(void *dst, const void *src, size_t count)
 {
     double *d = dst;
-    double *s = src;
+    const double *s = src;
     size_t c = count / sizeof(double);
     for (size_t i = 0; i < c; i++)
         d[i] += s[i];
@@ -914,7 +914,8 @@ int main(int argc, char ** argv)
 #if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(tileopcounters, alltileopcounters, nelm_tileopcounters, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);  
 #elif defined(PARSEC_HAVE_LCI)
-    lc_alreduce(tileopcounters, alltileopcounters, nelm_tileopcounters * sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+    memcpy(alltileopcounters, tileopcounters, nelm_tileopcounters * sizeof(unsigned long));
+    lci_allreducel(alltileopcounters, nelm_tileopcounters * sizeof(unsigned long), lci_sum_op_ul);
 #else
     memcpy(alltileopcounters, tileopcounters, nelm_tileopcounters * sizeof(unsigned long));
 #endif
@@ -923,7 +924,8 @@ int main(int argc, char ** argv)
 #if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(opcounters, allopcounters, nelm_opcounters, MPI_UNSIGNED_LONG, MPI_MAX, 0, MPI_COMM_WORLD);  
 #elif defined(PARSEC_HAVE_LCI)
-    lc_alreduce(opcounters, allopcounters, nelm_opcounters * sizeof(unsigned long), lci_max_op_ul, *lci_global_ep);
+    memcpy(allopcounters, opcounters, nelm_opcounters * sizeof(unsigned long));
+    lci_allreducel(allopcounters, nelm_opcounters * sizeof(unsigned long), lci_max_op_ul);
 #else
     memcpy(allopcounters, opcounters, nelm_opcounters * sizeof(unsigned long));
 #endif
@@ -951,10 +953,14 @@ int main(int argc, char ** argv)
     MPI_Reduce(&op_path[0], &total_path, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&op_offpath[0], &total_offpath, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 #elif defined(PARSEC_HAVE_LCI)
-    lc_alreduce(&op_band[0],    &total_band,    sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
-    lc_alreduce(&op_offband[0], &total_offband, sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
-    lc_alreduce(&op_path[0],    &total_path,    sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
-    lc_alreduce(&op_offpath[0], &total_offpath, sizeof(unsigned long), lci_sum_op_ul, *lci_global_ep);
+    total_band    = op_band[0];
+    total_offband = op_offband[0];
+    total_path    = op_path[0];
+    total_offpath = op_offpath[0];
+    lci_allreducem(&total_band,    sizeof(unsigned long), lci_sum_op_ul);
+    lci_allreducem(&total_offband, sizeof(unsigned long), lci_sum_op_ul);
+    lci_allreducem(&total_path,    sizeof(unsigned long), lci_sum_op_ul);
+    lci_allreducem(&total_offpath, sizeof(unsigned long), lci_sum_op_ul);
 #else
     total_band = op_band[0];
     total_offband = op_offband[0];
@@ -966,7 +972,7 @@ int main(int argc, char ** argv)
 #if   defined(PARSEC_HAVE_MPI)
     MPI_Barrier(MPI_COMM_WORLD);
 #elif defined(PARSEC_HAVE_LCI)
-    lc_barrier(*lci_global_ep);
+    lci_barrier();
 #endif
 
     unsigned long total_numop = 0;
@@ -1018,7 +1024,8 @@ int main(int argc, char ** argv)
 #if   defined(PARSEC_HAVE_MPI)
     MPI_Reduce(critical_path_time, g_time, 6, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 #elif defined(PARSEC_HAVE_LCI)
-    lc_alreduce(critical_path_time, g_time, 6 * sizeof(double), lci_sum_op_d, *lci_global_ep);
+    memcpy(g_time, critical_path_time, 6 * sizeof(double));
+    lci_allreducem(g_time, 6 * sizeof(double), lci_sum_op_d);
 #else
     memcpy(g_time, critical_path_time, 6 * sizeof(double));
 #endif

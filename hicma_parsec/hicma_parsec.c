@@ -344,12 +344,9 @@ parsec_context_t* setup_parsec(int argc, char **argv, int *iparam, double *dpara
 	MPI_Comm_size(MPI_COMM_WORLD, &iparam[IPARAM_NNODES]);
 	MPI_Comm_rank(MPI_COMM_WORLD, &iparam[IPARAM_RANK]);
 #elif defined(PARSEC_HAVE_LCI)
-	/* address leaks via lci_global_ep, so must have static duration */
-	static lc_ep ep;
-	lc_init(1, &ep);
-	lci_global_ep = &ep;
-	lc_get_num_proc(&iparam[IPARAM_NNODES]);
-	lc_get_proc_num(&iparam[IPARAM_RANK]);
+	LCI_initialize();
+	iparam[IPARAM_NNODES] = LCI_NUM_PROCESSES;
+	iparam[IPARAM_RANK] = LCI_RANK;
 #else
 	iparam[IPARAM_NNODES] = 1;
 	iparam[IPARAM_RANK] = 0;
@@ -412,7 +409,7 @@ void cleanup_parsec(parsec_context_t* parsec, int *iparam)
 #if   defined(PARSEC_HAVE_MPI)
         MPI_Barrier(MPI_COMM_WORLD);
 #elif defined(PARSEC_HAVE_LCI)
-        lc_barrier(*lci_global_ep);
+        lci_barrier();
 #endif
     }
 #endif
@@ -421,16 +418,16 @@ void cleanup_parsec(parsec_context_t* parsec, int *iparam)
 #if   defined(PARSEC_HAVE_MPI)
 	MPI_Finalize();
 #elif defined(PARSEC_HAVE_LCI)
-	lc_finalize();
+	LCI_finalize();
 #endif
 	(void)iparam;
 }
 
 #if defined(PARSEC_HAVE_LCI)
-static void lci_max_op(void *dst, void *src, size_t count)
+static void lci_max_op(void *dst, const void *src, size_t count)
 {
 	int *d = dst;
-	int *s = src;
+	const int *s = src;
 	if (*s > *d)
 		*d = *s;
 }
@@ -639,7 +636,7 @@ int HiCMA_dpotrf_L( parsec_context_t *parsec,
 			     );
 #elif defined(PARSEC_HAVE_LCI)
 	if( A->super.nodes > 1 )
-		lc_alreduce(&info, &ginfo, sizeof(int), lci_max_op, *lci_global_ep);
+		lci_allreducem(&ginfo, sizeof(int), lci_max_op);
 #endif
 
 	return ginfo;

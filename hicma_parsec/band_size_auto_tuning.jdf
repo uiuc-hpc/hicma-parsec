@@ -173,17 +173,17 @@ void parsec_band_size_auto_tuning_Destruct(parsec_taskpool_t *taskpool)
 }
 
 #if defined(PARSEC_HAVE_LCI)
-static void lci_sum_op_ll(void *dst, void *src, size_t count)
+static void lci_sum_op_ll(void *dst, const void *src, size_t count)
 {
     long long int *d = dst;
-    long long int *s = src;
+    const long long int *s = src;
     *d += *s;
 }
 
-static void lci_max_op(void *dst, void *src, size_t count)
+static void lci_max_op(void *dst, const void *src, size_t count)
 {
     int *d = dst;
-    int *s = src;
+    const int *s = src;
     if (*s > *d)
         *d = *s;
 }
@@ -270,10 +270,13 @@ int parsec_band_size_auto_tuning(parsec_context_t *parsec,
         MPI_Allreduce(&band_maxrank_process, &band_maxrank, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
         MPI_Barrier(MPI_COMM_WORLD);
 #elif defined(PARSEC_HAVE_LCI)
-        lc_alreduce(&ops_total_tlr, &sum_tlr, sizeof(long long int), lci_sum_op_ll, *lci_global_ep);
-        lc_alreduce(&ops_total_dense, &sum_dense, sizeof(long long int), lci_sum_op_ll, *lci_global_ep);
-        lc_alreduce(&band_maxrank_process, &band_maxrank, sizeof(int), lci_max_op, *lci_global_ep);
-        lc_barrier(*lci_global_ep);
+        sum_tlr = ops_total_tlr;
+        sum_dense = ops_total_dense;
+        band_maxrank = band_maxrank_process;
+        lci_allreducem(&sum_tlr, sizeof(long long int), lci_sum_op_ll);
+        lci_allreducem(&sum_dense, sizeof(long long int), lci_sum_op_ll);
+        lci_allreducem(&band_maxrank, sizeof(int), lci_max_op);
+        lci_barrier();
 #else
         sum_tlr = ops_total_tlr;
         sum_dense = ops_total_dense;
