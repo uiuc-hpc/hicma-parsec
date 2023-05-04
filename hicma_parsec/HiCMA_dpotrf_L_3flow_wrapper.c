@@ -40,8 +40,8 @@ static int wrap_potrf_complete(parsec_execution_stream_t * es,
     int val;
     double end_time;
     parsec_HiCMA_dpotrf_L_3flow_taskpool_t *parsec_tp = (parsec_HiCMA_dpotrf_L_3flow_taskpool_t*)this_task->taskpool;
-    val = parsec_tp->_g_wrap_potrf_complete(es, (parsec_task_t *)this_task);
     end_time = Wtime();
+    val = parsec_tp->_g_wrap_potrf_complete(es, (parsec_task_t *)this_task);
     parsec_tp->_g_potrf_time[0] += end_time - parsec_tp->_g_potrf_time_temp[0]; 
     gather_time[es->th_id] += end_time - gather_time_tmp[es->th_id];
 
@@ -63,11 +63,9 @@ static int wrap_trsm(parsec_execution_stream_t * es,
 
     if(this_task->locals.m.value == this_task->locals.k.value + 1){
         /* Record start time of trsm */
-        parsec_tp->_g_trsm_time_temp[0] = Wtime();
-        return parsec_tp->_g_wrap_trsm(es, (parsec_task_t *)this_task);
-    } else {
-        return parsec_tp->_g_wrap_trsm(es, (parsec_task_t *)this_task);
+        parsec_tp->_g_trsm_time_temp[0] = gather_time_tmp[es->th_id];
     }
+    return parsec_tp->_g_wrap_trsm(es, (parsec_task_t *)this_task);
 }
 
 static int wrap_trsm_complete(parsec_execution_stream_t * es,
@@ -77,20 +75,16 @@ static int wrap_trsm_complete(parsec_execution_stream_t * es,
     int val;
     double end_time;
 
+    end_time = Wtime();
+    val = parsec_tp->_g_wrap_trsm_complete(es, (parsec_task_t *)this_task);
     if(this_task->locals.m.value == this_task->locals.k.value + 1){
-        val = parsec_tp->_g_wrap_trsm_complete(es, (parsec_task_t *)this_task);
-        end_time = Wtime();
         parsec_tp->_g_trsm_time[0] += end_time - parsec_tp->_g_trsm_time_temp[0];
-
 #if PRINT_CRITICAL_PATH_TIME
 	fprintf(stderr, "OUT_critical_path_time band_size %d Nodes %d Matrix %d TRSM %d end_time %lf start_time %lf exe_time %lf sum_time %lf\n",
 			parsec_tp->_g_band_size, parsec_tp->_g_descAg->super.nodes, parsec_tp->_g_descAg->lm,
 			this_task->locals.k.value, end_time, parsec_tp->_g_trsm_time_temp[0],
 			end_time - parsec_tp->_g_trsm_time_temp[0], parsec_tp->_g_trsm_time[0]);
 #endif
-    } else {
-        val = parsec_tp->_g_wrap_trsm_complete(es, (parsec_task_t *)this_task);
-        end_time = Wtime();
     }
 
     gather_time[es->th_id] += end_time - gather_time_tmp[es->th_id];
@@ -104,11 +98,9 @@ static int wrap_syrk(parsec_execution_stream_t * es,
     gather_time_tmp[es->th_id] = Wtime();
     if(this_task->locals.m.value == this_task->locals.k.value + 1){
         /* Record start time of syrk */
-        parsec_tp->_g_syrk_time_temp[0] = Wtime();
-        return parsec_tp->_g_wrap_syrk(es, (parsec_task_t *)this_task);
-    } else {
-        return parsec_tp->_g_wrap_syrk(es, (parsec_task_t *)this_task);
+        parsec_tp->_g_syrk_time_temp[0] = gather_time_tmp[es->th_id];
     }
+    return parsec_tp->_g_wrap_syrk(es, (parsec_task_t *)this_task);
 }
 
 static int wrap_syrk_complete(parsec_execution_stream_t * es,
@@ -118,9 +110,9 @@ static int wrap_syrk_complete(parsec_execution_stream_t * es,
     int val;
     double end_time;
 
+    end_time = Wtime();
+    val = parsec_tp->_g_wrap_syrk_complete(es, (parsec_task_t *)this_task);
     if(this_task->locals.m.value == this_task->locals.k.value + 1){
-        val = parsec_tp->_g_wrap_syrk_complete(es, (parsec_task_t *)this_task);
-        end_time = Wtime();
         parsec_tp->_g_syrk_time[0] += end_time - parsec_tp->_g_syrk_time_temp[0];
 
 #if PRINT_CRITICAL_PATH_TIME
@@ -129,9 +121,6 @@ static int wrap_syrk_complete(parsec_execution_stream_t * es,
 			this_task->locals.k.value, end_time, parsec_tp->_g_syrk_time_temp[0],
 			end_time - parsec_tp->_g_syrk_time_temp[0], parsec_tp->_g_syrk_time[0]);
 #endif
-    } else {
-        val = parsec_tp->_g_wrap_syrk_complete(es, (parsec_task_t *)this_task);
-        end_time = Wtime();
     }
 
     gather_time[es->th_id] += end_time - gather_time_tmp[es->th_id];
@@ -153,8 +142,8 @@ static int wrap_gemm_complete(parsec_execution_stream_t * es,
     parsec_HiCMA_dpotrf_L_3flow_taskpool_t *parsec_tp = (parsec_HiCMA_dpotrf_L_3flow_taskpool_t*)this_task->taskpool;
     int val;
     double start_time = gather_time_tmp[es->th_id];
-    val = parsec_tp->_g_wrap_gemm_complete(es, (parsec_task_t *)this_task);
     double end_time = Wtime();
+    val = parsec_tp->_g_wrap_gemm_complete(es, (parsec_task_t *)this_task);
     gather_time[es->th_id] += end_time - start_time; 
 
     if( DEBUG_INFO )
