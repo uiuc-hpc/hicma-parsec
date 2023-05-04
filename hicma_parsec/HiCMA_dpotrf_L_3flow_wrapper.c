@@ -327,6 +327,11 @@ HiCMA_dpotrf_L_3flow_New( parsec_context_t *parsec,
     hicma_dpotrf->_g_p_work_mbr = (parsec_memory_pool_t*)malloc(sizeof(parsec_memory_pool_t));
     parsec_private_memory_init( hicma_dpotrf->_g_p_work_mbr, A->mb * compmaxrank * sizeof(double) ); 
 
+    hicma_dpotrf->_g_PRI_CHANGE = dplasma_aux_get_priority_limit( "POTRF", A );
+    if(0 == hicma_dpotrf->_g_PRI_CHANGE) {
+        hicma_dpotrf->_g_PRI_CHANGE = A->nt;
+    }
+
     /* Arena */
     parsec_matrix_add2arena(&hicma_dpotrf->arenas_datatypes[PARSEC_HiCMA_dpotrf_L_3flow_FULL_ARENA],
             parsec_datatype_double_t, matrix_UpperLower,
