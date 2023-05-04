@@ -12,12 +12,12 @@ static unsigned long int op_counts(char op, unsigned long int a, unsigned long i
   if(op == 'q') {//geqrf  if m >= n
     unsigned long int m = a;
     unsigned long int n = b;
-    res = 2*m*n*n - (unsigned long int)(2*n*n*n/3.0f) + 2*m*n + (unsigned long int)(17*n/3.0f);
+    res = 2*m*n*n - (unsigned long int)(2*n*n*n/3.0f) + m*n + n*n + (unsigned long int)(14*n/3.0f);
     //printf("%lu %lu %lu\n", m, n, res);
   } 
   else if(op == 'c') {//potrf  
     unsigned long int n = a;
-    res = n*n*n/3 - n*n/2.0 + n/6 ;
+    res = n*n*n/3 + n*n/2.0 + n/6 ;
     //printf("%lu %lu\n",  n, res);
   }
   else if(op == 't') {//trsm  
