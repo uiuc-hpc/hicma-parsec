@@ -69,6 +69,7 @@ static void HiCMA_dpotrf_L_3flow_update_INFO(parsec_taskpool_t* _tp, const parse
         int myid = es->th_id;\
         opcounters[myrank*nth+myid] += cnt;  \
         tileopcounters[i*descAg->nt+j] += cnt; \
+        this_task->locals.flops.value = cnt; \
     }while(0);
 %}
 
@@ -214,6 +215,7 @@ k = 0 .. descAg->mt-1
 
 info = 0  /* For the info in the case of recursive calls */
 recursive_tpid = -1 /* For profiling the recursive taskpool id */
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 :descAg(k, k)
@@ -267,8 +269,8 @@ BODY
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descAg, k );
 
-    flop_counter flops;
-    HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
+    flop_counter flop_cnt;
+    HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flop_cnt);
     
     if(iinfo != 0){
         printf("%s %d: dpotrf failed with a return value of %d. k:%d uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, k, uplo, tempkm, T, ld_Ag_k);
@@ -293,6 +295,8 @@ k = 0 .. m-1
 
 // Control message size to send, it's the new Cr
 size = 1
+
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 : descAv(m, k)
@@ -338,11 +342,11 @@ BODY
     int ldak = BLKLDD( descAg, k );
     int ldam = BLKLDD( descAv, m );
 
-    flop_counter flops;
+    flop_counter flop_cnt;
     int Crank = *((int *)Cr);
 
     HCORE_dtrsm(dplasmaLeft, dplasmaLower, dplasmaNoTrans, dplasmaNonUnit,
-            tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
+            tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flop_cnt );
 
     /* Pass Cr value to size */
     if(send_full_tile == 1){
@@ -373,6 +377,8 @@ potrf_dsyrk(k, m) [high_priority = on]
 // Execution space
 k = 0   .. descAg->mt-2
 m = k+1 .. descAg->mt-1
+
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 : descAg(m, m)
@@ -405,13 +411,13 @@ BODY
     void *p_elem_work = NULL;
     p_elem_work = parsec_private_memory_pop( p_work );
 
-    flop_counter flops;
+    flop_counter flop_cnt;
     HCORE_dsyrk(dplasmaLower, dplasmaNoTrans,
                tempmm, rank,
                (double)-1.0, 
                Au /*A(m, k)*/, ldau,
                Av /*A(m, k)*/, ldav,
-               (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work, &flops);
+               (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work, &flop_cnt);
     parsec_private_memory_push( p_work, p_elem_work );
 
     /* Operation count */
@@ -446,6 +452,8 @@ n = k+1 .. m-1
 
 // Control message size to send, it's the new Cr
 size = 1
+
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 : descAu(m, n)
@@ -535,7 +543,7 @@ BODY
     double* CVclone;
     int ld_CVclone;
     double* _CV_save;
-    flop_counter flops;
+    flop_counter flop_cnt;
     HCORE_dgemm_qr_svd( dplasmaNoTrans, dplasmaTrans,
 		    tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
 		    tempmmv,
@@ -545,7 +553,7 @@ BODY
 		    (double)1.0,
 		    Cu, Cv, Cr, ldamu,
 		    rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
-            &flops,
+            &flop_cnt,
 		    /** parameters that will be passed to HCORE_dgemm_ormqr */
 		    &work_new,
 		    &_CU,
@@ -593,7 +601,7 @@ BODY
 		    (double)1.0,
 		    Cu, Cv, Cr, ldamu,
 		    rk, storage_maxrank, computation_maxrank, acc, work_new,
-            &flops,
+            &flop_cnt,
 		    /** parameters coming from HCORE_dgemm_qr_svd */
 		    _CU,
 		    _CV,

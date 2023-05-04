@@ -69,6 +69,7 @@ static void HiCMA_dpotrf_L_2flow_update_INFO(parsec_taskpool_t* _tp, const parse
         int myid = es->th_id;\
         opcounters[myrank*nth+myid] += cnt;  \
         tileopcounters[i*descA->nt+j] += cnt; \
+        this_task->locals.flops.value = cnt; \
     }while(0);
 %}
 
@@ -179,6 +180,7 @@ k = 0 .. descA->mt-1
 
 info = 0  /* For the info in the case of recursive calls */
 recursive_tpid = -1 /* For profiling the recursive taskpool id */
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 :descA(k, k)
@@ -232,8 +234,8 @@ BODY
     int tempkm = k == descA->mt-1 ? descA->m - k*descA->mb : descA->mb;
     int iinfo = 0;
     int ld_Ag_k = BLKLDD( descA, k );
-    flop_counter flops;
-    HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flops);
+    flop_counter flop_cnt;
+    HCORE_dpotrf( dplasma_lapack_const(uplo), tempkm, T, ld_Ag_k, &iinfo, &flop_cnt);
 
     if(iinfo != 0){
         printf("%s %d: dpotrf failed with a return value of %d. k:%d uplo:%d m:%d A:%p lda:%d\n", __FILE__, __LINE__, iinfo, k, uplo, tempkm, T, ld_Ag_k);
@@ -261,6 +263,7 @@ k = 0 .. m-1
 size = 1
 
 recursive_tpid = -1 /* For profiling the recursive taskpool id */
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 : descA(m, k)
@@ -391,10 +394,10 @@ BODY
         int ldam = BLKLDD( descA, m );
         void *Cv = (void *)C + descA->mb * ((int *)Cr)[0] * sizeof(double);
 
-        flop_counter flops;
+        flop_counter flop_cnt;
         int Crank = *((int *)Cr);
         HCORE_dtrsm(dplasmaLeft, dplasmaLower, dplasmaNoTrans, dplasmaNonUnit,
-                tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flops  );
+                tempmm, Crank, (double)1.0, T, ldak, Cv, ldam, &flop_cnt );
 
         /* Pass Cr value to size */
         if(send_full_tile == 1){
@@ -419,6 +422,7 @@ k = 0   .. descA->mt-2
 m = k+1 .. descA->mt-1
 
 recursive_tpid = -1 /* For profiling the recursive taskpool id */
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 : descA(m, m)
@@ -532,13 +536,13 @@ BODY
 
 #if call_hcore_dsyrk
         void *p_elem_work = parsec_private_memory_pop( p_work );
-        flop_counter flops;
+        flop_counter flop_cnt;
         HCORE_dsyrk(dplasmaLower, dplasmaNoTrans,
                    tempmm, rank,
                    (double)-1.0, 
                    Au /*A(m, k)*/, ldau,
                    Av /*A(m, k)*/, ldav,
-                   (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work, &flops);
+                   (double) 1.0, T /*A(m, m)*/, ldam, p_elem_work, &flop_cnt);
         parsec_private_memory_push( p_work, p_elem_work );
 
 /* If want to call 3 gemms instead */
@@ -590,6 +594,7 @@ n = k+1 .. m-1
 size = 1
 
 recursive_tpid = -1 /* For profiling the recursive taskpool id */
+flops = 0 /* For profiling compute intensity */
 
 // Parallel partitioning
 : descA(m, n)
@@ -838,7 +843,7 @@ BODY
         double* CVclone;
         int ld_CVclone;
         double* _CV_save;
-        flop_counter flops;
+        flop_counter flop_cnt;
         HCORE_dgemm_qr_svd_b_dense( dplasmaNoTrans, dplasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
@@ -848,7 +853,7 @@ BODY
                 (double)1.0,
                 Cu, Cv, &new_Crank, ldamu,
                 rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
-                &flops,
+                &flop_cnt,
                 /** parameters that will be passed to HCORE_dgemm_ormqr */
                 &work_new,
                 &_CU,
@@ -892,7 +897,7 @@ BODY
                 (double)1.0,
                 Cu, Cv, &new_Crank, ldamu,
                 rk, 2*storage_maxrank, computation_maxrank, acc, work_new,
-                &flops,
+                &flop_cnt,
                 /** parameters coming from HCORE_dgemm_qr_svd */
                 _CU,
                 _CV,
@@ -993,7 +998,7 @@ BODY
         double* CVclone;
         int ld_CVclone;
         double* _CV_save;
-        flop_counter flops;
+        flop_counter flop_cnt;
         HCORE_dgemm_qr_svd( dplasmaNoTrans, dplasmaTrans,
                 tempmmv, // ASSUMPTION: For a tile, if nrows<ncols, storage is ncols for both U and V
                 tempmmv,
@@ -1003,7 +1008,7 @@ BODY
                 (double)1.0,
                 Cu, Cv, Cr, ldamu,
                 rk, storage_maxrank, computation_maxrank, acc, p_elem_work,
-                &flops,
+                &flop_cnt,
                 /** parameters that will be passed to HCORE_dgemm_ormqr */
                 &work_new,
                 &_CU,
@@ -1047,7 +1052,7 @@ BODY
                 (double)1.0,
                 Cu, Cv, Cr, ldamu,
                 rk, storage_maxrank, computation_maxrank, acc, work_new,
-                &flops,
+                &flop_cnt,
                 /** parameters coming from HCORE_dgemm_qr_svd */
                 _CU,
                 _CV,
