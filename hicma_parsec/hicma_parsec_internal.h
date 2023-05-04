@@ -17,6 +17,7 @@
 #include <parsec/execution_stream.h>
 #include <parsec/runtime.h>
 #include <parsec/profiling.h>
+#include <parsec/parsec_stats.h>
 #include <parsec/parsec_internal.h>
 #include <parsec/utils/debug.h>
 #include <parsec/utils/zone_malloc.h>

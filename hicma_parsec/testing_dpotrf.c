@@ -776,6 +776,13 @@ int main(int argc, char ** argv)
     double *g_time = calloc(6, sizeof(double));
     double *critical_path_time = calloc(6, sizeof(double));
 
+#ifdef PARSEC_STATS_SCHED
+    parsec_sched_stat_reset(parsec);
+#endif
+#ifdef PARSEC_STATS_COMM
+    parsec_comm_stat_reset(parsec);
+#endif
+
     /* Timer start */
     SYNC_TIME_START();
 
@@ -796,6 +803,13 @@ int main(int argc, char ** argv)
 			    HNB, P, Q, NB, N, two_flow, gflops=(flops/1e9)/sync_time_elapsed));
     /* Record time */
     time_hicma = sync_time_elapsed;
+
+#ifdef PARSEC_STATS_SCHED
+    parsec_sched_stat_print(parsec);
+#endif
+#ifdef PARSEC_STATS_COMM
+    parsec_comm_stat_print(parsec);
+#endif
 
     if( 0 == rank && info != 0 ) {
             printf("-- Factorization is suspicious (info = %d) ! \n", info);
